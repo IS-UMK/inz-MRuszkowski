@@ -1,8 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollBar?>
+<?import javafx.scene.layout.BorderPane?>
 
-
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SongCreatorWindow.SongCreator">
-
-</AnchorPane>
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+   <right>
+      <ScrollBar orientation="VERTICAL" BorderPane.alignment="CENTER" />
+   </right>
+   <bottom>
+      <ScrollBar BorderPane.alignment="CENTER" />
+   </bottom>
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+         <menus>
+            <Menu mnemonicParsing="false" text="Project">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="Save" />
+                  <MenuItem mnemonicParsing="false" text="Save As" />
+                  <MenuItem mnemonicParsing="false" text="Load" />
+                  <MenuItem mnemonicParsing="false" text="Export" />
+                  <MenuItem mnemonicParsing="false" text="Import" />
+               </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Paths">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="New Path" />
+                  <Menu mnemonicParsing="false" text="Select Path">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Action 1" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Delete Path">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Action 1" />
+                     </items>
+                  </Menu>
+                  <MenuItem mnemonicParsing="false" text="Rename Selected" />
+                  <MenuItem mnemonicParsing="false" text="Delete Selected" />
+                  <MenuItem mnemonicParsing="false" text="Record Path" />
+               </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Notes">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="Insert Note" />
+                  <MenuItem mnemonicParsing="false" text="Edit Note" />
+                  <MenuItem mnemonicParsing="false" text="Delete Note" />
+               </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Song">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="Play" />
+                  <MenuItem mnemonicParsing="false" text="Print Song" />
+               </items>
+            </Menu>
+         </menus>
+      </MenuBar>
+   </top>
+</BorderPane>
