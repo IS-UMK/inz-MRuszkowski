@@ -18,15 +18,15 @@ import org.jfugue.player.Player;
  *
  * @author Mateusz Ruszkowski
  */
-public class MainWindow {
+public class MainWindow extends Application{
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO: Wstawić kod na repozytorium
+        launch(args);
         //new SongCreator();
-
+        /*
         // This is “Twinkle, twinkle, little star”
         Pattern pattern1 = new Pattern("C5q C5q G5q G5q A5q A5q Gh");
         // This is “How I wonder what you are”
@@ -44,6 +44,34 @@ public class MainWindow {
         twinkleSong.add(pattern2);
 
         Player player = new Player();
-        player.play(twinkleSong);
+        player.play(twinkleSong);*/
+    }
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        Parent root = FXMLLoader.load(getClass().getResource("MainWindow.fxml"));
+
+        Scene scene = new Scene(root, 600, 800);
+
+        stage.setTitle("Song Creator Window");
+        stage.setScene(scene);
+        stage.show();
     }
 }
+/*public class SongCreator extends Application
+{
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        Parent root = FXMLLoader.load(getClass().getResource("SongCreator.fxml"));
+
+        Scene scene = new Scene(root, 600, 800);
+
+        stage.setTitle("Song Creator Window");
+        stage.setScene(scene);
+        stage.show();
+    }
+}*/
