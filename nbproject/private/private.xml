@@ -2,16 +2,6 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/D:/Netbeans/Projects/MusicCreator/src/Model/Duration.java</file>
-            <file>file:/D:/Netbeans/Projects/MusicCreator/src/Model/Instrument.java</file>
-            <file>file:/D:/Netbeans/Projects/MusicCreator/build.xml</file>
-            <file>file:/D:/Netbeans/Projects/MusicCreator/lib/nblibraries.properties</file>
-            <file>file:/D:/Netbeans/Projects/MusicCreator/src/Model/NoteToNumericValue.java</file>
-            <file>file:/D:/Netbeans/Projects/MusicCreator/src/Model/Acord.java</file>
-            <file>file:/D:/Netbeans/Projects/MusicCreator/src/Model/Note.java</file>
-            <file>file:/D:/Netbeans/Projects/MusicCreator/src/Model/IPlayable.java</file>
-            <file>file:/D:/Netbeans/Projects/MusicCreator/src/Model/Path.java</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>

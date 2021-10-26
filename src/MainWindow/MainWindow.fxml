@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainWindow.Controller">
   <columnConstraints>
     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -20,7 +20,7 @@
    <children>
       <BorderPane>
          <center>
-            <ListView BorderPane.alignment="CENTER">
+            <ListView id="listWithSongProjects" fx:id="listViewWithSongProjects" BorderPane.alignment="CENTER">
                <BorderPane.margin>
                   <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                </BorderPane.margin>
@@ -46,14 +46,12 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="152.0" minHeight="10.0" prefHeight="152.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
                   <BorderPane>
                      <center>
-                        <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Play Song" BorderPane.alignment="CENTER">
+                        <Button id="playSongDirectlyFromFileButton" fx:id="playSongDirectlyFromFileButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#PlaySongDirectlyFromFile" text="Play Song from MIDI File" BorderPane.alignment="CENTER">
                            <BorderPane.margin>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </BorderPane.margin>
@@ -65,7 +63,7 @@
                   </BorderPane>
                   <BorderPane GridPane.rowIndex="1">
                      <center>
-                        <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Create New" BorderPane.alignment="CENTER">
+                        <Button id="createNewSongButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#CreateNewSongProject" text="Create New" BorderPane.alignment="CENTER">
                            <BorderPane.margin>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </BorderPane.margin>
@@ -74,7 +72,7 @@
                   </BorderPane>
                   <BorderPane GridPane.rowIndex="2">
                      <center>
-                        <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Edit" BorderPane.alignment="CENTER">
+                        <Button id="editSongProjectFromListButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#EditSongProjectFromList" text="Edit" BorderPane.alignment="CENTER">
                            <BorderPane.margin>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </BorderPane.margin>
@@ -83,7 +81,7 @@
                   </BorderPane>
                   <BorderPane GridPane.rowIndex="3">
                      <center>
-                        <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Open" BorderPane.alignment="CENTER">
+                        <Button id="openSongProjectFromFile" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#OpenSongProjectFromFile" text="Open" BorderPane.alignment="CENTER">
                            <BorderPane.margin>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </BorderPane.margin>
@@ -92,7 +90,7 @@
                   </BorderPane>
                   <BorderPane GridPane.rowIndex="4">
                      <center>
-                        <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Remove From List" BorderPane.alignment="CENTER">
+                        <Button id="removeSongProjectFromListButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#RemoveSongProjectFromList" text="Remove From List" BorderPane.alignment="CENTER">
                            <BorderPane.margin>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </BorderPane.margin>
@@ -101,7 +99,7 @@
                   </BorderPane>
                   <BorderPane GridPane.rowIndex="5">
                      <center>
-                        <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Delete File" BorderPane.alignment="CENTER">
+                        <Button id="deleteSongProjectFromDiskButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#DeleteSongProjectFromDisk" text="Delete File" BorderPane.alignment="CENTER">
                            <BorderPane.margin>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </BorderPane.margin>
@@ -110,7 +108,7 @@
                   </BorderPane>
                   <BorderPane GridPane.rowIndex="6">
                      <center>
-                        <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Move Up" BorderPane.alignment="CENTER">
+                        <Button id="moveSongProjectUpOnListButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#MoveSongProjectUpOnList" text="Move Up" BorderPane.alignment="CENTER">
                            <BorderPane.margin>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </BorderPane.margin>
@@ -119,7 +117,7 @@
                   </BorderPane>
                   <BorderPane GridPane.rowIndex="7">
                      <center>
-                        <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Move Down" BorderPane.alignment="CENTER">
+                        <Button id="moveSongProjectDownOnListButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#MoveSongProjectDownOnList" text="Move Down" BorderPane.alignment="CENTER">
                            <BorderPane.margin>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </BorderPane.margin>
@@ -128,17 +126,17 @@
                   </BorderPane>
                   <BorderPane GridPane.rowIndex="8">
                      <center>
-                        <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Exit" BorderPane.alignment="CENTER">
+                        <Button id="exitFromAppButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#ExitFromApp" text="Exit" BorderPane.alignment="CENTER">
                            <BorderPane.margin>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                            </BorderPane.margin>
                         </Button>
                      </center>
                   </BorderPane>
-                  <BorderPane GridPane.rowIndex="10">
-                     <center>
-                        <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER" />
-                     </center>
+                  <BorderPane GridPane.rowIndex="9">
+                     <top>
+                        <Label id="logLabel" fx:id="logLabel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="143.0" prefWidth="359.0" BorderPane.alignment="CENTER" />
+                     </top>
                   </BorderPane>
                </children>
                <padding>
