@@ -36,7 +36,6 @@ public class MainWindow extends Application{
         StageToDeleteLater = stage;
         stage.setTitle("Menu Window");
         stage.setScene(scene);
-        ((Label)scene.lookup("#logLabel")).setText("Welcome to open source music creator!");
         stage.show();
     }
 }

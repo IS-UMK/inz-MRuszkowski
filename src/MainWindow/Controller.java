@@ -10,9 +10,11 @@ import javafx.stage.Stage;
 import org.jfugue.midi.MidiFileManager;
 import org.jfugue.pattern.Pattern;
 import org.jfugue.player.ManagedPlayer;
+import org.jfugue.player.ManagedPlayerListener;
 import org.jfugue.player.Player;
 
 import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.Sequence;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -26,20 +28,57 @@ public class Controller
     private ListView<String> listViewWithSongProjects;
     private HashMap<String, String> listModelWithSongProjects = new HashMap<String, String>();
 
-    //Logs in main window
-    @FXML
-    private Label logLabel;
-    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy");
-
     //When music is played from MainWindow
     @FXML
     Button playSongDirectlyFromFileButton;
     Player player = new Player();
     ManagedPlayer managedPlayer = player.getManagedPlayer();
 
-    private void appendTextToLogLabel(String message)
+    public Controller()
     {
-        logLabel.setText(String.format("%s\n%s - %s", logLabel.getText(), message, dtf.format(LocalDateTime.now())));
+        managedPlayer.addManagedPlayerListener(new ManagedPlayerListener() {
+            @Override
+            public void onStarted(Sequence sequence) {
+                playSongDirectlyFromFileButton.setText("Stop Playing");
+            }
+
+            @Override
+            public void onFinished() {
+                playSongDirectlyFromFileButton.setText("Play Song from MIDI File");
+            }
+
+            @Override
+            public void onPaused() {
+
+            }
+
+            @Override
+            public void onResumed() {
+
+            }
+
+            @Override
+            public void onSeek(long l) {
+
+            }
+
+            @Override
+            public void onReset() {
+                playSongDirectlyFromFileButton.setText("Play Song from MIDI File");
+            }
+        });
+    }
+
+    //Logs in main window
+    @FXML
+    Label logLabel;
+
+    private class Logger {
+        static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy");
+
+        public static void appendTextToLogLabel(Label logLabel, String message) {
+            logLabel.setText(String.format("%s\n%s - %s", logLabel.getText(), message, dtf.format(LocalDateTime.now())));
+        }
     }
 
     //Events when button click occurs below
@@ -54,30 +93,49 @@ public class Controller
 
                 Pattern patternFromFile = MidiFileManager.loadPatternFromMidi(file);
 
-                new Thread(() -> {
-                    //TODO: Jak wysłać wiadomość z innego wątku?
+                var playing = new PlaySongThread(
+                        logLabel,
+                        Logger.class.getMethod("appendTextToLogLabel"),
+                        player,
+                        managedPlayer,
+                        patternFromFile
+                );
+                new Thread(playing).start();
+                /*new Thread(() -> {
+                    //TODO: Jak wysłać wiadomość z innego wątku? Czy można uruchamiać funkcje z innego wątku?
                     //appendTextToLogLabel(String.format("Playing song %s has started", file.getName()));
 
                     if (!managedPlayer.isPlaying()) {
                         player.play(patternFromFile);
+
+                        while(!this.managedPlayer.isFinished()) {
+                            try {
+                                Thread.sleep(20L);
+                            } catch (InterruptedException var3) {
+                            }
+                        }
+
+                        //playSongDirectlyFromFileButton.setText("Play Song from MIDI File");
                     } else {
                         //appendTextToLogLabel(String.format("Cannot play song because there is already different one playing", file.getName()));
                         return;
                     }
 
                     //appendTextToLogLabel(String.format("Playing song %s has been finished", file.getName()));
-                }).start();
+                }).start();*/
 
-                playSongDirectlyFromFileButton.setText("Stop Playing");
+                //playSongDirectlyFromFileButton.setText("Stop Playing");
             } catch (RuntimeException e) {
-                appendTextToLogLabel("Loading song aborted");
+                Logger.appendTextToLogLabel(logLabel,"Loading song aborted");
                 return;
             } catch (InvalidMidiDataException e) {
                 e.printStackTrace();
-                appendTextToLogLabel(e.getMessage());
+                Logger.appendTextToLogLabel(logLabel, e.getMessage());
             } catch (IOException e) {
                 e.printStackTrace();
-                appendTextToLogLabel(e.getMessage());
+                Logger.appendTextToLogLabel(logLabel, e.getMessage());
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
             }
         }
 
@@ -99,7 +157,7 @@ public class Controller
             stage.setScene(scene);
             stage.show();
 
-            appendTextToLogLabel("New song project has been created");
+            Logger.appendTextToLogLabel(logLabel,"New song project has been created");
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
@@ -116,11 +174,11 @@ public class Controller
             //TODO: Jak przekazać referencje pliku to nowego okna?
             //plik jest już czytany w nowych oknie
 
-            appendTextToLogLabel(String.format("Project %s has been opened", file.getName()));
+            Logger.appendTextToLogLabel(logLabel,String.format("Project %s has been opened", file.getName()));
         }
         catch (RuntimeException e)
         {
-            appendTextToLogLabel("None item is selected to be edited");
+            Logger.appendTextToLogLabel(logLabel,"None item is selected to be edited");
         }
     }
 
@@ -148,11 +206,11 @@ public class Controller
             //TODO: Jak przekazać referencje pliku to nowego okna?
             //plik jest już czytany w nowych oknie
 
-            appendTextToLogLabel(String.format("Project %s has been opened", fileName));
+            Logger.appendTextToLogLabel(logLabel,String.format("Project %s has been opened", fileName));
         }
         catch (RuntimeException e)
         {
-            appendTextToLogLabel("Loading project aborted");
+            Logger.appendTextToLogLabel(logLabel,"Loading project aborted");
             return;
         }
     }
@@ -183,7 +241,7 @@ public class Controller
         try {
             String selectedItem = listViewWithSongProjects.getSelectionModel().getSelectedItem();
             listViewWithSongProjects.getItems().remove(selectedItem);
-            appendTextToLogLabel(String.format("Project %s has been removed from list", selectedItem));
+            Logger.appendTextToLogLabel(logLabel,String.format("Project %s has been removed from list", selectedItem));
 
             if(removeAlsoFromDisk)
             {
@@ -192,10 +250,10 @@ public class Controller
                 File file = new File(path);
                 if(file.delete())
                 {
-                    appendTextToLogLabel(String.format("File %s deleted successfully", file.getName()));
+                    Logger.appendTextToLogLabel(logLabel,String.format("File %s deleted successfully", file.getName()));
                 }
                 else{
-                    appendTextToLogLabel(String.format("Could not delete file %s", file.getName()));
+                    Logger.appendTextToLogLabel(logLabel,String.format("Could not delete file %s", file.getName()));
                 }
             }
 
@@ -203,7 +261,7 @@ public class Controller
         }
         catch (RuntimeException e)
         {
-            appendTextToLogLabel("None item is selected to be removed");
+            Logger.appendTextToLogLabel(logLabel,"None item is selected to be removed");
         }
     }
 
@@ -230,7 +288,7 @@ public class Controller
 
         listViewWithSongProjects.getItems().remove(selectedItem);
         listViewWithSongProjects.getItems().add(index + movement,selectedItem);
-        appendTextToLogLabel(String.format("Project %s moved %s on list", selectedItem, (movement < 0) ? "up" : "down"));
+        Logger.appendTextToLogLabel(logLabel,String.format("Project %s moved %s on list", selectedItem, (movement < 0) ? "up" : "down"));
     }
 
     public void ExitFromApp(javafx.event.ActionEvent actionEvent)
