@@ -150,7 +150,7 @@ public class Controller
         try {
             Parent root = FXMLLoader.load(getClass().getResource("../SongCreatorWindow/SongCreator.fxml"));
 
-            Scene scene = new Scene((Parent)root, 600, 800);
+            Scene scene = new Scene((Parent)root, 800, 600);
 
             Stage stage = new Stage();
             stage.setTitle("Song Creator Window");

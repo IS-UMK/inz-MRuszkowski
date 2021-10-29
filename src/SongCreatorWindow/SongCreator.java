@@ -16,7 +16,7 @@ public class SongCreator extends Application
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("SongCreator.fxml"));
 
-        Scene scene = new Scene(root, 600, 800);
+        Scene scene = new Scene(root, 800, 600);
 
         stage.setTitle("Song Creator Window");
         stage.setScene(scene);

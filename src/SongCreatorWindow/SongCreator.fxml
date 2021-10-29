@@ -3,34 +3,26 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ScrollBar?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
 
-<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
-   <right>
-      <ScrollBar orientation="VERTICAL" BorderPane.alignment="CENTER" />
-   </right>
-   <bottom>
-      <ScrollBar BorderPane.alignment="CENTER" />
-   </bottom>
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SongCreatorWindow.Controllers.MainController">
    <top>
       <MenuBar BorderPane.alignment="CENTER">
          <menus>
             <Menu mnemonicParsing="false" text="Project">
                <items>
-                  <MenuItem mnemonicParsing="false" text="Save" />
-                  <MenuItem mnemonicParsing="false" text="Save As" />
-                  <MenuItem mnemonicParsing="false" text="Load" />
-                  <MenuItem mnemonicParsing="false" text="Export" />
-                  <MenuItem mnemonicParsing="false" text="Import" />
+                  <MenuItem mnemonicParsing="false" onAction="#SaveProjectToFile" text="Save" />
+                  <MenuItem mnemonicParsing="false" onAction="#SaveProjectToFileWithDifferentName" text="Save As" />
+                  <MenuItem mnemonicParsing="false" onAction="#LoadProjectFromFile" text="Load" />
+                  <MenuItem mnemonicParsing="false" onAction="#ExportProjectToMIDIFile" text="Export" />
+                  <MenuItem mnemonicParsing="false" onAction="#ImportProjectFromMIDIFile" text="Import" />
                </items>
             </Menu>
             <Menu mnemonicParsing="false" text="Paths">
                <items>
-                  <MenuItem mnemonicParsing="false" text="New Path" />
+                  <MenuItem mnemonicParsing="false" onAction="#InsertNewPath" text="New Path" />
                   <Menu mnemonicParsing="false" text="Select Path">
                      <items>
                         <MenuItem mnemonicParsing="false" text="Action 1" />
@@ -41,37 +33,32 @@
                         <MenuItem mnemonicParsing="false" text="Action 1" />
                      </items>
                   </Menu>
-                  <MenuItem mnemonicParsing="false" text="Rename Selected" />
-                  <MenuItem mnemonicParsing="false" text="Delete Selected" />
-                  <MenuItem mnemonicParsing="false" text="Record Path" />
+                  <MenuItem mnemonicParsing="false" onAction="#RenameSelected" text="Rename Selected" />
+                  <MenuItem mnemonicParsing="false" onAction="#DeleteSelected" text="Delete Selected" />
+                  <MenuItem mnemonicParsing="false" onAction="#RecordPath" text="Record Path" />
                </items>
             </Menu>
             <Menu mnemonicParsing="false" text="Notes">
                <items>
-                  <MenuItem mnemonicParsing="false" text="Insert Note" />
-                  <MenuItem mnemonicParsing="false" text="Edit Note" />
-                  <MenuItem mnemonicParsing="false" text="Delete Note" />
+                  <MenuItem mnemonicParsing="false" onAction="#InsertNote" text="Insert Note" />
+                  <MenuItem mnemonicParsing="false" onAction="#EditNote" text="Edit Note" />
+                  <MenuItem mnemonicParsing="false" onAction="#DeleteNote" text="Delete Note" />
                </items>
             </Menu>
             <Menu mnemonicParsing="false" text="Song">
                <items>
-                  <MenuItem mnemonicParsing="false" text="Play" />
-                  <MenuItem mnemonicParsing="false" text="Print Song" />
+                  <MenuItem mnemonicParsing="false" onAction="#PlayAllPathsWithoutMutedOnes" text="Play" />
+                  <MenuItem mnemonicParsing="false" onAction="#PrintSongToPDFFile" text="Print Song" />
                </items>
             </Menu>
          </menus>
       </MenuBar>
    </top>
    <center>
-      <GridPane prefWidth="586.0" BorderPane.alignment="CENTER">
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-      </GridPane>
+      <ScrollPane fx:id="scrollPaneWithPaths" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <content>
+          <AnchorPane fx:id="anchorPaneWithPaths" />
+        </content>
+      </ScrollPane>
    </center>
 </BorderPane>
