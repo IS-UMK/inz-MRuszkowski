@@ -57,7 +57,7 @@
    <center>
       <ScrollPane fx:id="scrollPaneWithPaths" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <content>
-            <AnchorPane fx:id="anchorPaneWithPaths" />
+            <AnchorPane fx:id="anchorPaneWithPaths" onMouseClicked="#InsertNoteOnMouseClicked" />
          </content>
       </ScrollPane>
    </center>

@@ -1,7 +1,6 @@
 package SongCreatorWindow.Controllers;
 
 import Model.Path;
-import com.sun.javafx.geom.Rectangle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
@@ -10,15 +9,14 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -31,9 +29,16 @@ public class MainController
     @FXML
     AnchorPane anchorPaneWithPaths;
 
+    //Constants
     double Height = workSpace != null ? workSpace.getHeight() / 3 : 200;
     double Width = Screen.getPrimary().getBounds().getWidth();
+
+    //Data structures for GUI Components
     List<Canvas> canvasList = new LinkedList<Canvas>();
+    HashMap<Canvas, Slider> sliderMap = new HashMap<Canvas, Slider>();
+
+    //Data structures for program logic
+    List<Path> musicPaths = new LinkedList<Path>();
 
     //region Project
     public void SaveProjectToFile(ActionEvent actionEvent)
@@ -79,6 +84,7 @@ public class MainController
 
         //create canvas and set its size
         Canvas canvas = new Canvas(Width, Height);
+        canvas.setLayoutY(Height * canvasList.size());
 
         //paint new path on new canvas
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -125,7 +131,7 @@ public class MainController
         volumeSlider.setShowTickMarks(true);
         volumeSlider.setShowTickLabels(true);
         volumeSlider.setLayoutX(Height * 2.15);
-        volumeSlider.setLayoutY(Height * .75);
+        volumeSlider.setLayoutY(Height * canvasList.size() + Height * .75);
 
         //five lines for inserting notes
         gc.setLineWidth(2);
@@ -135,6 +141,11 @@ public class MainController
         //add (default Violin) music key
         Image violinKeyImage = new Image(MainController.class.getResource("/Images/violin_key.png").toString(), 100, 170.62, false, false);
         gc.drawImage(violinKeyImage, Height * 3, Height / 13);
+
+        //Save created components
+        musicPaths.add(path);
+        canvasList.add(canvas);
+        sliderMap.put(canvas, volumeSlider);
 
         //add created canvas and volume slider
         anchorPaneWithPaths.getChildren().add(canvas);
@@ -183,6 +194,34 @@ public class MainController
     public void PrintSongToPDFFile(ActionEvent actionEvent)
     {
 
+    }
+    //endregion
+
+
+    //region MouseEvents
+    public void InsertNoteOnMouseClicked(MouseEvent mouseEvent)
+    {
+        double x = mouseEvent.getX();
+        double y = mouseEvent.getY();
+
+        System.out.println(String.format("User Clicked left mouse button at position: X - %f, Y - %f", x, y));
+
+        if(x > 3 * Height + 100) // 100 - rozmiar klucza wiolinowego, może lepiej by było to sparametryzowane
+        {
+            Image noteImage = new Image(MainController.class.getResource("/Images/quarter_note.png").toString(), 100, 100, false, false);
+
+            int index = (int)y / (int)Height;
+            System.out.println(String.format("The selected path where to insert note: %d", index));
+
+            var canvas = canvasList.get(index);
+
+            var gc = canvas.getGraphicsContext2D();
+
+            double insertX = x - 45;
+            double insertY = y - 80 - Height * index;
+            System.out.println(String.format("Note inserted at: X - %f, Y - %f", insertX, insertY));
+            gc.drawImage(noteImage, insertX, insertY);
+        }
     }
     //endregion
 }
