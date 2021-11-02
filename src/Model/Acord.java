@@ -34,12 +34,13 @@ public class Acord implements IPlayable{
     @Override
     public String ExtractJFugueSoundString() {
         
-        String str = "";
+        var musicString = new StringBuilder();
         
         for(Note n : notes)
-            str += n.ExtractJFugueSoundString();
-        
-        return str;
+            musicString.append(String.format("%s+", n.ExtractJFugueSoundString()));
+
+        musicString.deleteCharAt(musicString.length() - 1); //Remove the last '+' symbol
+        return musicString.toString();
     }
     
 }

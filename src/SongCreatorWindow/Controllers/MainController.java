@@ -1,19 +1,24 @@
 package SongCreatorWindow.Controllers;
 
 import Model.Path;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.HPos;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Slider;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 
 import java.util.HashMap;
@@ -37,7 +42,7 @@ public class MainController
     List<Canvas> canvasList = new LinkedList<Canvas>();
     HashMap<Canvas, Slider> sliderMap = new HashMap<Canvas, Slider>();
 
-    //Data structures for program logic
+    //Data structures for program logic (Model)
     List<Path> musicPaths = new LinkedList<Path>();
 
     //region Project
@@ -80,7 +85,8 @@ public class MainController
         System.out.println(String.format("User inserted new path of name - %s", pathName));
 
         //Create new path according to user typed values
-        var path = Path.CreatePath(pathName, "PIANO");
+        var path = Path.CreatePath(pathName, (byte)musicPaths.size(), "PIANO");
+        System.out.println("Created Path:" + path.toString());
 
         //create canvas and set its size
         Canvas canvas = new Canvas(Width, Height);
@@ -113,19 +119,47 @@ public class MainController
 
         Image instrumentImage = new Image(MainController.class.getResource("/Images/piano.png").toString(), Height * .7, Height * .7, false, false);
         gc.drawImage(instrumentImage, Height * 1.15, Height / 10);
-        gc.fillText(
-            path.getInstrument(),
-            1.25*Height + Height/2 - path.getInstrument().length()/2.0*36,
-            Height - Height/10,
-            Height
-        );
 
-        //display speaker and create volume slider
+        //Instrument Selection
+        ChoiceBox choiceBox = new ChoiceBox(FXCollections.observableArrayList(
+                path.GetInstrument(), "Second", "Third")
+        );
+        choiceBox.setLayoutX(1.1 * Height);
+        choiceBox.setLayoutY(Height * canvasList.size() + Height - Height/5);
+        choiceBox.setMinWidth(Height * .8);
+        choiceBox.setMaxWidth(Height * .8);
+        choiceBox.setValue(path.GetInstrument());
+
+        //display speaker, tempo selection and create volume slider
         gc.strokeRect(2 * Height, 0, Height, Height);
         //TODO: Coś nie chce ładować grafiki wektorowej
         Image speakerImage = new Image(MainController.class.getResource("/Images/speaker.png").toString(), 100, 100, false, false);
         gc.drawImage(speakerImage, Height * 2.25, Height / 5);
 
+        //tempo selection
+        var tempoLabel = new Label("Tempo");
+        tempoLabel.setMinWidth(Height / 2);
+        tempoLabel.setTextAlignment(TextAlignment.RIGHT);
+        tempoLabel.setLayoutX(Height * 2);
+        tempoLabel.setLayoutY(Height * canvasList.size() + Height / 10);
+
+        var textField = new TextField();
+        textField.textProperty().addListener(new ChangeListener<String>() {
+        @Override
+        public void changed(
+            ObservableValue<? extends String> observable,
+            String oldValue, String newValue) {
+                if (!newValue.matches("\\d*")) {
+                    textField.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            }
+        });
+        textField.setMaxWidth(Height / 5);
+        textField.setLayoutX(Height * 2.5);
+        textField.setLayoutY(Height * canvasList.size() + Height / 10);
+        textField.setText(String.valueOf(path.GetTempo()));
+
+        //Volume selection
         Slider volumeSlider = new Slider(0, 100 ,0.5);
         volumeSlider.setMaxWidth(Height * .9);
         volumeSlider.setShowTickMarks(true);
@@ -149,6 +183,9 @@ public class MainController
 
         //add created canvas and volume slider
         anchorPaneWithPaths.getChildren().add(canvas);
+        anchorPaneWithPaths.getChildren().add(choiceBox);
+        anchorPaneWithPaths.getChildren().add(tempoLabel);
+        anchorPaneWithPaths.getChildren().add(textField);
         anchorPaneWithPaths.getChildren().add(volumeSlider);
     }
 

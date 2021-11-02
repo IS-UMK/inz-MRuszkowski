@@ -1,5 +1,6 @@
 package Model;
 
+import java.lang.reflect.Field;
 import java.util.LinkedList;
 
 /**
@@ -16,28 +17,62 @@ public class Path {
     LinkedList<IPlayable> _sound;
     int _lenght;
 
-    private Path(String pathName, String selectedInstrument, byte volumeLevel)
+    int _tempo;
+    int _voice;
+
+    private Path(String pathName, byte pathId, String selectedInstrument, int tempo, byte volumeLevel)
     {
         _pathName = pathName;
-        //_pathId = 0;
 
         _selectedInstrument = selectedInstrument;
         _volumeLevel = volumeLevel;
 
         _sound = new LinkedList<IPlayable>();
         //_lenght = 0;
+
+        _voice = _pathId = pathId;
+        _tempo = tempo;
+        System.out.println();
     }
 
-    public static Path CreatePath(String pathName, String selectedInstrument, byte volumeLevel) { return new Path(pathName, selectedInstrument, volumeLevel); }
-    public static Path CreatePath(String pathName, String selectedInstrument) { return new Path(pathName, selectedInstrument, (byte)50); }
+    public static Path CreatePath(String pathName, byte pathId, String selectedInstrument, int tempo, byte volumeLevel) { return new Path(pathName, pathId, selectedInstrument, tempo, volumeLevel); }
+    public static Path CreatePath(String pathName, byte pathId, String selectedInstrument, int tempo) { return new Path(pathName, pathId, selectedInstrument, tempo, (byte)50); }
+    public static Path CreatePath(String pathName, byte pathId, String selectedInstrument) { return new Path(pathName, pathId, selectedInstrument, 120, (byte)50); }
 
-    public String getInstrument()
+    public String GetInstrument()
     {
         return _selectedInstrument;
     }
 
-    public void setInstrument(String selectedInstrument)
+    public int GetTempo() { return _tempo; }
+
+    public void SetInstrument(String selectedInstrument)
     {
         _selectedInstrument = selectedInstrument;
+    }
+
+    public String GetExtractedMusic()
+    {
+        var musicString = new StringBuilder();
+
+        musicString.append(String.format("T%d V%d", _tempo, _voice));
+
+        for(IPlayable s : _sound)
+            musicString.append(String.format("%s ", s.ExtractJFugueSoundString()));
+
+        return musicString.toString();
+    }
+
+    @Override
+    public String toString() {
+        var info = new StringBuilder();
+
+        info.append(String.format("Path name - %s\n", _pathName));
+        info.append(String.format("Selected instrument - %s\n", _selectedInstrument));
+        info.append(String.format("Volume level - %s\n", _volumeLevel));
+        info.append(String.format("Tempo of track - %s\n", _tempo));
+        info.append(String.format("Voice - %s\n", _voice));
+
+        return info.toString();
     }
 }

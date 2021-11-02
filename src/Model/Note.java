@@ -11,9 +11,9 @@ public class Note implements IPlayable{
      */
     public char NoteDuration;
     /**
-     * In which moment the note occures
+     * In which moment the note occurs
      */
-    public int Time;
+    public int TimeX;
     /**
      * Integer for instrument sound selection.
      */
@@ -25,6 +25,6 @@ public class Note implements IPlayable{
     
     @Override
     public String ExtractJFugueSoundString() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return String.format("I%d %d%c", Instrument, NoteValue, NoteDuration);
     }
 }

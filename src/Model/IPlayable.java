@@ -8,5 +8,5 @@ public interface IPlayable {
     /**
      * @return JFugue string
      */
-    String ExtractJFugueSoundString();
+    public String ExtractJFugueSoundString();
 }
