@@ -217,9 +217,9 @@ public class MainController
 
             var gc = canvas.getGraphicsContext2D();
 
-            double insertX = x - 45;
-            double insertY = y - 80 - Height * index;
-            System.out.println(String.format("Note inserted at: X - %f, Y - %f", insertX, insertY));
+            int insertX = ((int)(x - 45) / 10) * 10;
+            int insertY = ((int)((y - 80 - Height * index) / 10)) * 10;
+            System.out.println(String.format("Note inserted at: X - %d, Y - %d", insertX, insertY));
             gc.drawImage(noteImage, insertX, insertY);
         }
     }
