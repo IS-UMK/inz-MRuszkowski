@@ -1,22 +1,39 @@
 package SongCreatorWindow.Controllers;
 
 import Model.Path;
+import com.sun.javafx.geom.Rectangle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
+import javafx.stage.Screen;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class MainController
 {
     @FXML
+    BorderPane workSpace;
+    @FXML
     ScrollPane scrollPaneWithPaths;
     @FXML
     AnchorPane anchorPaneWithPaths;
+
+    double Height = workSpace != null ? workSpace.getHeight() / 3 : 200;
+    double Width = Screen.getPrimary().getBounds().getWidth();
+    List<Canvas> canvasList = new LinkedList<Canvas>();
 
     //region Project
     public void SaveProjectToFile(ActionEvent actionEvent)
@@ -61,11 +78,7 @@ public class MainController
         var path = Path.CreatePath(pathName, "PIANO");
 
         //create canvas and set its size
-        Canvas canvas = new Canvas(scrollPaneWithPaths.getWidth(), 200);
-        double height = canvas.getHeight(); //TODO: Zamienić na globalną stałą
-        double width = canvas.getWidth();    //TODO: Zamienić na globalną stałą
-        anchorPaneWithPaths.setLayoutX(width);
-        anchorPaneWithPaths.setLayoutY(height); //TODO: zmienić na wartość stałej globalnej razy ilość canvasów
+        Canvas canvas = new Canvas(Width, Height);
 
         //paint new path on new canvas
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -73,40 +86,59 @@ public class MainController
         //border of path
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(1);
-        gc.strokeRect(0,0, width, height);
+        gc.strokeRect(0,0, Width, Height);
 
         //Display Path Name
-        gc.strokeRect(0,0, height, height);
-        gc.setFont(new Font(Font.getFamilies().toArray()[1].toString(), 24));
+        gc.strokeRect(0,0, Height, Height);
+        Font font = new Font(Font.getFamilies().toArray()[1].toString(), 24);
+        gc.setFont(font);
         //Text should be placed basing on the middle of square, minus half of the final text size on canvas (font size)
-        gc.fillText(pathName, height/2 - pathName.length()/2.0*24*3/4, height/2, height);
+        gc.fillText(pathName, Height /2 - pathName.length()/2.0*24*3/4, Height /2, Height);
 
         //Display selected instrument info
-        gc.strokeRect(height, 0, height, height);
+        gc.strokeRect(Height, 0, Height, Height);
         String selected_instrument_note = "Selected Instrument:";
         gc.fillText(
                 selected_instrument_note,
-                1.4*height + height/2 - selected_instrument_note.length()/2.0*24*3/4,
-                height - selected_instrument_note.length()/2.0*24*3/4,
-                height
-        );
-        gc.fillText(
-            path.getInstrument(),
-            1.4*height + height/2 - path.getInstrument().length()/2.0*36,
-            height/2 - path.getInstrument().length()/2.0*24*3/4,
-            height
+                1.4*Height + Height/2 - selected_instrument_note.length()/2.0*24*3/4,
+                Height - selected_instrument_note.length()/2.0*24*3/4,
+                Height
         );
 
-        //display speaker with volume slider
-        gc.strokeRect(2 * height, 0, height, height);
+        Image instrumentImage = new Image(MainController.class.getResource("/Images/piano.png").toString(), Height * .7, Height * .7, false, false);
+        gc.drawImage(instrumentImage, Height * 1.15, Height / 10);
+        gc.fillText(
+            path.getInstrument(),
+            1.25*Height + Height/2 - path.getInstrument().length()/2.0*36,
+            Height - Height/10,
+            Height
+        );
+
+        //display speaker and create volume slider
+        gc.strokeRect(2 * Height, 0, Height, Height);
+        //TODO: Coś nie chce ładować grafiki wektorowej
+        Image speakerImage = new Image(MainController.class.getResource("/Images/speaker.png").toString(), 100, 100, false, false);
+        gc.drawImage(speakerImage, Height * 2.25, Height / 5);
+
+        Slider volumeSlider = new Slider(0, 100 ,0.5);
+        volumeSlider.setMaxWidth(Height * .9);
+        volumeSlider.setShowTickMarks(true);
+        volumeSlider.setShowTickLabels(true);
+        volumeSlider.setLayoutX(Height * 2.15);
+        volumeSlider.setLayoutY(Height * .75);
 
         //five lines for inserting notes
         gc.setLineWidth(2);
         for(int i = 1; i <= 5; i++)
-            gc.strokeLine(3*height + 20,40 + i*20, canvas.getWidth() - 20, 40 + i*20);
+            gc.strokeLine(3* Height + 20,40 + i*20, canvas.getWidth() - 20, 40 + i*20);
 
-        //add created canvas
+        //add (default Violin) music key
+        Image violinKeyImage = new Image(MainController.class.getResource("/Images/violin_key.png").toString(), 100, 170.62, false, false);
+        gc.drawImage(violinKeyImage, Height * 3, Height / 13);
+
+        //add created canvas and volume slider
         anchorPaneWithPaths.getChildren().add(canvas);
+        anchorPaneWithPaths.getChildren().add(volumeSlider);
     }
 
     public void RenameSelected(ActionEvent actionEvent)

@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SongCreatorWindow.Controllers.MainController">
+<BorderPane fx:id="workSpace" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SongCreatorWindow.Controllers.MainController">
    <top>
       <MenuBar BorderPane.alignment="CENTER">
          <menus>
@@ -56,9 +56,9 @@
    </top>
    <center>
       <ScrollPane fx:id="scrollPaneWithPaths" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-        <content>
-          <AnchorPane fx:id="anchorPaneWithPaths" />
-        </content>
+         <content>
+            <AnchorPane fx:id="anchorPaneWithPaths" />
+         </content>
       </ScrollPane>
    </center>
 </BorderPane>
