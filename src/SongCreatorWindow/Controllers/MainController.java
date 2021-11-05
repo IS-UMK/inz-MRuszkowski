@@ -1,5 +1,6 @@
 package SongCreatorWindow.Controllers;
 
+import Images.ImageManager;
 import Model.Instrument;
 import Model.Path;
 import javafx.beans.value.ChangeListener;
@@ -122,15 +123,16 @@ public class MainController
                 Height
         );
 
-        Image instrumentImage = new Image(MainController.class.getResource("/Images/piano.png").toString(), Height * .7, Height * .7, false, false);
+        Image instrumentImage = ImageManager.getInstance().setDimensions(Height * .7, Height * .7).getPiano();
         gc.drawImage(instrumentImage, Height * 1.15, Height / 10);
 
         //Instrument Selection
         var instruments = Instrument.getAllInstruments();
 
-        //Observable list where I can choose Instrument
+        //Observable list where I can choose Instrument - create list with given instrument list
         ChoiceBox choiceBox = new ChoiceBox(FXCollections.observableArrayList(instruments));
 
+        //set layout of list created above
         choiceBox.setLayoutX(1.1 * Height);
         choiceBox.setLayoutY(Height * canvasList.size() + Height - Height/5);
         choiceBox.setMinWidth(Height * .8);
@@ -140,7 +142,7 @@ public class MainController
         //display speaker, tempo selection and create volume slider
         gc.strokeRect(2 * Height, 0, Height, Height);
         //TODO: Coś nie chce ładować grafiki wektorowej
-        Image speakerImage = new Image(MainController.class.getResource("/Images/speaker.png").toString(), 100, 100, false, false);
+        Image speakerImage = ImageManager.getInstance().setDimensions(100, 100).getSpeaker();
         gc.drawImage(speakerImage, Height * 2.25, Height / 5);
 
         //tempo selection
@@ -186,7 +188,7 @@ public class MainController
             gc.strokeLine(3* Height + 20,40 + i*20, canvas.getWidth() - 20, 40 + i*20);
 
         //add (default Violin) music key
-        Image violinKeyImage = new Image(MainController.class.getResource("/Images/violin_key.png").toString(), 100, 170.62, false, false);
+        Image violinKeyImage = ImageManager.getInstance().setDimensions(100, 170.62).getViolinKey();
         gc.drawImage(violinKeyImage, Height * 3, Height / 13);
 
         //Save created components
@@ -257,7 +259,7 @@ public class MainController
 
         if(x > 3 * Height + 100) // 100 - rozmiar klucza wiolinowego, może lepiej by było to sparametryzowane
         {
-            Image noteImage = new Image(MainController.class.getResource("/Images/quarter_note.png").toString(), 100, 100, false, false);
+            Image noteImage = ImageManager.getInstance().setDimensions(100, 100).getQuarterNote();
 
             int index = (int)y / (int)Height;
             System.out.println(String.format("The selected path where to insert note: %d", index));
