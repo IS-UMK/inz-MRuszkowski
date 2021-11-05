@@ -1,5 +1,6 @@
 package SongCreatorWindow.Controllers;
 
+import Model.Instrument;
 import Model.Path;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -21,6 +22,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -100,9 +102,12 @@ public class MainController
         gc.setLineWidth(1);
         gc.strokeRect(0,0, Width, Height);
 
+        //set up font to use
+        Font font = new Font(Font.getFamilies().toArray()[1].toString(), 24);
+        var savedFont = gc.getFont();
+
         //Display Path Name
         gc.strokeRect(0,0, Height, Height);
-        Font font = new Font(Font.getFamilies().toArray()[1].toString(), 24);
         gc.setFont(font);
         //Text should be placed basing on the middle of square, minus half of the final text size on canvas (font size)
         gc.fillText(pathName, Height /2 - pathName.length()/2.0*24*3/4, Height /2, Height);
@@ -121,14 +126,16 @@ public class MainController
         gc.drawImage(instrumentImage, Height * 1.15, Height / 10);
 
         //Instrument Selection
-        ChoiceBox choiceBox = new ChoiceBox(FXCollections.observableArrayList(
-                path.GetInstrument(), "Second", "Third")
-        );
+        var instruments = Instrument.getAllInstruments();
+
+        //Observable list where I can choose Instrument
+        ChoiceBox choiceBox = new ChoiceBox(FXCollections.observableArrayList(instruments));
+
         choiceBox.setLayoutX(1.1 * Height);
         choiceBox.setLayoutY(Height * canvasList.size() + Height - Height/5);
         choiceBox.setMinWidth(Height * .8);
         choiceBox.setMaxWidth(Height * .8);
-        choiceBox.setValue(path.GetInstrument());
+        choiceBox.setValue(instruments[0]);
 
         //display speaker, tempo selection and create volume slider
         gc.strokeRect(2 * Height, 0, Height, Height);
@@ -137,11 +144,17 @@ public class MainController
         gc.drawImage(speakerImage, Height * 2.25, Height / 5);
 
         //tempo selection
-        var tempoLabel = new Label("Tempo");
+        gc.setFont(savedFont);
+        gc.fillText(
+                "Tempo",
+                Height * 2.25,
+                Height / 5.5,
+                Height
+        );
+        /*var tempoLabel = new Label("Tempo");
         tempoLabel.setMinWidth(Height / 2);
-        tempoLabel.setTextAlignment(TextAlignment.RIGHT);
-        tempoLabel.setLayoutX(Height * 2);
-        tempoLabel.setLayoutY(Height * canvasList.size() + Height / 10);
+        tempoLabel.setLayoutX(Height * 2.25);
+        tempoLabel.setLayoutY(Height * canvasList.size() + Height / 8.5);*/
 
         var textField = new TextField();
         textField.textProperty().addListener(new ChangeListener<String>() {
@@ -184,7 +197,6 @@ public class MainController
         //add created canvas and volume slider
         anchorPaneWithPaths.getChildren().add(canvas);
         anchorPaneWithPaths.getChildren().add(choiceBox);
-        anchorPaneWithPaths.getChildren().add(tempoLabel);
         anchorPaneWithPaths.getChildren().add(textField);
         anchorPaneWithPaths.getChildren().add(volumeSlider);
     }
