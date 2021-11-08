@@ -7,6 +7,20 @@ import java.util.LinkedList;
  * Public class that is part of model. It represents a Acord (more than one note) for JFugue library
  */
 public class Acord implements IPlayable{
+    /**
+     * In which moment the note occurs
+     */
+    double TimeX;
+
+    @Override
+    public double getTimeX() {
+        return TimeX;
+    }
+
+    @Override
+    public void setTimeX(double x) {
+        TimeX = x;
+    }
 
     /**
      * Collection of Notes
@@ -30,7 +44,7 @@ public class Acord implements IPlayable{
     {
         notes.remove(index);
     }
-    
+
     @Override
     public String ExtractJFugueSoundString() {
         

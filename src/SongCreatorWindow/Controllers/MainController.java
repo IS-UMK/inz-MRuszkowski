@@ -2,15 +2,15 @@ package SongCreatorWindow.Controllers;
 
 import Images.ImageManager;
 import Model.Instrument;
+import Model.Note;
+import Model.NoteToNumericValue;
 import Model.Path;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.geometry.HPos;
-import javafx.geometry.Pos;
-import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
@@ -20,16 +20,17 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
+import org.jfugue.player.Player;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 public class MainController
 {
+    //TODO: Wyeliminować wzorzec "kula błota"
+
     @FXML
     BorderPane workSpace;
     @FXML
@@ -43,10 +44,28 @@ public class MainController
 
     //Data structures for GUI Components
     List<Canvas> canvasList = new LinkedList<Canvas>();
-    HashMap<Canvas, Slider> sliderMap = new HashMap<Canvas, Slider>();
+    HashMap<Path, Canvas> canvasMap = new HashMap<>();
+    HashMap<Canvas, Slider> volumeSliderMap = new HashMap<Canvas, Slider>();
+    HashMap<Canvas, ChoiceBox> choiceBoxMap = new HashMap<>();
+    HashMap<Canvas, TextField> textFieldMap = new HashMap<>();
+    HashMap<Canvas, TextField> tempoMap = new HashMap<>();
+    HashMap<Canvas, MenuItem> selectionMenuItemToCanvas = new HashMap<>();
 
     //Data structures for program logic (Model)
+    @FXML
+    Menu selectPathMenuItem;
+    Path selectedPath = null;
+
+    Canvas interactionCanvas;
+    int strokeLineWidthForSelection = 10;
+
+    @FXML
+    MenuItem deletePathMenuItem;
     List<Path> musicPaths = new LinkedList<Path>();
+
+    //For playing music
+    @FXML
+    MenuItem playMenuItem;
 
     //region Project
     public void SaveProjectToFile(ActionEvent actionEvent)
@@ -153,26 +172,22 @@ public class MainController
                 Height / 5.5,
                 Height
         );
-        /*var tempoLabel = new Label("Tempo");
-        tempoLabel.setMinWidth(Height / 2);
-        tempoLabel.setLayoutX(Height * 2.25);
-        tempoLabel.setLayoutY(Height * canvasList.size() + Height / 8.5);*/
 
-        var textField = new TextField();
-        textField.textProperty().addListener(new ChangeListener<String>() {
+        var tempoTextField = new TextField();
+        tempoTextField.textProperty().addListener(new ChangeListener<String>() {
         @Override
         public void changed(
             ObservableValue<? extends String> observable,
             String oldValue, String newValue) {
                 if (!newValue.matches("\\d*")) {
-                    textField.setText(newValue.replaceAll("[^\\d]", ""));
+                    tempoTextField.setText(newValue.replaceAll("[^\\d]", ""));
                 }
             }
         });
-        textField.setMaxWidth(Height / 5);
-        textField.setLayoutX(Height * 2.5);
-        textField.setLayoutY(Height * canvasList.size() + Height / 10);
-        textField.setText(String.valueOf(path.GetTempo()));
+        tempoTextField.setMaxWidth(Height / 5);
+        tempoTextField.setLayoutX(Height * 2.5);
+        tempoTextField.setLayoutY(Height * canvasList.size() + Height / 10);
+        tempoTextField.setText(String.valueOf(path.getTempo()));
 
         //Volume selection
         Slider volumeSlider = new Slider(0, 100 ,0.5);
@@ -194,18 +209,148 @@ public class MainController
         //Save created components
         musicPaths.add(path);
         canvasList.add(canvas);
-        sliderMap.put(canvas, volumeSlider);
+        canvasMap.put(path, canvas);
+        volumeSliderMap.put(canvas, volumeSlider);
+        choiceBoxMap.put(canvas, choiceBox);
+        textFieldMap.put(canvas, tempoTextField);
+        tempoMap.put(canvas, tempoTextField);
 
         //add created canvas and volume slider
         anchorPaneWithPaths.getChildren().add(canvas);
         anchorPaneWithPaths.getChildren().add(choiceBox);
-        anchorPaneWithPaths.getChildren().add(textField);
+        anchorPaneWithPaths.getChildren().add(tempoTextField);
         anchorPaneWithPaths.getChildren().add(volumeSlider);
+
+        anchorPaneWithPaths.getChildren().remove(interactionCanvas);
+        interactionCanvas = new Canvas(Width, Height * canvasList.size());
+        anchorPaneWithPaths.getChildren().add(interactionCanvas);
+
+        var pathToSelect = new MenuItem(pathName);
+        pathToSelect.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                selectedPath = path;
+
+                GraphicsContext gc = interactionCanvas.getGraphicsContext2D();
+
+                int index = musicPaths.indexOf(selectedPath);
+
+                gc.clearRect(0, 0, interactionCanvas.getWidth(), interactionCanvas.getHeight());
+                gc.setStroke(Color.BLUE);
+                gc.setLineWidth(strokeLineWidthForSelection);
+                gc.strokeRect(0 + strokeLineWidthForSelection / 2, Height * index + strokeLineWidthForSelection / 2,
+                        Width - strokeLineWidthForSelection, Height - strokeLineWidthForSelection);
+
+                System.out.println(String.format("Path number %d has been selected", index));
+            }
+        });
+        selectPathMenuItem.getItems().add(pathToSelect);
+        selectionMenuItemToCanvas.put(canvas, pathToSelect);
+
+        deletePathMenuItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                //check if any path is selected
+                if(selectedPath == null)
+                {
+                    var alert = new Alert(Alert.AlertType.ERROR, "None path is selected");
+                    alert.showAndWait();
+                    return;
+                }
+
+                //get canvas with components
+                Canvas canvas = canvasMap.get(selectedPath);
+                musicPaths.remove(selectedPath);
+
+                //remove it from GUI
+                anchorPaneWithPaths.getChildren().remove(canvas);
+                selectedPath = null;
+
+                //move up canvases below selected to delete
+                int index = canvasList.indexOf(canvas);
+                System.out.println(String.format("Deleting path %d", index));
+
+                for(int i = index + 1; i < canvasList.size(); i++)
+                {
+                    System.out.println(String.format("Moving components of path %d up", i));
+
+                    var canvas_to_move_up = canvasList.get(i);
+                    canvas_to_move_up.setLayoutY(canvas_to_move_up.getLayoutY() - Height);
+
+                    var volumeSlider_to_move_up = volumeSliderMap.get(canvas_to_move_up);
+                    volumeSlider_to_move_up.setLayoutY(volumeSlider_to_move_up.getLayoutY() - Height);
+
+                    var choiceBox_to_move_up = choiceBoxMap.get(canvas_to_move_up);
+                    choiceBox_to_move_up.setLayoutY(choiceBox_to_move_up.getLayoutY() - Height);
+
+                    var textField_to_move_up = textFieldMap.get(canvas_to_move_up);
+                    textField_to_move_up.setLayoutY(textField_to_move_up.getLayoutY() - Height);
+
+                    var tempoField_to_move_up= tempoMap.get(canvas_to_move_up);
+                    tempoField_to_move_up.setLayoutY(tempoField_to_move_up.getLayoutY() - Height);
+                }
+
+                //remove this canvas from data structures
+                canvasMap.remove(selectedPath);
+                canvasList.remove(canvas);
+
+                //remove components associated with that canvas
+                Slider volumeSlider = volumeSliderMap.get(canvas);
+                volumeSliderMap.remove(volumeSlider);
+                anchorPaneWithPaths.getChildren().remove(volumeSlider);
+
+                ChoiceBox choiceBox = choiceBoxMap.get(canvas);
+                choiceBoxMap.remove(choiceBox);
+                anchorPaneWithPaths.getChildren().remove(choiceBox);
+
+                TextField textField = textFieldMap.get(canvas);
+                textFieldMap.remove(textField);
+                anchorPaneWithPaths.getChildren().remove(textField);
+
+                TextField tempoField = tempoMap.get(canvas);
+                tempoMap.remove(tempoField);
+                anchorPaneWithPaths.getChildren().remove(tempoField);
+
+                //remove selection option
+                MenuItem pathSelectionMenuItem = selectionMenuItemToCanvas.get(canvas);
+                selectPathMenuItem.getItems().remove(pathSelectionMenuItem);
+                selectionMenuItemToCanvas.remove(pathSelectionMenuItem);
+
+                //clear selection
+                interactionCanvas.getGraphicsContext2D().clearRect(0, 0, interactionCanvas.getWidth(), interactionCanvas.getHeight());
+            }
+        });
     }
 
     public void RenameSelected(ActionEvent actionEvent)
     {
+        if(selectedPath == null)
+            return;
 
+        //ask user for new name
+        TextInputDialog window = new TextInputDialog("Changing path name");
+        window.setHeaderText("Enter name of existing path:");
+        window.showAndWait();
+
+        //get user choice
+        String result = window.getResult();
+        System.out.println(String.format("Changing path name from %s to %s", selectedPath.GetName(), result));
+        selectedPath.setName(result);
+
+        //change name on canvas
+        Canvas canvas = canvasMap.get(selectedPath);
+        var gc = canvas.getGraphicsContext2D();
+
+        gc.clearRect(0,0, Height, Height);
+        gc.strokeRect(0,0, Height, Height);
+        Font font = new Font(Font.getFamilies().toArray()[1].toString(), 24);
+        gc.setFont(font);
+        //Text should be placed basing on the middle of square, minus half of the final text size on canvas (font size)
+        gc.fillText(result, Height /2 - result.length()/2.0*24*3/4, Height /2, Height);
+
+        //change name in menu item
+        MenuItem pathSelectionMenuItem = selectionMenuItemToCanvas.get(canvas);
+        pathSelectionMenuItem.setText(result);
     }
 
     public void DeleteSelected(ActionEvent actionEvent)
@@ -239,7 +384,17 @@ public class MainController
     //region Song
     public void PlayAllPathsWithoutMutedOnes(ActionEvent actionEvent)
     {
+        new Thread(() -> {
+            Player player = new Player();
+            var musicString = new StringBuilder();
 
+            for(Path s : musicPaths)
+                musicString.append(s.getExtractedMusic());
+
+            System.out.println(String.format("Built music string - %s", musicString.toString()));
+
+            player.play(musicString.toString());
+        }).start();
     }
 
     public void PrintSongToPDFFile(ActionEvent actionEvent)
@@ -259,10 +414,16 @@ public class MainController
 
         if(x > 3 * Height + 100) // 100 - rozmiar klucza wiolinowego, może lepiej by było to sparametryzowane
         {
-            Image noteImage = ImageManager.getInstance().setDimensions(100, 100).getQuarterNote();
-
+            //model code
             int index = (int)y / (int)Height;
             System.out.println(String.format("The selected path where to insert note: %d", index));
+
+            Note note = Note.CreateNote(NoteToNumericValue.Get_Octave_5_sound_C(), 'q');
+            note.setTimeX(x);
+            musicPaths.get(index).addSound(note);
+
+            //view code
+            Image noteImage = ImageManager.getInstance().setDimensions(100, 100).getQuarterNote();
 
             var canvas = canvasList.get(index);
 

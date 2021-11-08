@@ -10,25 +10,21 @@ import java.lang.reflect.Method;
 
 public class PlaySongThread implements Runnable
 {
-    Label _logLabel;
-    Method _log;
     Player _player;
     ManagedPlayer _managedPlayer;
     Pattern _pattern;
 
-    public PlaySongThread(Label logLabel, Method log, Player player, ManagedPlayer managedPlayer, Pattern pattern)
+    public PlaySongThread(Player player, ManagedPlayer managedPlayer, Pattern pattern)
     {
-        _logLabel = logLabel;
-        _log = log;
         _player = player;
         _managedPlayer = managedPlayer;
         _pattern = pattern;
     }
     @Override
     public void run() {
-        try {
+        //try {
             if (!_managedPlayer.isPlaying()) {
-                _log.invoke(_logLabel, String.format("Playing song %s has started", _pattern));
+                //_log.invoke(_logLabel, String.format("Playing song %s has started", _pattern));
                 _player.play(_pattern);
 
                 while (!this._managedPlayer.isFinished()) {
@@ -38,15 +34,15 @@ public class PlaySongThread implements Runnable
                     }
                 }
 
-                _log.invoke(_logLabel, String.format("Playing song %s has been finished", _pattern));
+                //_log.invoke(_logLabel, String.format("Playing song %s has been finished", _pattern));
             } else {
-                _log.invoke(_logLabel, String.format("Cannot play song because there is already different one playing", _pattern));
+                //_log.invoke(_logLabel, String.format("Cannot play song because there is already different one playing", _pattern));
                 return;
             }
-        }
-        catch (IllegalAccessException | InvocationTargetException e)
+        /*}
+        catch (Exception e)
         {
-
-        }
+            System.err.println(e.getMessage());
+        }*/
     }
 }

@@ -6,7 +6,17 @@ package Model;
  */
 public interface IPlayable {
     /**
+     * Get the moment when note occurs
+     */
+    double getTimeX();
+
+    /**
+     * set the moment when note occurs
+     * @param x
+     */
+    void setTimeX(double x);
+    /**
      * @return JFugue string
      */
-    public String ExtractJFugueSoundString();
+    String ExtractJFugueSoundString();
 }

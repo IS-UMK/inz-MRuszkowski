@@ -1,6 +1,5 @@
 package Model;
 
-import java.lang.reflect.Field;
 import java.util.LinkedList;
 
 /**
@@ -14,7 +13,7 @@ public class Path {
     String _selectedInstrument;
     byte _volumeLevel;
 
-    LinkedList<IPlayable> _sound;
+    LinkedList<IPlayable> _sounds;
     int _lenght;
 
     int _tempo;
@@ -27,7 +26,7 @@ public class Path {
         _selectedInstrument = selectedInstrument;
         _volumeLevel = volumeLevel;
 
-        _sound = new LinkedList<IPlayable>();
+        _sounds = new LinkedList<IPlayable>();
         //_lenght = 0;
 
         _voice = _pathId = pathId;
@@ -44,20 +43,36 @@ public class Path {
         return _selectedInstrument;
     }
 
-    public int GetTempo() { return _tempo; }
+    public int getTempo() { return _tempo; }
 
     public void SetInstrument(String selectedInstrument)
     {
         _selectedInstrument = selectedInstrument;
     }
 
-    public String GetExtractedMusic()
+    public void addSound(IPlayable sound)
+    {
+        for(IPlayable s : _sounds)
+            if(s.getTimeX() > sound.getTimeX())
+            {
+                int index = _sounds.indexOf(s);
+                if(index != 0)
+                    _sounds.add( index - 1, sound);
+                else
+                    _sounds.add(0, sound);
+                return;
+            }
+
+        _sounds.add(sound);
+    }
+
+    public String getExtractedMusic()
     {
         var musicString = new StringBuilder();
 
-        musicString.append(String.format("T%d V%d", _tempo, _voice));
+        musicString.append(String.format("T%d V%d ", _tempo, _voice));
 
-        for(IPlayable s : _sound)
+        for(IPlayable s : _sounds)
             musicString.append(String.format("%s ", s.ExtractJFugueSoundString()));
 
         return musicString.toString();
@@ -74,5 +89,15 @@ public class Path {
         info.append(String.format("Voice - %s\n", _voice));
 
         return info.toString();
+    }
+
+    public String GetName()
+    {
+        return _pathName;
+    }
+
+    public void setName(String result)
+    {
+        _pathName = result;
     }
 }

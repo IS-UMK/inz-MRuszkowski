@@ -94,13 +94,13 @@ public class Controller
                 Pattern patternFromFile = MidiFileManager.loadPatternFromMidi(file);
 
                 var playing = new PlaySongThread(
-                        logLabel,
-                        Logger.class.getMethod("appendTextToLogLabel"),
                         player,
                         managedPlayer,
                         patternFromFile
                 );
-                new Thread(playing).start();
+                Thread music = new Thread(playing);
+                music.start();
+
                 /*new Thread(() -> {
                     //TODO: Jak wysłać wiadomość z innego wątku? Czy można uruchamiać funkcje z innego wątku?
                     //appendTextToLogLabel(String.format("Playing song %s has started", file.getName()));
@@ -134,8 +134,6 @@ public class Controller
             } catch (IOException e) {
                 e.printStackTrace();
                 Logger.appendTextToLogLabel(logLabel, e.getMessage());
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
             }
         }
 
