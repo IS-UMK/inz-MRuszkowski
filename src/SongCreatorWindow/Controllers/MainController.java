@@ -59,8 +59,6 @@ public class MainController
     Canvas interactionCanvas;
     int strokeLineWidthForSelection = 10;
 
-    @FXML
-    MenuItem deletePathMenuItem;
     List<Path> musicPaths = new LinkedList<Path>();
 
     //For playing music
@@ -221,24 +219,28 @@ public class MainController
         anchorPaneWithPaths.getChildren().add(tempoTextField);
         anchorPaneWithPaths.getChildren().add(volumeSlider);
 
-        anchorPaneWithPaths.getChildren().remove(interactionCanvas);
-        interactionCanvas = new Canvas(Width, Height * canvasList.size());
-        anchorPaneWithPaths.getChildren().add(interactionCanvas);
-
         var pathToSelect = new MenuItem(pathName);
         pathToSelect.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                if(interactionCanvas == null)
+                {
+                    interactionCanvas = new Canvas(Width, Height);
+                    anchorPaneWithPaths.getChildren().add(interactionCanvas);
+                }
+
                 selectedPath = path;
 
                 GraphicsContext gc = interactionCanvas.getGraphicsContext2D();
+                gc.clearRect(0, 0, interactionCanvas.getWidth(), interactionCanvas.getHeight());
 
                 int index = musicPaths.indexOf(selectedPath);
+                interactionCanvas.setHeight(Height);
+                interactionCanvas.setLayoutY(Height * index);
 
-                gc.clearRect(0, 0, interactionCanvas.getWidth(), interactionCanvas.getHeight());
                 gc.setStroke(Color.BLUE);
                 gc.setLineWidth(strokeLineWidthForSelection);
-                gc.strokeRect(0 + strokeLineWidthForSelection / 2, Height * index + strokeLineWidthForSelection / 2,
+                gc.strokeRect(strokeLineWidthForSelection / 2, strokeLineWidthForSelection / 2,
                         Width - strokeLineWidthForSelection, Height - strokeLineWidthForSelection);
 
                 System.out.println(String.format("Path number %d has been selected", index));
@@ -246,80 +248,13 @@ public class MainController
         });
         selectPathMenuItem.getItems().add(pathToSelect);
         selectionMenuItemToCanvas.put(canvas, pathToSelect);
+    }
 
-        deletePathMenuItem.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                //check if any path is selected
-                if(selectedPath == null)
-                {
-                    var alert = new Alert(Alert.AlertType.ERROR, "None path is selected");
-                    alert.showAndWait();
-                    return;
-                }
-
-                //get canvas with components
-                Canvas canvas = canvasMap.get(selectedPath);
-                musicPaths.remove(selectedPath);
-
-                //remove it from GUI
-                anchorPaneWithPaths.getChildren().remove(canvas);
-                selectedPath = null;
-
-                //move up canvases below selected to delete
-                int index = canvasList.indexOf(canvas);
-                System.out.println(String.format("Deleting path %d", index));
-
-                for(int i = index + 1; i < canvasList.size(); i++)
-                {
-                    System.out.println(String.format("Moving components of path %d up", i));
-
-                    var canvas_to_move_up = canvasList.get(i);
-                    canvas_to_move_up.setLayoutY(canvas_to_move_up.getLayoutY() - Height);
-
-                    var volumeSlider_to_move_up = volumeSliderMap.get(canvas_to_move_up);
-                    volumeSlider_to_move_up.setLayoutY(volumeSlider_to_move_up.getLayoutY() - Height);
-
-                    var choiceBox_to_move_up = choiceBoxMap.get(canvas_to_move_up);
-                    choiceBox_to_move_up.setLayoutY(choiceBox_to_move_up.getLayoutY() - Height);
-
-                    var textField_to_move_up = textFieldMap.get(canvas_to_move_up);
-                    textField_to_move_up.setLayoutY(textField_to_move_up.getLayoutY() - Height);
-
-                    var tempoField_to_move_up= tempoMap.get(canvas_to_move_up);
-                    tempoField_to_move_up.setLayoutY(tempoField_to_move_up.getLayoutY() - Height);
-                }
-
-                //remove this canvas from data structures
-                canvasMap.remove(selectedPath);
-                canvasList.remove(canvas);
-
-                //remove components associated with that canvas
-                Slider volumeSlider = volumeSliderMap.get(canvas);
-                volumeSliderMap.remove(volumeSlider);
-                anchorPaneWithPaths.getChildren().remove(volumeSlider);
-
-                ChoiceBox choiceBox = choiceBoxMap.get(canvas);
-                choiceBoxMap.remove(choiceBox);
-                anchorPaneWithPaths.getChildren().remove(choiceBox);
-
-                TextField textField = textFieldMap.get(canvas);
-                textFieldMap.remove(textField);
-                anchorPaneWithPaths.getChildren().remove(textField);
-
-                TextField tempoField = tempoMap.get(canvas);
-                tempoMap.remove(tempoField);
-                anchorPaneWithPaths.getChildren().remove(tempoField);
-
-                //remove selection option
-                MenuItem pathSelectionMenuItem = selectionMenuItemToCanvas.get(canvas);
-                selectPathMenuItem.getItems().remove(pathSelectionMenuItem);
-                selectionMenuItemToCanvas.remove(pathSelectionMenuItem);
-
-                //clear selection
-                interactionCanvas.getGraphicsContext2D().clearRect(0, 0, interactionCanvas.getWidth(), interactionCanvas.getHeight());
-            }
-        });
+    public void UnselectPath(ActionEvent actionEvent)
+    {
+        interactionCanvas.getGraphicsContext2D().clearRect(0, 0, interactionCanvas.getWidth(), interactionCanvas.getHeight());
+        interactionCanvas.setHeight(0);
+        selectedPath = null;
     }
 
     public void RenameSelected(ActionEvent actionEvent)
@@ -351,11 +286,79 @@ public class MainController
         //change name in menu item
         MenuItem pathSelectionMenuItem = selectionMenuItemToCanvas.get(canvas);
         pathSelectionMenuItem.setText(result);
+
+        UnselectPath(null);
     }
 
     public void DeleteSelected(ActionEvent actionEvent)
     {
+        if(selectedPath == null)
+        {
+            var alert = new Alert(Alert.AlertType.ERROR, "None path is selected");
+            alert.showAndWait();
+            return;
+        }
 
+        //get canvas with components
+        Canvas canvas = canvasMap.get(selectedPath);
+        musicPaths.remove(selectedPath);
+
+        //remove it from GUI
+        anchorPaneWithPaths.getChildren().remove(canvas);
+        selectedPath = null;
+
+        //move up canvases below selected to delete
+        int index = canvasList.indexOf(canvas);
+        System.out.println(String.format("Deleting path %d", index));
+
+        for(int i = index + 1; i < canvasList.size(); i++)
+        {
+            System.out.println(String.format("Moving components of path %d up", i));
+
+            var canvas_to_move_up = canvasList.get(i);
+            canvas_to_move_up.setLayoutY(canvas_to_move_up.getLayoutY() - Height);
+
+            var volumeSlider_to_move_up = volumeSliderMap.get(canvas_to_move_up);
+            volumeSlider_to_move_up.setLayoutY(volumeSlider_to_move_up.getLayoutY() - Height);
+
+            var choiceBox_to_move_up = choiceBoxMap.get(canvas_to_move_up);
+            choiceBox_to_move_up.setLayoutY(choiceBox_to_move_up.getLayoutY() - Height);
+
+            var textField_to_move_up = textFieldMap.get(canvas_to_move_up);
+            textField_to_move_up.setLayoutY(textField_to_move_up.getLayoutY() - Height);
+
+            var tempoField_to_move_up= tempoMap.get(canvas_to_move_up);
+            tempoField_to_move_up.setLayoutY(tempoField_to_move_up.getLayoutY() - Height);
+        }
+
+        //remove this canvas from data structures
+        canvasMap.remove(selectedPath);
+        canvasList.remove(canvas);
+
+        //remove components associated with that canvas
+        Slider volumeSlider = volumeSliderMap.get(canvas);
+        volumeSliderMap.remove(volumeSlider);
+        anchorPaneWithPaths.getChildren().remove(volumeSlider);
+
+        ChoiceBox choiceBox = choiceBoxMap.get(canvas);
+        choiceBoxMap.remove(choiceBox);
+        anchorPaneWithPaths.getChildren().remove(choiceBox);
+
+        TextField textField = textFieldMap.get(canvas);
+        textFieldMap.remove(textField);
+        anchorPaneWithPaths.getChildren().remove(textField);
+
+        TextField tempoField = tempoMap.get(canvas);
+        tempoMap.remove(tempoField);
+        anchorPaneWithPaths.getChildren().remove(tempoField);
+
+        //remove selection option
+        MenuItem pathSelectionMenuItem = selectionMenuItemToCanvas.get(canvas);
+        selectPathMenuItem.getItems().remove(pathSelectionMenuItem);
+        selectionMenuItemToCanvas.remove(pathSelectionMenuItem);
+
+        //clear selection
+        UnselectPath(null);
     }
 
     public void RecordPath(ActionEvent actionEvent)

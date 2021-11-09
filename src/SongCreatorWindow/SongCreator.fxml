@@ -24,8 +24,9 @@
                <items>
                   <MenuItem mnemonicParsing="false" onAction="#InsertNewPath" text="New Path" />
                   <Menu fx:id="selectPathMenuItem" mnemonicParsing="false" text="Select Path" />
+                  <MenuItem mnemonicParsing="false" onAction="#UnselectPath" text="Unselect Path" />
                   <MenuItem mnemonicParsing="false" onAction="#RenameSelected" text="Rename Selected" />
-                  <MenuItem fx:id="deletePathMenuItem" mnemonicParsing="false" onAction="#DeleteSelected" text="Delete Selected" />
+                  <MenuItem mnemonicParsing="false" onAction="#DeleteSelected" text="Delete Selected" />
                   <MenuItem mnemonicParsing="false" onAction="#RecordPath" text="Record Path" />
                </items>
             </Menu>
