@@ -38,17 +38,17 @@ public class Path {
     public static Path CreatePath(String pathName, byte pathId, String selectedInstrument, int tempo) { return new Path(pathName, pathId, selectedInstrument, tempo, (byte)50); }
     public static Path CreatePath(String pathName, byte pathId, String selectedInstrument) { return new Path(pathName, pathId, selectedInstrument, 120, (byte)50); }
 
-    public String GetInstrument()
+    public String setInstrument()
     {
         return _selectedInstrument;
     }
 
-    public int getTempo() { return _tempo; }
-
-    public void SetInstrument(String selectedInstrument)
+    public void setInstrument(String selectedInstrument)
     {
         _selectedInstrument = selectedInstrument;
     }
+
+    public int getTempo() { return _tempo; }
 
     public void addSound(IPlayable sound)
     {
@@ -91,7 +91,7 @@ public class Path {
         return info.toString();
     }
 
-    public String GetName()
+    public String getName()
     {
         return _pathName;
     }

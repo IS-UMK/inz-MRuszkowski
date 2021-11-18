@@ -18,6 +18,7 @@ public class Note implements IPlayable{
      * In which moment the note occurs
      */
     double TimeX;
+    double NoteHeight;
 
     @Override
     public double getTimeX() {
@@ -27,6 +28,11 @@ public class Note implements IPlayable{
     @Override
     public void setTimeX(double x) {
         TimeX = x;
+    }
+
+    public double getNoteHeight() { return NoteHeight; }
+    public void setNoteHeight(double y) {
+        NoteHeight = y;
     }
 
     /**
