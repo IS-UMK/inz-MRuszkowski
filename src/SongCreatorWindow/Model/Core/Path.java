@@ -57,7 +57,7 @@ public class Path {
             {
                 int index = _sounds.indexOf(s);
                 if(index != 0)
-                    _sounds.add( index - 1, sound);
+                    _sounds.add(index, sound);
                 else
                     _sounds.add(0, sound);
                 return;

@@ -36,6 +36,7 @@ public class MainController
 
     public MainController()
     {
+        //TODO: Można to zrobić bardziej elegancko?
         new java.util.Timer().schedule(
             new java.util.TimerTask() {
                 @Override

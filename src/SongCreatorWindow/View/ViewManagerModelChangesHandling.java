@@ -72,7 +72,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent
 
         var gc = canvas.getGraphicsContext2D();
 
-        System.out.println(String.format("Note inserted at: X - %d, Y - %d", note.getTimeX(), note.getNoteHeight()));
+        System.out.println(String.format("Note inserted at: X - %f, Y - %f", note.getTimeX(), note.getNoteHeight()));
         gc.drawImage(noteImage, note.getTimeX(), note.getNoteHeight());
     }
 
