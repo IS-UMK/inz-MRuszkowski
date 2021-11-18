@@ -1,10 +1,12 @@
 package SongCreatorWindow.Controllers;
 
 import Images.ImageManager;
-import Model.Instrument;
-import Model.Note;
-import Model.NoteToNumericValue;
-import Model.Path;
+import SongCreatorWindow.Model.Core.Instrument;
+import SongCreatorWindow.Model.Core.Note;
+import SongCreatorWindow.Model.Core.NoteToNumericValue;
+import SongCreatorWindow.Model.Core.Path;
+import SongCreatorWindow.Model.ModelManager;
+import SongCreatorWindow.View.ViewManagerModelChangesHandling;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -34,22 +36,25 @@ public class MainController
     @FXML
     BorderPane workSpace;
     @FXML
-    ScrollPane scrollPaneWithPaths;
-    @FXML
     AnchorPane anchorPaneWithPaths;
 
     //Constants
     double Height = workSpace != null ? workSpace.getHeight() / 3 : 200;
     double Width = Screen.getPrimary().getBounds().getWidth();
 
+    ModelManager modelManager;
+    ViewManagerModelChangesHandling viewManager;
+
+    //TODO: USUń
+    //########################################
     //Data structures for GUI Components
     List<Canvas> canvasList = new LinkedList<Canvas>();
     HashMap<Path, Canvas> canvasMap = new HashMap<>();
     HashMap<Canvas, Slider> volumeSliderMap = new HashMap<Canvas, Slider>();
     HashMap<Canvas, ChoiceBox> choiceBoxMap = new HashMap<>();
-    HashMap<Canvas, TextField> textFieldMap = new HashMap<>();
     HashMap<Canvas, TextField> tempoMap = new HashMap<>();
     HashMap<Canvas, MenuItem> selectionMenuItemToCanvas = new HashMap<>();
+    //########################################
 
     //Data structures for program logic (Model)
     @FXML
@@ -173,14 +178,14 @@ public class MainController
 
         var tempoTextField = new TextField();
         tempoTextField.textProperty().addListener(new ChangeListener<String>() {
-        @Override
-        public void changed(
-            ObservableValue<? extends String> observable,
-            String oldValue, String newValue) {
-                if (!newValue.matches("\\d*")) {
-                    tempoTextField.setText(newValue.replaceAll("[^\\d]", ""));
+            @Override
+            public void changed(
+                ObservableValue<? extends String> observable,
+                String oldValue, String newValue) {
+                    if (!newValue.matches("\\d*")) {
+                        tempoTextField.setText(newValue.replaceAll("[^\\d]", ""));
+                    }
                 }
-            }
         });
         tempoTextField.setMaxWidth(Height / 5);
         tempoTextField.setLayoutX(Height * 2.5);
@@ -210,7 +215,6 @@ public class MainController
         canvasMap.put(path, canvas);
         volumeSliderMap.put(canvas, volumeSlider);
         choiceBoxMap.put(canvas, choiceBox);
-        textFieldMap.put(canvas, tempoTextField);
         tempoMap.put(canvas, tempoTextField);
 
         //add created canvas and volume slider
@@ -246,6 +250,7 @@ public class MainController
                 System.out.println(String.format("Path number %d has been selected", index));
             }
         });
+
         selectPathMenuItem.getItems().add(pathToSelect);
         selectionMenuItemToCanvas.put(canvas, pathToSelect);
     }
@@ -305,7 +310,6 @@ public class MainController
 
         //remove it from GUI
         anchorPaneWithPaths.getChildren().remove(canvas);
-        selectedPath = null;
 
         //move up canvases below selected to delete
         int index = canvasList.indexOf(canvas);
@@ -324,11 +328,8 @@ public class MainController
             var choiceBox_to_move_up = choiceBoxMap.get(canvas_to_move_up);
             choiceBox_to_move_up.setLayoutY(choiceBox_to_move_up.getLayoutY() - Height);
 
-            var textField_to_move_up = textFieldMap.get(canvas_to_move_up);
-            textField_to_move_up.setLayoutY(textField_to_move_up.getLayoutY() - Height);
-
-            var tempoField_to_move_up= tempoMap.get(canvas_to_move_up);
-            tempoField_to_move_up.setLayoutY(tempoField_to_move_up.getLayoutY() - Height);
+            var tempoMap_to_move_up= tempoMap.get(canvas_to_move_up);
+            tempoMap_to_move_up.setLayoutY(tempoMap_to_move_up.getLayoutY() - Height);
         }
 
         //remove this canvas from data structures
@@ -343,10 +344,6 @@ public class MainController
         ChoiceBox choiceBox = choiceBoxMap.get(canvas);
         choiceBoxMap.remove(choiceBox);
         anchorPaneWithPaths.getChildren().remove(choiceBox);
-
-        TextField textField = textFieldMap.get(canvas);
-        textFieldMap.remove(textField);
-        anchorPaneWithPaths.getChildren().remove(textField);
 
         TextField tempoField = tempoMap.get(canvas);
         tempoMap.remove(tempoField);
@@ -417,12 +414,23 @@ public class MainController
 
         if(x > 3 * Height + 100) // 100 - rozmiar klucza wiolinowego, może lepiej by było to sparametryzowane
         {
+            int base = NoteToNumericValue.Get_Octave_5_sound_G();
+
+            /*switch (key)
+            {
+
+            }*/
+
             //model code
             int index = (int)y / (int)Height;
             System.out.println(String.format("The selected path where to insert note: %d", index));
+            int insertX = ((int)(x - 45) / 10) * 10;
+            int insertY = ((int)((y - 80 - Height * index) / 10)) * 10;
 
-            Note note = Note.CreateNote(NoteToNumericValue.Get_Octave_5_sound_C(), 'q');
-            note.setTimeX(x);
+            int move_sound_by = (insertY - 40) / 10;
+
+            Note note = Note.CreateNote(base - move_sound_by, 'q');
+            note.setTimeX(insertX);
             musicPaths.get(index).addSound(note);
 
             //view code
@@ -432,8 +440,6 @@ public class MainController
 
             var gc = canvas.getGraphicsContext2D();
 
-            int insertX = ((int)(x - 45) / 10) * 10;
-            int insertY = ((int)((y - 80 - Height * index) / 10)) * 10;
             System.out.println(String.format("Note inserted at: X - %d, Y - %d", insertX, insertY));
             gc.drawImage(noteImage, insertX, insertY);
         }

@@ -1,4 +1,4 @@
-package Model;
+package SongCreatorWindow.Model.Core;
 
 import java.lang.reflect.Field;
 import java.util.LinkedList;
