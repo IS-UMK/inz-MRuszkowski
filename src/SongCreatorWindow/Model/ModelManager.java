@@ -104,6 +104,10 @@ public class ModelManager
         System.out.println(String.format("User inserted new path of name - %s", pathName));
     }
 
+    /**
+     * Sets the new name of selected path in model
+     * @param newName
+     */
     public void renameSelectedPathName(String newName)
     {
         selectedPath.setName(newName);
@@ -113,6 +117,9 @@ public class ModelManager
         System.out.println(String.format("Changing path name from %s to %s", selectedPath.getName(), newName));
     }
 
+    /**
+     * removes selected path from model
+     */
     public void removeSelectedPath()
     {
         musicPaths.remove(selectedPath);
@@ -124,6 +131,11 @@ public class ModelManager
     //endregion
 
     //region Music
+
+    /**
+     * Extracts the entire music string out of all paths
+     * @return Music String
+     */
     public String extractEntireMusic()
     {
         var musicString = new StringBuilder();
@@ -138,6 +150,11 @@ public class ModelManager
     //endregion
 
     //region Events/Listeners Methods
+
+    /**
+     * Add listener that react on particular events like IPathEvent, INoteEvent
+     * @param listener Inherits after IMusicEvent interface
+     */
     public void addListener(IMusicEvent listener)
     {
         if(listener instanceof IPathEvent)
@@ -146,6 +163,11 @@ public class ModelManager
             noteListeners.add((INoteEvent) listener);
     }
 
+    /**
+     * Raise event when note is added to particular path
+     * @param path
+     * @param note
+     */
     private void fireOnNoteAdded(Path path, Note note)
     {
         Iterator iterator = pathListeners.iterator();
@@ -156,6 +178,10 @@ public class ModelManager
         }
     }
 
+    /**
+     * Raise event when new path is created
+     * @param path
+     */
     private void fireOnCreatedPathEvent(Path path)
     {
         Iterator iterator = pathListeners.iterator();
@@ -166,6 +192,10 @@ public class ModelManager
         }
     }
 
+    /**
+     * Raise event when the selected path has changed name
+     * @param path
+     */
     private void fireOnPathNameRenamed(Path path)
     {
         Iterator iterator = pathListeners.iterator();
@@ -176,6 +206,9 @@ public class ModelManager
         }
     }
 
+    /**
+     * Raise event when selected path is set to null
+     */
     private void fireOnPathClearSelection()
     {
         Iterator iterator = pathListeners.iterator();
@@ -186,6 +219,10 @@ public class ModelManager
         }
     }
 
+    /**
+     * Raise event when selected path has been deleted
+     * @param path
+     */
     private void fireOnPathDeleted(Path path)
     {
         Iterator iterator = pathListeners.iterator();
@@ -197,6 +234,11 @@ public class ModelManager
     }
     //endregion
 
+    /**
+     * Method that checks if loaded file match the required extension used by program
+     * @param filename
+     * @return Extension of file or empty string packed in container "Optional"
+     */
     private Optional<String> getExtensionByString(String filename) {
         return Optional.ofNullable(filename)
                 .filter(f -> f.contains("."))

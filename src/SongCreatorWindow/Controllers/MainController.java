@@ -106,6 +106,9 @@ public class MainController
 
     public void UnselectPath(ActionEvent actionEvent)
     {
+        if(modelManager.getSelectedPath() == null)
+            return;
+
         modelManager.clearSelectionOfPath();
     }
 
