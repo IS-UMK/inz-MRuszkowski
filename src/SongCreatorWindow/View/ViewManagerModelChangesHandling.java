@@ -6,6 +6,7 @@ import SongCreatorWindow.Model.Core.Note;
 import SongCreatorWindow.Model.Core.Path;
 import SongCreatorWindow.Model.Events.INoteEvent;
 import SongCreatorWindow.Model.Events.IPathEvent;
+import SongCreatorWindow.Model.GlobalSettings;
 import SongCreatorWindow.Model.ModelManager;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -66,7 +67,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent
     @Override
     public void onNoteAdded(Path path, Note note)
     {
-        Image noteImage = ImageManager.getInstance().setDimensions(100, 100).getQuarterNote();
+        Image noteImage = ImageManager.getInstance().setDimensions(noteWidth, 100).getQuarterNote();
 
         var canvas = canvasMap.get(path);
 
@@ -172,7 +173,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent
             gc.strokeLine(3* Height + 20,40 + i*20, canvas.getWidth() - 20, 40 + i*20);
 
         //add (default Violin) music key
-        Image violinKeyImage = ImageManager.getInstance().setDimensions(100, 170.62).getViolinKey();
+        Image violinKeyImage = ImageManager.getInstance().setDimensions(musicKeyWidth, 170.62).getViolinKey();
         gc.drawImage(violinKeyImage, Height * 3, Height / 13);
 
         //Save created components

@@ -1,18 +1,25 @@
 package SongCreatorWindow.Model;
 
-import SongCreatorWindow.Model.Core.IPlayable;
-import SongCreatorWindow.Model.Core.Note;
-import SongCreatorWindow.Model.Core.NoteToNumericValue;
-import SongCreatorWindow.Model.Core.Path;
+import SongCreatorWindow.Model.Core.*;
 import SongCreatorWindow.Model.Events.IMusicEvent;
 import SongCreatorWindow.Model.Events.INoteEvent;
 import SongCreatorWindow.Model.Events.IPathEvent;
+import javafx.stage.FileChooser;
+import org.jfugue.midi.MidiFileManager;
+import org.jfugue.pattern.Pattern;
 
-import java.io.File;
+import javax.sound.midi.InvalidMidiDataException;
+import java.io.*;
 import java.util.*;
 
-public class ModelManager
+import static SongCreatorWindow.Model.GlobalSettings.*;
+
+public class ModelManager implements Serializable
 {
+    String projectName = null;
+    public void setProjectName(String name) { projectName = name; }
+    public String getProjectName() { return projectName; }
+
     //Paths
     List<Path> musicPaths = new LinkedList<Path>();
     Path selectedPath = null;
@@ -21,17 +28,85 @@ public class ModelManager
     public List<IPathEvent> pathListeners = new LinkedList<>();
     public List<INoteEvent> noteListeners = new LinkedList<>();
 
-    public ModelManager(String pathToProject) throws IllegalArgumentException, NoSuchElementException
+    public ModelManager() { }
+
+    //region Files
+    public static void saveProject(ModelManager modelManager) throws IOException
     {
-        /*if(pathToProject != null) {
-            String fileExtension = getExtensionByString(pathToProject).get();
+        /*FileChooser choice = new FileChooser();*/
 
-            if (fileExtension != GlobalSettings.projectsExtensions)
-                throw new IllegalArgumentException("File extension does not match.");
+        String fileName = String.format("D:\\Studia\\%s.%s", modelManager.projectName, GlobalSettings.projectsExtensions);
 
-            File file = new File(pathToProject);
-        }*/
+        ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(fileName));
+
+        stream.writeObject(modelManager);
+        stream.flush();
+        stream.close();
+
+        System.out.println(String.format("Project has been saved to file: %s", fileName));
     }
+
+    public static ModelManager loadProject(String pathToProject) throws IOException, ClassNotFoundException
+    {
+        String fileExtension = getExtensionByString(pathToProject).get();
+
+        if (fileExtension != GlobalSettings.projectsExtensions)
+            throw new IllegalArgumentException("File extension does not match.");
+
+        ObjectInputStream stream = new ObjectInputStream(new FileInputStream(pathToProject));
+
+        ModelManager project = (ModelManager) stream.readObject();
+        stream.close();
+
+        System.out.println(String.format("Project %s has been loaded", project.getProjectName()));
+
+        return project;
+    }
+
+    public static void exportProjectToMIDI(ModelManager modelManager) throws IOException
+    {
+        String entireMusic = modelManager.extractEntireMusic();
+
+        String fileName = String.format("D:\\Studia\\%s.mid", modelManager.projectName);
+
+        MidiFileManager.savePatternToMidi(new Pattern(entireMusic), new File(fileName));
+
+        System.out.println(String.format("Project has been exported to midi file: %s", fileName));
+    }
+
+    public static ModelManager importProjectFromMIDI(String pathToProject) throws IOException, InvalidMidiDataException
+    {
+        Pattern pattern = MidiFileManager.loadPatternFromMidi(new File(pathToProject));
+
+        String musicString = pattern.toString();
+        var modelManager = new ModelManager();
+
+        String[] paths = musicString.split("^V[0-15]] $");
+
+        byte i = 0;
+
+        int startX;
+
+        for(String path : paths)
+        {
+            startX = (int) (numberOfPropertySquaresInPath * Height + musicKeyWidth);
+
+            modelManager.createPath(String.format("Path %d", i+1));
+
+            String[] sounds = path.split("^I* [0-9]{1,3}[a-z]");
+
+            for(String sound : sounds)
+            {
+                String[] notes = sound.split(" ");
+                modelManager.addNote(i++, startX, Integer.parseInt(notes[1]) * 10 + 40);
+
+                startX += noteWidth * 2;
+            }
+        }
+
+        return modelManager;
+    }
+    //endregion
 
     //region Notes
     public void addNote(int pathIndex, int insertX, int insertY)
@@ -95,7 +170,7 @@ public class ModelManager
     public void createPath(String pathName)
     {
         //
-        var path = Path.CreatePath(pathName, (byte)musicPaths.size(), "PIANO");
+        var path = Path.CreatePath(pathName, (byte)musicPaths.size(), Instrument.getAllInstruments()[0]);
         System.out.println("Created Path:" + path.toString());
 
         musicPaths.add(path);
@@ -239,7 +314,7 @@ public class ModelManager
      * @param filename
      * @return Extension of file or empty string packed in container "Optional"
      */
-    private Optional<String> getExtensionByString(String filename) {
+    private static Optional<String> getExtensionByString(String filename) {
         return Optional.ofNullable(filename)
                 .filter(f -> f.contains("."))
                 .map(f -> f.substring(filename.lastIndexOf(".") + 1));

@@ -1,5 +1,6 @@
 package SongCreatorWindow.Controllers;
 
+import SongCreatorWindow.Model.GlobalSettings;
 import SongCreatorWindow.Model.ModelManager;
 import SongCreatorWindow.View.ViewManagerModelChangesHandling;
 import javafx.event.ActionEvent;
@@ -10,6 +11,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import org.jfugue.player.Player;
+
+import java.io.IOException;
 
 import static SongCreatorWindow.Model.GlobalSettings.*;
 
@@ -41,7 +44,7 @@ public class MainController
             new java.util.TimerTask() {
                 @Override
                 public void run() {
-                    modelManager = new ModelManager("");
+                    modelManager = new ModelManager();
                     viewManager = new ViewManagerModelChangesHandling(modelManager, anchorPaneWithPaths, selectPathMenuItem, playMenuItem);
                     modelManager.addListener(viewManager);
                 }
@@ -53,12 +56,43 @@ public class MainController
     //region Project
     public void SaveProjectToFile(ActionEvent actionEvent)
     {
+        if(modelManager.getProjectName() == null)
+        {
+            TextInputDialog window = new TextInputDialog("Project name");
+            window.setHeaderText("Enter name project:");
+            window.showAndWait();
 
+            String projectName = window.getResult();
+            if(projectName == null)
+                return;
+
+            modelManager.setProjectName(projectName);
+        }
+
+        try {
+            ModelManager.saveProject(modelManager);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void SaveProjectToFileWithDifferentName(ActionEvent actionEvent)
     {
+        TextInputDialog window = new TextInputDialog("Project name");
+        window.setHeaderText("Enter name project:");
+        window.showAndWait();
 
+        String projectName = window.getResult();
+        if(projectName == null)
+            return;
+
+        modelManager.setProjectName(projectName);
+
+        try {
+            ModelManager.saveProject(modelManager);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void LoadProjectFromFile(ActionEvent actionEvent)
@@ -87,6 +121,9 @@ public class MainController
 
         //get user response and create path
         String pathName = window.getResult();
+        if(pathName == null)
+            return;
+
         modelManager.createPath(pathName);
     }
 

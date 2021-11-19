@@ -23,6 +23,11 @@ public class GlobalSettings
     /**
      * Music Key settings
      */
-    public final static int musicKeyWidth = 100;
+    public static int musicKeyWidth = 100;
     public final static int numberOfPropertySquaresInPath = 3;
+
+    /**
+     * Note settings
+     */
+    public static int noteWidth = 100;
 }

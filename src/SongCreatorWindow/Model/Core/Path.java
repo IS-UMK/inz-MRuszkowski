@@ -56,10 +56,7 @@ public class Path {
             if(s.getTimeX() > sound.getTimeX())
             {
                 int index = _sounds.indexOf(s);
-                if(index != 0)
-                    _sounds.add(index, sound);
-                else
-                    _sounds.add(0, sound);
+                _sounds.add(index, sound);
                 return;
             }
 
