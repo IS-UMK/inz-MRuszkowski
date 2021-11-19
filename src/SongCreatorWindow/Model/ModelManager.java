@@ -20,6 +20,10 @@ public class ModelManager implements Serializable
     public void setProjectName(String name) { projectName = name; }
     public String getProjectName() { return projectName; }
 
+    String projectDestination = null;
+    public void setProjectDestination(String name) { projectDestination = name; }
+    public String getProjectDestination() { return projectDestination; }
+
     //Paths
     List<Path> musicPaths = new LinkedList<Path>();
     Path selectedPath = null;
@@ -33,9 +37,9 @@ public class ModelManager implements Serializable
     //region Files
     public static void saveProject(ModelManager modelManager) throws IOException
     {
-        /*FileChooser choice = new FileChooser();*/
+        String fileName = modelManager.getProjectDestination();
 
-        String fileName = String.format("D:\\Studia\\%s.%s", modelManager.projectName, GlobalSettings.projectsExtensions);
+        System.out.println(String.format("Saving project destination set to: %s", fileName));
 
         ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(fileName));
 

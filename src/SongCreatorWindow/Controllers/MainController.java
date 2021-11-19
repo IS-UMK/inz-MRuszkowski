@@ -1,5 +1,6 @@
 package SongCreatorWindow.Controllers;
 
+import MainWindow.MainWindow;
 import SongCreatorWindow.Model.GlobalSettings;
 import SongCreatorWindow.Model.ModelManager;
 import SongCreatorWindow.View.ViewManagerModelChangesHandling;
@@ -10,8 +11,10 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.FileChooser;
 import org.jfugue.player.Player;
 
+import java.io.File;
 import java.io.IOException;
 
 import static SongCreatorWindow.Model.GlobalSettings.*;
@@ -58,15 +61,33 @@ public class MainController
     {
         if(modelManager.getProjectName() == null)
         {
-            TextInputDialog window = new TextInputDialog("Project name");
+            /*TextInputDialog window = new TextInputDialog("Project name");
             window.setHeaderText("Enter name project:");
-            window.showAndWait();
+            window.showAndWait();*/
 
-            String projectName = window.getResult();
+            /*FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Choose Project File");
+            File file = fileChooser.showOpenDialog(MainWindow.StageToDeleteLater);*/
+
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Choose Project File");
+
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                    String.format("Music creator file (*.%s)", projectsExtensions),
+                    String.format("*.%s", projectsExtensions)
+            );
+            fileChooser.getExtensionFilters().add(extFilter);
+
+            File file = fileChooser.showSaveDialog(MainWindow.StageToDeleteLater);
+            if(file == null)
+                return;
+
+            String projectName = file.getName();
             if(projectName == null)
                 return;
 
             modelManager.setProjectName(projectName);
+            modelManager.setProjectDestination(file.getPath());
         }
 
         try {
