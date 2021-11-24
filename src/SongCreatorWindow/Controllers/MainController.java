@@ -12,6 +12,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import org.jfugue.player.Player;
 
+import javax.sound.midi.InvalidMidiDataException;
 import java.io.File;
 import java.io.IOException;
 
@@ -58,7 +59,7 @@ public class MainController
     public void SaveProjectToFile(ActionEvent actionEvent)
     {
         if(modelManager.getProjectName() == null)
-            if(!projectSavingPreProcess())
+            if(!projectSavingPreProcess("Choose Project Destination", "Music creator file", projectsExtensions))
                 return;
 
         try {
@@ -71,7 +72,7 @@ public class MainController
 
     public void SaveProjectToFileWithDifferentName(ActionEvent actionEvent)
     {
-        if(!projectSavingPreProcess())
+        if(!projectSavingPreProcess("Choose Project Destination", "Music creator file", projectsExtensions))
             return;
 
         try {
@@ -85,14 +86,14 @@ public class MainController
      * Asks user for project name and destination
      * @return True if preprocess has finished successfully
      */
-    private boolean projectSavingPreProcess()
+    private boolean projectSavingPreProcess(String title, String fileExtensionMessage, String fileExtension)
     {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Choose Project Destination");
+        fileChooser.setTitle(title);
 
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-                String.format("Music creator file (*.%s)", projectsExtensions),
-                String.format("*.%s", projectsExtensions)
+                String.format("%s (*.%s)", fileExtensionMessage, fileExtension),
+                String.format("*.%s", fileExtension)
         );
         fileChooser.getExtensionFilters().add(extFilter);
 
@@ -147,12 +148,49 @@ public class MainController
 
     public void ExportProjectToMIDIFile(ActionEvent actionEvent)
     {
+        if(!projectSavingPreProcess("Choose Export Destination", "Midi file", midiExtension))
+            return;
 
+        try {
+            ModelManager.exportProjectToMIDI(modelManager);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void ImportProjectFromMIDIFile(ActionEvent actionEvent)
     {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choose Midi File");
 
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                String.format("Midi file (*.%s)", midiExtension),
+                String.format("*.%s", midiExtension)
+        );
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        File file = fileChooser.showOpenDialog(MainWindow.StageToDeleteLater);
+
+        if(file == null)
+            return;
+
+        ModelManager loadedProject = null;
+
+        try {
+            loadedProject = ModelManager.importProjectFromMIDI(file.getPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InvalidMidiDataException e) {
+            e.printStackTrace();
+        }
+
+        if(loadedProject == null)
+            return;
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are You sure to load project? Current work will be lost if is not saved.");
+        alert.showAndWait();
+
+        modelManager.replaceExistingModel(loadedProject);
     }
     //endregion
 

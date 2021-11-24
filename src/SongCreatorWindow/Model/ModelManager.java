@@ -78,8 +78,9 @@ public class ModelManager implements Serializable
     {
         String entireMusic = modelManager.extractEntireMusic();
 
-        String fileName = String.format("D:\\Studia\\%s.mid", modelManager.projectName);
+        String fileName = String.format(modelManager.getProjectDestination(), modelManager.getProjectName());
 
+        //WARNING - Author of JFugue does not close stream here
         MidiFileManager.savePatternToMidi(new Pattern(entireMusic), new File(fileName));
 
         System.out.println(String.format("Project has been exported to midi file: %s", fileName));
@@ -87,24 +88,36 @@ public class ModelManager implements Serializable
 
     public static ModelManager importProjectFromMIDI(String pathToProject) throws IOException, InvalidMidiDataException
     {
-        Pattern pattern = MidiFileManager.loadPatternFromMidi(new File(pathToProject));
+        Pattern patternFromMidiFile = MidiFileManager.loadPatternFromMidi(new File(pathToProject));
 
-        String musicString = pattern.toString();
+        String musicString = patternFromMidiFile.toString();
         var modelManager = new ModelManager();
 
-        String[] paths = musicString.split("^V[0-15]] $");
+        String[] patterns = musicString.split("T[0-9]{1,3}");
+
+        for(int i = 1; i < patterns.length; i++)
+            patterns[i] = patterns[i].substring(3).trim();
 
         byte i = 0;
 
         int startX;
 
-        for(String path : paths)
+        for(String pattern : patterns)
         {
+            if(i == 0)
+            {
+                i++;
+                continue;
+            }
+
             startX = (int) (numberOfPropertySquaresInPath * Height + musicKeyWidth);
 
             modelManager.createPath(String.format("Path %d", i+1));
 
-            String[] sounds = path.split("^I* [0-9]{1,3}[a-z]");
+            String[] sounds = pattern.split("I[0-9]{1,3}");
+
+            for(String sound : sounds)
+                sound = sound.trim();
 
             for(String sound : sounds)
             {
