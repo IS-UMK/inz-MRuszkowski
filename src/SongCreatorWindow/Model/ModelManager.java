@@ -265,12 +265,6 @@ public class ModelManager implements Serializable
             noteListeners.add((INoteEvent) listener);
     }
 
-    public void removeListener(IMusicEvent listener)
-    {
-        pathListeners.remove(listener);
-        noteListeners.remove(listener);
-    }
-
     /**
      * Raise event when note is added to particular path
      * @param path
@@ -340,6 +334,7 @@ public class ModelManager implements Serializable
             pathEvent.onPathDeleted(path);
         }
     }
+    //endregion
 
     public void clearModel()
     {
@@ -349,8 +344,9 @@ public class ModelManager implements Serializable
             this.setSelectedPath(path);
             this.removeSelectedPath();
         }
+
+        clearSelectionOfPath();
     }
-    //endregion
 
     /**
      * Method that checks if loaded file match the required extension used by program
