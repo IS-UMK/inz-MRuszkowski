@@ -4,7 +4,6 @@ import SongCreatorWindow.Model.Core.*;
 import SongCreatorWindow.Model.Events.IMusicEvent;
 import SongCreatorWindow.Model.Events.INoteEvent;
 import SongCreatorWindow.Model.Events.IPathEvent;
-import javafx.stage.FileChooser;
 import org.jfugue.midi.MidiFileManager;
 import org.jfugue.pattern.Pattern;
 
@@ -16,6 +15,8 @@ import static SongCreatorWindow.Model.GlobalSettings.*;
 
 public class ModelManager implements Serializable
 {
+    private static final long serialVersionUID = 8538391531267863794L;
+
     String projectName = null;
     public void setProjectName(String name) { projectName = name; }
     public String getProjectName() { return projectName; }
@@ -28,13 +29,19 @@ public class ModelManager implements Serializable
     List<Path> musicPaths = new LinkedList<Path>();
     Path selectedPath = null;
 
+    /**
+     * Get music path from model copied
+     * @return Copy of paths
+     */
+    public List<Path> getPaths() { return new ArrayList<Path>(musicPaths); }
+
     //events
-    public List<IPathEvent> pathListeners = new LinkedList<>();
-    public List<INoteEvent> noteListeners = new LinkedList<>();
+    transient public List<IPathEvent> pathListeners = new LinkedList<>();
+    transient public List<INoteEvent> noteListeners = new LinkedList<>();
 
     public ModelManager() { }
 
-    //region Files
+    //region Files - Saving & Loading
     public static void saveProject(ModelManager modelManager) throws IOException
     {
         String fileName = modelManager.getProjectDestination();
@@ -54,7 +61,7 @@ public class ModelManager implements Serializable
     {
         String fileExtension = getExtensionByString(pathToProject).get();
 
-        if (fileExtension != GlobalSettings.projectsExtensions)
+        if (!fileExtension.equals(GlobalSettings.projectsExtensions))
             throw new IllegalArgumentException("File extension does not match.");
 
         ObjectInputStream stream = new ObjectInputStream(new FileInputStream(pathToProject));
@@ -110,6 +117,22 @@ public class ModelManager implements Serializable
 
         return modelManager;
     }
+
+    public void replaceExistingModel(ModelManager modelManager)
+    {
+        clearModel();
+
+        this.setProjectName(modelManager.getProjectName());
+        this.setProjectDestination(modelManager.getProjectDestination());
+
+        for(Path path : modelManager.getPaths())
+        {
+            createPath(path.getName());
+
+            for(IPlayable sound : path.getSounds())
+                addNote(path.getVoice(), sound.getTimeX(), sound.getSoundHeight());
+        }
+    }
     //endregion
 
     //region Notes
@@ -120,7 +143,7 @@ public class ModelManager implements Serializable
 
         Note note = Note.CreateNote(base - move_sound_by, 'q');
         note.setTimeX(insertX);
-        note.setNoteHeight(insertY);
+        note.setSoundHeight(insertY);
 
         Path path = musicPaths.get(pathIndex);
         path.addSound(note);
@@ -242,6 +265,12 @@ public class ModelManager implements Serializable
             noteListeners.add((INoteEvent) listener);
     }
 
+    public void removeListener(IMusicEvent listener)
+    {
+        pathListeners.remove(listener);
+        noteListeners.remove(listener);
+    }
+
     /**
      * Raise event when note is added to particular path
      * @param path
@@ -309,6 +338,16 @@ public class ModelManager implements Serializable
         while(iterator.hasNext()) {
             IPathEvent pathEvent = (IPathEvent) iterator.next();
             pathEvent.onPathDeleted(path);
+        }
+    }
+
+    public void clearModel()
+    {
+        //foreach on copied collection due to occurring error - if collection modified during loop, the Exception is thrown
+        for(Path path : getPaths())
+        {
+            this.setSelectedPath(path);
+            this.removeSelectedPath();
         }
     }
     //endregion

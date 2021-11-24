@@ -6,7 +6,6 @@ import SongCreatorWindow.Model.Core.Note;
 import SongCreatorWindow.Model.Core.Path;
 import SongCreatorWindow.Model.Events.INoteEvent;
 import SongCreatorWindow.Model.Events.IPathEvent;
-import SongCreatorWindow.Model.GlobalSettings;
 import SongCreatorWindow.Model.ModelManager;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -73,8 +72,9 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent
 
         var gc = canvas.getGraphicsContext2D();
 
-        System.out.println(String.format("Note inserted at: X - %f, Y - %f", note.getTimeX(), note.getNoteHeight()));
-        gc.drawImage(noteImage, note.getTimeX(), note.getNoteHeight());
+        System.out.println(String.format("Note inserted at: X - %d, Y - %d", note.getTimeX(), note.getSoundHeight()));
+
+        gc.drawImage(noteImage, note.getTimeX(), note.getSoundHeight());
     }
 
     @Override
@@ -297,6 +297,12 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent
     @Override
     public void onPathClearSelection()
     {
+        if(interactionCanvas == null)
+        {
+            interactionCanvas = new Canvas(Width, Height);
+            anchorPaneWithPaths.getChildren().add(interactionCanvas);
+        }
+
         interactionCanvas.getGraphicsContext2D().clearRect(0, 0, interactionCanvas.getWidth(), interactionCanvas.getHeight());
         interactionCanvas.setHeight(0);
     }

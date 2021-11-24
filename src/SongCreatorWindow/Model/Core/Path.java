@@ -1,25 +1,66 @@
 package SongCreatorWindow.Model.Core;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
  * Class for JFugue to create music paths. More than one path can be played at onec.
  */
-public class Path {
+public class Path implements Serializable
+{
     String _pathName;
-    byte _pathId;
+    public String getName()
+    {
+        return _pathName;
+    }
+    public void setName(String result)
+    {
+        _pathName = result;
+    }
 
     String _selectedInstrument;
-    byte _volumeLevel;
+    public String getInstrument()
+    {
+        return _selectedInstrument;
+    }
+    public void setInstrument(String selectedInstrument)
+    {
+        _selectedInstrument = selectedInstrument;
+    }
 
-    LinkedList<IPlayable> _sounds;
-    int _lenght;
+    byte _volumeLevel;
+    public byte getVolume()
+    {
+        return _volumeLevel;
+    }
+    public void setVolume(byte volumeLevel)
+    {
+        _volumeLevel = volumeLevel;
+    }
+
+    byte _voice;
+    public byte getVoice()
+    {
+        return _voice;
+    }
+    public void setVoice(byte voice)
+    {
+        _voice = voice;
+    }
 
     int _tempo;
-    int _voice;
+    public int getTempo() { return _tempo; }
+    public void setTempo(int tempo) { _tempo = tempo; }
 
-    private Path(String pathName, byte pathId, String selectedInstrument, int tempo, byte volumeLevel)
+    List<IPlayable> _sounds;
+    public List<IPlayable> getSounds() { return new ArrayList<IPlayable>(_sounds); }
+
+    int _lenght;
+
+    private Path(String pathName, byte voice, String selectedInstrument, int tempo, byte volumeLevel)
     {
         _pathName = pathName;
 
@@ -29,26 +70,14 @@ public class Path {
         _sounds = new LinkedList<IPlayable>();
         //_lenght = 0;
 
-        _voice = _pathId = pathId;
+        _voice = voice;
         _tempo = tempo;
         System.out.println();
     }
 
-    public static Path CreatePath(String pathName, byte pathId, String selectedInstrument, int tempo, byte volumeLevel) { return new Path(pathName, pathId, selectedInstrument, tempo, volumeLevel); }
-    public static Path CreatePath(String pathName, byte pathId, String selectedInstrument, int tempo) { return new Path(pathName, pathId, selectedInstrument, tempo, (byte)50); }
-    public static Path CreatePath(String pathName, byte pathId, String selectedInstrument) { return new Path(pathName, pathId, selectedInstrument, 120, (byte)50); }
-
-    public String setInstrument()
-    {
-        return _selectedInstrument;
-    }
-
-    public void setInstrument(String selectedInstrument)
-    {
-        _selectedInstrument = selectedInstrument;
-    }
-
-    public int getTempo() { return _tempo; }
+    public static Path CreatePath(String pathName, byte voice, String selectedInstrument, int tempo, byte volumeLevel) { return new Path(pathName, voice, selectedInstrument, tempo, volumeLevel); }
+    public static Path CreatePath(String pathName, byte voice, String selectedInstrument, int tempo) { return new Path(pathName, voice, selectedInstrument, tempo, (byte)50); }
+    public static Path CreatePath(String pathName, byte voice, String selectedInstrument) { return new Path(pathName, voice, selectedInstrument, 120, (byte)50); }
 
     public void addSound(IPlayable sound)
     {
@@ -84,17 +113,8 @@ public class Path {
         info.append(String.format("Volume level - %s\n", _volumeLevel));
         info.append(String.format("Tempo of track - %s\n", _tempo));
         info.append(String.format("Voice - %s\n", _voice));
+        info.append(String.format("Music String - %s\n\n", getExtractedMusic()));
 
         return info.toString();
-    }
-
-    public String getName()
-    {
-        return _pathName;
-    }
-
-    public void setName(String result)
-    {
-        _pathName = result;
     }
 }

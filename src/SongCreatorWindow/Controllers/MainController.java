@@ -1,12 +1,10 @@
 package SongCreatorWindow.Controllers;
 
 import MainWindow.MainWindow;
-import SongCreatorWindow.Model.GlobalSettings;
 import SongCreatorWindow.Model.ModelManager;
 import SongCreatorWindow.View.ViewManagerModelChangesHandling;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -60,54 +58,21 @@ public class MainController
     public void SaveProjectToFile(ActionEvent actionEvent)
     {
         if(modelManager.getProjectName() == null)
-        {
-            /*TextInputDialog window = new TextInputDialog("Project name");
-            window.setHeaderText("Enter name project:");
-            window.showAndWait();*/
-
-            /*FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Choose Project File");
-            File file = fileChooser.showOpenDialog(MainWindow.StageToDeleteLater);*/
-
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Choose Project File");
-
-            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-                    String.format("Music creator file (*.%s)", projectsExtensions),
-                    String.format("*.%s", projectsExtensions)
-            );
-            fileChooser.getExtensionFilters().add(extFilter);
-
-            File file = fileChooser.showSaveDialog(MainWindow.StageToDeleteLater);
-            if(file == null)
+            if(!projectSavingPreProcess())
                 return;
-
-            String projectName = file.getName();
-            if(projectName == null)
-                return;
-
-            modelManager.setProjectName(projectName);
-            modelManager.setProjectDestination(file.getPath());
-        }
 
         try {
             ModelManager.saveProject(modelManager);
         } catch (IOException e) {
             e.printStackTrace();
+            System.err.println(e.getMessage());
         }
     }
 
     public void SaveProjectToFileWithDifferentName(ActionEvent actionEvent)
     {
-        TextInputDialog window = new TextInputDialog("Project name");
-        window.setHeaderText("Enter name project:");
-        window.showAndWait();
-
-        String projectName = window.getResult();
-        if(projectName == null)
+        if(!projectSavingPreProcess())
             return;
-
-        modelManager.setProjectName(projectName);
 
         try {
             ModelManager.saveProject(modelManager);
@@ -116,9 +81,68 @@ public class MainController
         }
     }
 
+    /**
+     * Asks user for project name and destination
+     * @return True if preprocess has finished successfully
+     */
+    private boolean projectSavingPreProcess()
+    {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choose Project Destination");
+
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                String.format("Music creator file (*.%s)", projectsExtensions),
+                String.format("*.%s", projectsExtensions)
+        );
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        File file = fileChooser.showSaveDialog(MainWindow.StageToDeleteLater);
+        if(file == null)
+            return false;
+
+        String projectName = file.getName();
+        if(projectName == null)
+            return false;
+
+        modelManager.setProjectName(projectName);
+        modelManager.setProjectDestination(file.getPath());
+
+        return true;
+    }
+
     public void LoadProjectFromFile(ActionEvent actionEvent)
     {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choose Project File");
 
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                String.format("Music creator file (*.%s)", projectsExtensions),
+                String.format("*.%s", projectsExtensions)
+        );
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        File file = fileChooser.showOpenDialog(MainWindow.StageToDeleteLater);
+
+        if(file == null)
+            return;
+
+        ModelManager loadedProject = null;
+
+        try {
+            loadedProject = ModelManager.loadProject(file.getPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        if(loadedProject == null)
+            return;
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are You sure to load project? Current work will be lost if is not saved.");
+        alert.showAndWait();
+
+        modelManager.replaceExistingModel(loadedProject);
     }
 
     public void ExportProjectToMIDIFile(ActionEvent actionEvent)

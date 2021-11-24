@@ -17,21 +17,27 @@ public class Note implements IPlayable{
     /**
      * In which moment the note occurs
      */
-    double TimeX;
-    double NoteHeight;
+    int TimeX;
+    int NoteHeight;
 
     @Override
-    public double getTimeX() {
+    public int getTimeX() {
         return TimeX;
     }
 
     @Override
-    public void setTimeX(double x) {
+    public void setTimeX(int x) {
         TimeX = x;
     }
 
-    public double getNoteHeight() { return NoteHeight; }
-    public void setNoteHeight(double y) {
+    @Override
+    public int getSoundHeight()
+    {
+        return NoteHeight;
+    }
+
+    @Override
+    public void setSoundHeight(int y) {
         NoteHeight = y;
     }
 
