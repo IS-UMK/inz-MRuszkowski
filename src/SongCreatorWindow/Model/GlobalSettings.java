@@ -1,5 +1,7 @@
 package SongCreatorWindow.Model;
 
+import SongCreatorWindow.Model.Core.MusicKeySelection;
+import SongCreatorWindow.Model.Core.NoteToNumericValue;
 import javafx.stage.Screen;
 
 public class GlobalSettings
@@ -24,11 +26,35 @@ public class GlobalSettings
     /**
      * Music Key settings
      */
-    public static int musicKeyWidth = 100;
+    public static double musicKeyWidth = 100.0;
+    public static double getMusicKeyHeight()
+    {
+        double height = 0;
+
+        switch (defaultMusicKey)
+        {
+            case ViolinKey:
+                height = 170.62;
+                break;
+            case BassKey:
+                height = 111.11; // 53 - F4
+                break;
+            case AltoKey:
+                height = 107.95; // 60 - C5
+                break;
+        }
+
+        return height;
+    }
     public final static int numberOfPropertySquaresInPath = 3;
 
     /**
      * Note settings
      */
     public static int noteWidth = 100;
+
+    /**
+     * Default music key selection for new path
+     */
+    public static MusicKeySelection defaultMusicKey = MusicKeySelection.ViolinKey;
 }

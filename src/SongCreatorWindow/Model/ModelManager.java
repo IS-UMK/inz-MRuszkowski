@@ -25,6 +25,29 @@ public class ModelManager implements Serializable
     public void setProjectDestination(String name) { projectDestination = name; }
     public String getProjectDestination() { return projectDestination; }
 
+    MusicKeySelection selectedDefaultKey = GlobalSettings.defaultMusicKey;
+    public void setDefaultMusicKeySelection(MusicKeySelection musicKey) { selectedDefaultKey = musicKey; }
+    public MusicKeySelection getDefaultMusicKeySelection() { return selectedDefaultKey; }
+    private int getBasePointSound()
+    {
+        int base = -1;
+
+        switch (selectedDefaultKey)
+        {
+            case ViolinKey:
+                base = NoteToNumericValue.Get_Octave_5_sound_G(); // 67 - G5
+                break;
+            case BassKey:
+                base = NoteToNumericValue.Get_Octave_4_sound_F(); // 53 - F4
+                break;
+            case AltoKey:
+                base = NoteToNumericValue.Get_Octave_5_sound_C(); // 60 - C5
+                break;
+        }
+
+        return base;
+    }
+
     //Paths
     List<Path> musicPaths = new LinkedList<Path>();
     Path selectedPath = null;
@@ -135,6 +158,8 @@ public class ModelManager implements Serializable
     {
         clearModel();
 
+        this.selectedDefaultKey = modelManager.getDefaultMusicKeySelection();
+
         this.setProjectName(modelManager.getProjectName());
         this.setProjectDestination(modelManager.getProjectDestination());
 
@@ -151,7 +176,7 @@ public class ModelManager implements Serializable
     //region Notes
     public void addNote(int pathIndex, int insertX, int insertY)
     {
-        int base = NoteToNumericValue.Get_Octave_5_sound_G();
+        int base = getBasePointSound();
         int move_sound_by = (insertY - 40) / 10;
 
         Note note = Note.CreateNote(base - move_sound_by, 'q');
@@ -210,7 +235,7 @@ public class ModelManager implements Serializable
     public void createPath(String pathName)
     {
         //
-        var path = Path.CreatePath(pathName, (byte)musicPaths.size(), Instrument.getAllInstruments()[0]);
+        var path = Path.CreatePath(pathName, (byte)musicPaths.size(), this.selectedDefaultKey, Instrument.getAllInstruments()[0]);
         System.out.println("Created Path:" + path.toString());
 
         musicPaths.add(path);

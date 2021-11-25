@@ -1,5 +1,7 @@
 package Images;
 
+import SongCreatorWindow.Model.Core.MusicKeySelection;
+import SongCreatorWindow.Model.Core.NoteToNumericValue;
 import javafx.scene.image.Image;
 
 public class ImageManager
@@ -81,7 +83,27 @@ public class ImageManager
     //region Getters - Flyweight pattern utilized
 
     //region Music keys
-    public Image getAltoKey()
+    public Image getMusicKey(MusicKeySelection musicKeySelection)
+    {
+        Image image = null;
+
+        switch (musicKeySelection)
+        {
+            case ViolinKey:
+                image = getViolinKey();
+                break;
+            case BassKey:
+                image = getBassKey();
+                break;
+            case AltoKey:
+                image = getAltoKey();
+                break;
+        }
+
+        return image;
+    }
+
+    private Image getAltoKey()
     {
         if(reloadImage || _altoKeyImage == null)
         {
@@ -92,10 +114,11 @@ public class ImageManager
         return _altoKeyImage;
     }
 
-    public Image getViolinKey()
+    private Image getViolinKey()
     {
         if(reloadImage || _violinKeyImage == null)
         {
+           // _violinKeyImage = getImageByResource("/Images/violin_clef.svg");
             _violinKeyImage = getImageByResource("/Images/violin_key.png");
             setReloadFlag(false);
         }
@@ -103,7 +126,7 @@ public class ImageManager
         return _violinKeyImage;
     }
 
-    public Image getBassKey()
+    private Image getBassKey()
     {
         if(reloadImage || _bassKeyImage == null)
         {
