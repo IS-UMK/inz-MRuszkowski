@@ -1,5 +1,8 @@
 package MainWindow;
 
+import SongCreatorWindow.Controllers.MainController;
+import SongCreatorWindow.Model.Core.GlobalLoaderDTO;
+import SongCreatorWindow.Model.GlobalSettings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -20,6 +23,8 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+
+import static SongCreatorWindow.Model.GlobalSettings.midiExtension;
 
 public class Controller
 {
@@ -143,17 +148,37 @@ public class Controller
         }
     }
 
+    private void OpenSongCreatorWindow() throws IOException
+    {
+        Parent root = FXMLLoader.load(getClass().getResource("../SongCreatorWindow/SongCreator.fxml"));
+
+        Scene scene = new Scene(root, 800, 600);
+
+        Stage stage = new Stage();
+        stage.setTitle("Song Creator Window");
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    private void OpenSongCreatorWindow(String pathToProject) throws IOException
+    {
+        FXMLLoader root = new FXMLLoader(getClass().getResource("../SongCreatorWindow/SongCreator.fxml"));
+
+        Scene scene = new Scene(root.load(), 800, 600);
+
+        MainController controller = root.getController();
+        controller.initLoader(pathToProject);
+
+        Stage stage = new Stage();
+        stage.setTitle("Song Creator Window");
+        stage.setScene(scene);
+        stage.show();
+    }
+
     public void CreateNewSongProject(javafx.event.ActionEvent actionEvent)
     {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("../SongCreatorWindow/SongCreator.fxml"));
-
-            Scene scene = new Scene((Parent)root, 800, 600);
-
-            Stage stage = new Stage();
-            stage.setTitle("Song Creator Window");
-            stage.setScene(scene);
-            stage.show();
+            OpenSongCreatorWindow();
 
             Logger.appendTextToLogLabel(logLabel,"New song project has been created");
         } catch (IOException e) {
@@ -164,19 +189,20 @@ public class Controller
 
     public void EditSongProjectFromList(javafx.event.ActionEvent actionEvent)
     {
-        //TODO: przekazać referencję do pliku na podstawie zaznaczonego elementu na liście
         try {
             String selectedItem = listViewWithSongProjects.getSelectionModel().getSelectedItem();
-            File file = new File(listModelWithSongProjects.get(selectedItem));
+            //File file = new File(listModelWithSongProjects.get(selectedItem));
+            String destinationPath = listModelWithSongProjects.get(selectedItem);
 
-            //TODO: Jak przekazać referencje pliku to nowego okna?
-            //plik jest już czytany w nowych oknie
+            OpenSongCreatorWindow(destinationPath);
 
-            Logger.appendTextToLogLabel(logLabel,String.format("Project %s has been opened", file.getName()));
+            Logger.appendTextToLogLabel(logLabel,String.format("Project %s has been opened", selectedItem));
         }
         catch (RuntimeException e)
         {
             Logger.appendTextToLogLabel(logLabel,"None item is selected to be edited");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -185,6 +211,12 @@ public class Controller
         try {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Choose Project File");
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                    String.format("Midi file (*.%s)", GlobalSettings.projectsExtensions),
+                    String.format("*.%s", GlobalSettings.projectsExtensions)
+            );
+            fileChooser.getExtensionFilters().add(extFilter);
+
             File file = fileChooser.showOpenDialog(MainWindow.StageToDeleteLater);
 
             String fileName = file.getName();
@@ -201,15 +233,17 @@ public class Controller
             listModelWithSongProjects.put(fileName, filePath);
             listViewWithSongProjects.getItems().add(fileName);
 
-            //TODO: Jak przekazać referencje pliku to nowego okna?
-            //plik jest już czytany w nowych oknie
+            OpenSongCreatorWindow(filePath);
 
             Logger.appendTextToLogLabel(logLabel,String.format("Project %s has been opened", fileName));
         }
         catch (RuntimeException e)
         {
             Logger.appendTextToLogLabel(logLabel,"Loading project aborted");
-            return;
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
         }
     }
 

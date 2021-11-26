@@ -1,8 +1,11 @@
 package SongCreatorWindow.Controllers;
 
 import MainWindow.MainWindow;
+import SongCreatorWindow.Model.Core.GlobalLoaderDTO;
+import SongCreatorWindow.Model.GlobalSettings;
 import SongCreatorWindow.Model.ModelManager;
 import SongCreatorWindow.View.ViewManagerModelChangesHandling;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -39,20 +42,40 @@ public class MainController
     ModelManager modelManager;
     ViewManagerModelChangesHandling viewManager;
 
+    GlobalLoaderDTO loader;
+
+    public void initLoader(String filePath)
+    {
+        loader = GlobalLoaderDTO.getInstance();
+        loader.setLoadingData(filePath);
+    }
+
     public MainController()
     {
-        //TODO: Można to zrobić bardziej elegancko?
-        new java.util.Timer().schedule(
-            new java.util.TimerTask() {
-                @Override
-                public void run() {
-                    modelManager = new ModelManager();
-                    viewManager = new ViewManagerModelChangesHandling(modelManager, anchorPaneWithPaths, selectPathMenuItem, playMenuItem);
-                    modelManager.addListener(viewManager);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                modelManager = new ModelManager();
+
+                viewManager = new ViewManagerModelChangesHandling(modelManager, anchorPaneWithPaths, selectPathMenuItem, playMenuItem);
+                modelManager.addListener(viewManager);
+
+
+                if(loader.isHereProjectToLoad()) {
+                    try {
+                        modelManager.replaceExistingModel(
+                                ModelManager.loadProject(
+                                        loader.getProjectDestinationOnce()
+                                )
+                        );
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
                 }
-            },
-            1000
-        );
+            }
+        });
     }
 
     //region Project
@@ -164,8 +187,8 @@ public class MainController
         fileChooser.setTitle("Choose Midi File");
 
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-                String.format("Midi file (*.%s)", midiExtension),
-                String.format("*.%s", midiExtension)
+                String.format("Midi file (*.%s)", GlobalSettings.midiExtension),
+                String.format("*.%s", GlobalSettings.midiExtension)
         );
         fileChooser.getExtensionFilters().add(extFilter);
 
