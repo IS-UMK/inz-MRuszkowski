@@ -10,6 +10,8 @@ public class GlobalSettings
      * File extension where projects data is stored
      */
     public final static String projectsExtensions = "mrinz";
+    public final static String fileNameWithProjectList = "projectsList.dat";
+    public final static String fileNameWithProjectListView = "projectsListView.dat";
     public final static String midiExtension = "mid";
 
     /**

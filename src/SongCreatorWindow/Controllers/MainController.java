@@ -140,8 +140,8 @@ public class MainController
         fileChooser.setTitle("Choose Project File");
 
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-                String.format("Music creator file (*.%s)", projectsExtensions),
-                String.format("*.%s", projectsExtensions)
+                String.format("Music creator file (*.%s)", GlobalSettings.projectsExtensions, GlobalSettings.projectsExtensions),
+                String.format("*.%s", GlobalSettings.projectsExtensions)
         );
         fileChooser.getExtensionFilters().add(extFilter);
 

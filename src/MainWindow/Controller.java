@@ -3,6 +3,7 @@ package MainWindow;
 import SongCreatorWindow.Controllers.MainController;
 import SongCreatorWindow.Model.Core.GlobalLoaderDTO;
 import SongCreatorWindow.Model.GlobalSettings;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -18,11 +19,14 @@ import org.jfugue.player.Player;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.Sequence;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static SongCreatorWindow.Model.GlobalSettings.midiExtension;
 
@@ -41,6 +45,13 @@ public class Controller
 
     public Controller()
     {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                LoadListWithProjects();
+            }
+        });
+
         managedPlayer.addManagedPlayerListener(new ManagedPlayerListener() {
             @Override
             public void onStarted(Sequence sequence) {
@@ -191,7 +202,6 @@ public class Controller
     {
         try {
             String selectedItem = listViewWithSongProjects.getSelectionModel().getSelectedItem();
-            //File file = new File(listModelWithSongProjects.get(selectedItem));
             String destinationPath = listModelWithSongProjects.get(selectedItem);
 
             OpenSongCreatorWindow(destinationPath);
@@ -212,7 +222,7 @@ public class Controller
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Choose Project File");
             FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-                    String.format("Midi file (*.%s)", GlobalSettings.projectsExtensions),
+                    String.format("Music creator file (*.%s)", GlobalSettings.projectsExtensions),
                     String.format("*.%s", GlobalSettings.projectsExtensions)
             );
             fileChooser.getExtensionFilters().add(extFilter);
@@ -233,6 +243,7 @@ public class Controller
             listModelWithSongProjects.put(fileName, filePath);
             listViewWithSongProjects.getItems().add(fileName);
 
+            SaveListWithProjects();
             OpenSongCreatorWindow(filePath);
 
             Logger.appendTextToLogLabel(logLabel,String.format("Project %s has been opened", fileName));
@@ -247,6 +258,61 @@ public class Controller
         }
     }
 
+    public void SaveListWithProjects()
+    {
+        try {
+            ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(GlobalSettings.fileNameWithProjectList));
+
+            stream.writeObject(listModelWithSongProjects);
+            stream.flush();
+            stream.close();
+
+            var items = listViewWithSongProjects.getItems();
+            List<String> toFile = new LinkedList<>();//String[items.size()];
+            int i = 0;
+            for(var item : items)
+                toFile.add(item);
+
+            stream = new ObjectOutputStream(new FileOutputStream(GlobalSettings.fileNameWithProjectListView));
+            stream.writeObject(toFile);
+            stream.flush();
+            stream.close();
+
+            System.out.println("Current values of list with projects has been saved");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void LoadListWithProjects()
+    {
+        boolean modelLoaded = false;
+
+        try {
+            ObjectInputStream stream = new ObjectInputStream(new FileInputStream(GlobalSettings.fileNameWithProjectList));
+
+            listModelWithSongProjects = (HashMap<String, String>)stream.readObject();
+            stream.close();
+            modelLoaded = true;
+
+            stream = new ObjectInputStream(new FileInputStream(GlobalSettings.fileNameWithProjectListView));
+
+            var items = (List<String>)stream.readObject();
+            stream.close();
+
+            for(String item : items)
+                listViewWithSongProjects.getItems().add(item);
+        } catch (IOException e) {
+            if(modelLoaded)
+            {
+                for(String key : listModelWithSongProjects.keySet())
+                    listViewWithSongProjects.getItems().add(key);
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void RemoveSongProjectFromList(javafx.event.ActionEvent actionEvent)
     {
         removeItemFromListAndOptionallyFromDisk(false);
@@ -255,7 +321,6 @@ public class Controller
     public void DeleteSongProjectFromDisk(javafx.event.ActionEvent actionEvent)
     {
         removeItemFromListAndOptionallyFromDisk(true);
-
     }
 
     private void removeItemFromListAndOptionallyFromDisk(boolean removeAlsoFromDisk)
@@ -290,6 +355,7 @@ public class Controller
             }
 
             listModelWithSongProjects.remove(selectedItem);
+            SaveListWithProjects();
         }
         catch (RuntimeException e)
         {
@@ -320,6 +386,9 @@ public class Controller
 
         listViewWithSongProjects.getItems().remove(selectedItem);
         listViewWithSongProjects.getItems().add(index + movement,selectedItem);
+
+        SaveListWithProjects();
+
         Logger.appendTextToLogLabel(logLabel,String.format("Project %s moved %s on list", selectedItem, (movement < 0) ? "up" : "down"));
     }
 
