@@ -110,18 +110,12 @@ public class Path implements Serializable
 
         int instrumentValue = Instrument.GetInstrumentValueByChosenName(getInstrument());
 
-        //Difference 100 (TimeX) is Equal to Rq/@"time+0.25" (np. @0.25, @0.5) (I guess that: Rq = @0.25, @ set time when sound occurs, R means rest)
-        /*
-        double time = (_sounds.get(0).getTimeX() - GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal()) / (GlobalSettings.Height * 2);
-        musicString.append(String.format("@%f ", time));
-        */
-
         if(instrumentValue == -1) {
             for (IPlayable s : _sounds)
                 musicString.append(
                         String.format(
-                                "@%f %s ",
-                                (s.getTimeX() - GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() - GlobalSettings.fixedXPositionOfNotes) / (GlobalSettings.Height * 2),
+                                "@%s %s ",
+                                getSoundTimeOccurrence(s),
                                 s.ExtractJFugueSoundString()
                         )
                 );
@@ -133,13 +127,18 @@ public class Path implements Serializable
                 musicString.append(
                         String.format(
                                 "@%s %s ",
-                                (s.getTimeX() - GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() - GlobalSettings.fixedXPositionOfNotes) / (GlobalSettings.Height * 2),
+                                getSoundTimeOccurrence(s),
                                 s.ExtractJFugueSoundString().split(" ")[1]
                         )
                 );
         }
 
         return musicString.toString();
+    }
+
+    private String getSoundTimeOccurrence(IPlayable sound)
+    {
+        return Double.toString((sound.getTimeX() - GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() - GlobalSettings.fixedXPositionOfNotes) / (GlobalSettings.Height * 2));
     }
 
     @Override

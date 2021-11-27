@@ -159,7 +159,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent, 
                 Height
         );
 
-        Image instrumentImage = ImageManager.getInstance().setDimensions(Height * .7, Height * .7).getPiano();
+        Image instrumentImage = ImageManager.getInstance().setDimensions(Height * .7, Height * .7).getInstrumentByName(path.getInstrument());
         gc.drawImage(instrumentImage, Height * 1.15, Height / 10);
 
         //Instrument Selection
@@ -193,7 +193,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent, 
         choiceBox.setLayoutY(Height * canvasList.size() + Height - Height/5);
         choiceBox.setMinWidth(Height * .8);
         choiceBox.setMaxWidth(Height * .8);
-        choiceBox.setValue(instruments[1]);
+        choiceBox.setValue(path.getInstrument());
 
         //display speaker, tempo selection and create volume slider
         gc.strokeRect(2 * Height, 0, Height, Height);

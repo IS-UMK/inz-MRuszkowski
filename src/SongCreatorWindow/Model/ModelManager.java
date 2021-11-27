@@ -179,7 +179,7 @@ public class ModelManager implements Serializable
 
         for(Path path : modelManager.getPaths())
         {
-            createPath(path.getName());
+            createPath(path.getName(), path.getInstrument(), path.getTempo(), path.getVolume());
 
             for(IPlayable sound : path.getSounds())
                 addNote(path.getVoice(), sound.getTimeX(), sound.getSoundHeight());
@@ -243,10 +243,19 @@ public class ModelManager implements Serializable
     }
 
     /**
-     * Create new path according to user typed values
+     * Create new path according to user typed values with selected piano as instrument, tempo 120 and volume level 50
      * @param pathName
      */
     public void createPath(String pathName)
+    {
+        createPath(pathName, Instrument.getAllInstruments()[1], 120, (byte)50);
+    }
+
+    /**
+     * Create new path according to user typed values with selected instrument
+     * @param pathName
+     */
+    public void createPath(String pathName, String instrument, int tempo, byte volume)
     {
         //
         var path =
@@ -254,7 +263,9 @@ public class ModelManager implements Serializable
                         pathName,
                         (byte)musicPaths.size(),
                         this.selectedDefaultKey,
-                        Instrument.getAllInstruments()[1]
+                        instrument,
+                        tempo,
+                        volume
                 );
         System.out.println("Created Path:" + path.toString());
 
