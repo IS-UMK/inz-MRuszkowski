@@ -236,4 +236,8 @@ public class Instrument {
         public static int HARPISCHORD = 6;
         public static int CLAVINET = 7;
     }
+    public abstract class None
+    {
+        public static int None_Instrument = -1;
+    }
 }

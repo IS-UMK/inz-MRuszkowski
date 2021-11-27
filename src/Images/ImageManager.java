@@ -1,7 +1,6 @@
 package Images;
 
 import SongCreatorWindow.Model.Core.MusicKeySelection;
-import SongCreatorWindow.Model.Core.NoteToNumericValue;
 import javafx.scene.image.Image;
 
 public class ImageManager
@@ -65,7 +64,23 @@ public class ImageManager
     Image _sixtyFourth_NoteImage;
     Image _oneHundredTwentyEighth_NoteImage;
 
+    Image _soundEffectsImage;
+    Image _percussiveImage;
+    Image _ethnicImage;
+    Image _synthEffectsImage;
+    Image _synthPadImage;
+    Image _synthLeadImage;
+    Image _pipeImage;
+    Image _reedImage;
+    Image _brassImage;
+    Image _ensembleImage;
+    Image _stringsImage;
+    Image _bassImage;
+    Image _guitarImage;
+    Image _organImage;
+    Image _noneImage;
     Image _pianoImage;
+    Image _ChromaticPercussionImage;
     Image _speakerImage;
 
     /**
@@ -229,6 +244,233 @@ public class ImageManager
     //endregion
 
     //region Instruments
+    public Image getInstrumentByName(String instrumentName)
+    {
+        Image instrument = null;
+
+        switch (instrumentName)
+        {
+            case "Sound_Effects":
+                instrument = getSoundEffects();
+                break;
+            case "Percussive":
+                instrument = getPercussive();
+                break;
+            case "Ethnic":
+                instrument = getEthnic();
+                break;
+            case "Synth_Effects":
+                instrument = getSynthEffects();
+                break;
+            case "Synth_Pad":
+                instrument = getSynthPad();
+                break;
+            case "Synth_Lead":
+                instrument = getSynthLead();
+                break;
+            case "Pipe":
+                instrument = getPipe();
+                break;
+            case "Reed":
+                instrument = getReed();
+                break;
+            case "Brass":
+                instrument = getBrass();
+                break;
+            case "Ensemble":
+                instrument = getEnsemble();
+                break;
+            case "Strings":
+                instrument = getStrings();
+                break;
+            case "Bass":
+                instrument = getBass();
+                break;
+            case "Guitar":
+                instrument = getGuitar();
+                break;
+            case "Organ":
+                instrument = getOrgan();
+                break;
+            case "Chromatic_Percussion":
+                instrument = getChromaticPercussion();
+                break;
+            case "Piano":
+                instrument = getPiano();
+                break;
+            case "None":
+                instrument = getNone();
+                break;
+        }
+
+        return instrument;
+    }
+
+    public Image getSoundEffects()
+    {
+        if(reloadImage || _soundEffectsImage == null)
+        {
+            _soundEffectsImage = getImageByResource("/Images/sound_Effects.png");
+            setReloadFlag(false);
+        }
+
+        return _soundEffectsImage;
+    }
+
+    public Image getPercussive()
+    {
+        if(reloadImage || _percussiveImage == null)
+        {
+            _percussiveImage = getImageByResource("/Images/percussive.png");
+            setReloadFlag(false);
+        }
+
+        return _percussiveImage;
+    }
+
+    public Image getEthnic()
+    {
+        if(reloadImage || _ethnicImage == null)
+        {
+            _ethnicImage = getImageByResource("/Images/ethnic.png");
+            setReloadFlag(false);
+        }
+
+        return _ethnicImage;
+    }
+
+    public Image getSynthEffects()
+    {
+        if(reloadImage || _synthEffectsImage == null)
+        {
+            _synthEffectsImage = getImageByResource("/Images/synth_pad_effects.png");
+            setReloadFlag(false);
+        }
+
+        return _synthEffectsImage;
+    }
+
+    public Image getSynthPad()
+    {
+        if(reloadImage || _synthPadImage == null)
+        {
+            _synthPadImage = getImageByResource("/Images/synth_pad_effects.png");
+            setReloadFlag(false);
+        }
+
+        return _synthPadImage;
+    }
+
+    public Image getSynthLead()
+    {
+        if(reloadImage || _synthLeadImage == null)
+        {
+            _synthLeadImage = getImageByResource("/Images/synth_lead.png");
+            setReloadFlag(false);
+        }
+
+        return _synthLeadImage;
+    }
+
+    public Image getPipe()
+    {
+        if(reloadImage || _pipeImage == null)
+        {
+            _pipeImage = getImageByResource("/Images/pipe.png");
+            setReloadFlag(false);
+        }
+
+        return _pipeImage;
+    }
+
+    public Image getReed()
+    {
+        if(reloadImage || _reedImage == null)
+        {
+            _reedImage = getImageByResource("/Images/reed.png");
+            setReloadFlag(false);
+        }
+
+        return _reedImage;
+    }
+
+    public Image getBrass()
+    {
+        if(reloadImage || _brassImage == null)
+        {
+            _brassImage = getImageByResource("/Images/brass.png");
+            setReloadFlag(false);
+        }
+
+        return _brassImage;
+    }
+
+    public Image getEnsemble()
+    {
+        if(reloadImage || _ensembleImage == null)
+        {
+            _ensembleImage = getImageByResource("/Images/ensemble.png");
+            setReloadFlag(false);
+        }
+
+        return _ensembleImage;
+    }
+
+    public Image getStrings()
+    {
+        if(reloadImage || _stringsImage == null)
+        {
+            _stringsImage = getImageByResource("/Images/strings.png");
+            setReloadFlag(false);
+        }
+
+        return _stringsImage;
+    }
+
+    public Image getBass()
+    {
+        if(reloadImage || _bassImage == null)
+        {
+            _bassImage = getImageByResource("/Images/bass.png");
+            setReloadFlag(false);
+        }
+
+        return _bassImage;
+    }
+
+    public Image getGuitar()
+    {
+        if(reloadImage || _guitarImage == null)
+        {
+            _guitarImage = getImageByResource("/Images/guitar.png");
+            setReloadFlag(false);
+        }
+
+        return _guitarImage;
+    }
+
+    public Image getOrgan()
+    {
+        if(reloadImage || _organImage == null)
+        {
+            _organImage = getImageByResource("/Images/organs.png");
+            setReloadFlag(false);
+        }
+
+        return _organImage;
+    }
+
+    public Image getChromaticPercussion()
+    {
+        if(reloadImage || _ChromaticPercussionImage == null)
+        {
+            _ChromaticPercussionImage = getImageByResource("/Images/chromatic_percussion.png");
+            setReloadFlag(false);
+        }
+
+        return _ChromaticPercussionImage;
+    }
+
     public Image getPiano()
     {
         if(reloadImage || _pianoImage == null)
@@ -238,6 +480,17 @@ public class ImageManager
         }
 
         return _pianoImage;
+    }
+
+    public Image getNone()
+    {
+        if(reloadImage || _noneImage == null)
+        {
+            _noneImage = getImageByResource("/Images/red_x.png");
+            setReloadFlag(false);
+        }
+
+        return _noneImage;
     }
     //endregion
 

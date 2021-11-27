@@ -167,13 +167,33 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent, 
 
         //Observable list where I can choose Instrument - create list with given instrument list
         ChoiceBox choiceBox = new ChoiceBox(FXCollections.observableArrayList(instruments));
+        choiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
+            @Override
+            public void changed(ObservableValue observableValue, Object o, Object t1) {
+                String instrumentName = (String) observableValue.getValue();
+                path.setInstrument(instrumentName);
+
+                gc.clearRect(
+                        Height * 1.15,
+                        Height / 10,
+                        Height * .7,
+                        Height * .7
+                );
+
+                String instrument = instrumentName.split(" ")[0];
+                Image instrumentImage = ImageManager.getInstance().setDimensions(Height * .7, Height * .7).getInstrumentByName(instrument);
+                gc.drawImage(instrumentImage, Height * 1.15, Height / 10);
+
+                System.out.println(String.format("Instrument set to %s for path %s", instrumentName, path.getName()));
+            }
+        });
 
         //set layout of list created above
         choiceBox.setLayoutX(1.1 * Height);
         choiceBox.setLayoutY(Height * canvasList.size() + Height - Height/5);
         choiceBox.setMinWidth(Height * .8);
         choiceBox.setMaxWidth(Height * .8);
-        choiceBox.setValue(instruments[0]);
+        choiceBox.setValue(instruments[1]);
 
         //display speaker, tempo selection and create volume slider
         gc.strokeRect(2 * Height, 0, Height, Height);
@@ -186,7 +206,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent, 
         gc.fillText(
                 "Tempo",
                 Height * 2.25,
-                Height / 5.5,
+                Height / 7.5,
                 Height
         );
 
@@ -196,14 +216,19 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent, 
             public void changed(
                     ObservableValue<? extends String> observable,
                     String oldValue, String newValue) {
-                if (!newValue.matches("\\d*")) {
-                    tempoTextField.setText(newValue.replaceAll("[^\\d]", ""));
+                if (!newValue.matches("[^\\d]"))
+                {
+                    if(newValue.isEmpty())
+                        return;
+
+                    path.setTempo(Integer.parseInt(newValue));
+                    System.out.println(String.format("Tempo of path %s has been changed to %d", path.getName() , path.getTempo()));
                 }
             }
         });
         tempoTextField.setMaxWidth(Height / 5);
         tempoTextField.setLayoutX(Height * 2.5);
-        tempoTextField.setLayoutY(Height * canvasList.size() + Height / 10);
+        tempoTextField.setLayoutY(Height * canvasList.size() + Height / 20);
         tempoTextField.setText(String.valueOf(path.getTempo()));
 
         //Volume selection

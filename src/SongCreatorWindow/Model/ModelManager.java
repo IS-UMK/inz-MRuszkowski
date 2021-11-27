@@ -249,7 +249,13 @@ public class ModelManager implements Serializable
     public void createPath(String pathName)
     {
         //
-        var path = Path.CreatePath(pathName, (byte)musicPaths.size(), this.selectedDefaultKey, Instrument.getAllInstruments()[0]);
+        var path =
+                Path.CreatePath(
+                        pathName,
+                        (byte)musicPaths.size(),
+                        this.selectedDefaultKey,
+                        Instrument.getAllInstruments()[1]
+                );
         System.out.println("Created Path:" + path.toString());
 
         musicPaths.add(path);

@@ -105,8 +105,18 @@ public class Path implements Serializable
 
         musicString.append(String.format("T%d V%d ", _tempo, _voice));
 
-        for(IPlayable s : _sounds)
-            musicString.append(String.format("%s ", s.ExtractJFugueSoundString()));
+        int instrumentValue = Instrument.GetInstrumentValueByChosenName(getInstrument());
+
+        if(instrumentValue == -1) {
+            for (IPlayable s : _sounds)
+                musicString.append(String.format("%s ", s.ExtractJFugueSoundString()));
+        }
+        else{
+            musicString.append(String.format("I%d ", instrumentValue));
+
+            for (IPlayable s : _sounds)
+                musicString.append(String.format("%s ", s.ExtractJFugueSoundString().split(" ")[1]));
+        }
 
         return musicString.toString();
     }
