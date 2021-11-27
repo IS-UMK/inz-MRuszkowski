@@ -13,6 +13,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
+import javafx.stage.Screen;
 import org.jfugue.player.Player;
 
 import javax.sound.midi.InvalidMidiDataException;
@@ -42,11 +43,10 @@ public class MainController
     ModelManager modelManager;
     ViewManagerModelChangesHandling viewManager;
 
-    GlobalLoaderDTO loader;
+    GlobalLoaderDTO loader = GlobalLoaderDTO.getInstance();
 
     public void initLoader(String filePath)
     {
-        loader = GlobalLoaderDTO.getInstance();
         loader.setLoadingData(filePath);
     }
 

@@ -4,6 +4,7 @@ import Images.ImageManager;
 import SongCreatorWindow.Model.Core.Instrument;
 import SongCreatorWindow.Model.Core.Note;
 import SongCreatorWindow.Model.Core.Path;
+import SongCreatorWindow.Model.Events.IModelEvent;
 import SongCreatorWindow.Model.Events.INoteEvent;
 import SongCreatorWindow.Model.Events.IPathEvent;
 import SongCreatorWindow.Model.GlobalSettings;
@@ -28,7 +29,7 @@ import java.util.List;
 import static SongCreatorWindow.Model.GlobalSettings.*;
 import static SongCreatorWindow.Model.GlobalSettings.strokeLineWidthForSelection;
 
-public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent
+public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent, IModelEvent
 {
     //Model
     ModelManager modelManager;
@@ -47,6 +48,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent
     MenuItem playMenuItem;
 
     Canvas interactionCanvas;
+    double canvasCurrentWidth = Width;
 
     public ViewManagerModelChangesHandling(ModelManager modelManager, AnchorPane anchorPaneWithPaths, Menu selectPathMenuItem, MenuItem playMenuItem)
     {
@@ -65,6 +67,12 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent
     }
 
     @Override
+    public void onModelLoaded(int latestTimeX)
+    {
+        canvasCurrentWidth = latestTimeX > canvasCurrentWidth ? latestTimeX + GlobalSettings.canvasExtension : GlobalSettings.Width;
+    }
+
+    @Override
     public void onNoteAdded(Path path, Note note)
     {
         Image noteImage = ImageManager.getInstance().setDimensions(noteWidth, 100).getQuarterNote();
@@ -73,16 +81,54 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent
 
         var gc = canvas.getGraphicsContext2D();
 
-        System.out.println(String.format("Note inserted at: X - %d, Y - %d", note.getTimeX(), note.getSoundHeight()));
+        if(note.getTimeX() >= canvas.getWidth() - GlobalSettings.widthOfAreaWhereCanvasExtends)
+            addSpaceToCanvas();
 
         gc.drawImage(noteImage, note.getTimeX(), note.getSoundHeight());
+        System.out.println(String.format("Note inserted at: X - %d, Y - %d", note.getTimeX(), note.getSoundHeight()));
+    }
+
+    private void addSpaceToCanvas()
+    {
+        double oldWidth = 0;
+
+        for(Canvas canvas : canvasList)
+        {
+            oldWidth = canvas.getWidth();
+            canvas.setWidth(oldWidth + GlobalSettings.canvasExtension);
+            var gc = canvas.getGraphicsContext2D();
+
+            gc.clearRect(
+                    oldWidth - GlobalSettings.getLinesMargins(),
+                    0,
+                    canvas.getWidth(),
+                    canvas.getHeight()
+            );
+
+            gc.strokeRect(
+                    numberOfPropertySquaresInPath * Height,
+                    0,
+                    canvas.getWidth(),
+                    canvas.getHeight()
+            );
+
+            for(int i = 1; i <= 5; i++)
+                gc.strokeLine(
+                        oldWidth - GlobalSettings.getLinesMargins(),
+                        GlobalSettings.getLinesStartHeight() + i * GlobalSettings.getLinesPadding(),
+                        canvas.getWidth() - GlobalSettings.getLinesMargins(),
+                        GlobalSettings.getLinesStartHeight() + i * GlobalSettings.getLinesPadding()
+                );
+        }
+
+        canvasCurrentWidth = oldWidth + GlobalSettings.canvasExtension;
     }
 
     @Override
     public void onPathCreated(Path path)
     {
         //create canvas and set its size
-        Canvas canvas = new Canvas(Width, Height);
+        Canvas canvas = new Canvas(canvasCurrentWidth, Height);
         canvas.setLayoutY(Height * canvasList.size());
 
         //paint new path on new canvas
@@ -91,7 +137,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent
         //border of path
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(1);
-        gc.strokeRect(0,0, Width, Height);
+        gc.strokeRect(0,0, canvasCurrentWidth, Height);
 
         //set up font to use
         Font font = new Font(Font.getFamilies().toArray()[1].toString(), 24);
@@ -169,9 +215,14 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent
         volumeSlider.setLayoutY(Height * canvasList.size() + Height * .75);
 
         //five lines for inserting notes
-        gc.setLineWidth(2);
+        gc.setLineWidth(GlobalSettings.strokeLineBorderWidth);
         for(int i = 1; i <= 5; i++)
-            gc.strokeLine(3* Height + 20,40 + i*20, canvas.getWidth() - 20, 40 + i*20);
+            gc.strokeLine(
+                    numberOfPropertySquaresInPath * Height + GlobalSettings.getLinesMargins(),
+                    GlobalSettings.getLinesStartHeight() + i * GlobalSettings.getLinesPadding(),
+                    canvas.getWidth() - GlobalSettings.getLinesMargins(),
+                    GlobalSettings.getLinesStartHeight() + i * GlobalSettings.getLinesPadding()
+            );
 
         //add (default Violin) music key
         Image musicKeyImage = ImageManager.getInstance().setDimensions(GlobalSettings.musicKeyWidth, GlobalSettings.getMusicKeyHeight()).getMusicKey(path.getMusicKeySelection());
@@ -212,7 +263,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent
                 gc.setStroke(Color.BLUE);
                 gc.setLineWidth(strokeLineWidthForSelection);
                 gc.strokeRect(strokeLineWidthForSelection / 2, strokeLineWidthForSelection / 2,
-                        Width - strokeLineWidthForSelection, Height - strokeLineWidthForSelection);
+                        canvasCurrentWidth - strokeLineWidthForSelection, Height - strokeLineWidthForSelection);
 
                 System.out.println(String.format("Path number %d has been selected", index));
             }

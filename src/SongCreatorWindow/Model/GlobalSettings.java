@@ -1,7 +1,6 @@
 package SongCreatorWindow.Model;
 
 import SongCreatorWindow.Model.Core.MusicKeySelection;
-import SongCreatorWindow.Model.Core.NoteToNumericValue;
 import javafx.stage.Screen;
 
 public class GlobalSettings
@@ -10,23 +9,36 @@ public class GlobalSettings
      * File extension where projects data is stored
      */
     public final static String projectsExtensions = "mrinz";
+    /**
+     * File extension where model of HashMap "Project name --->  Project Destination Path" is stored
+     */
     public final static String fileNameWithProjectList = "projectsList.dat";
+    /**
+     * File extension where ListView items are stored in order. This file can be deleted before starting the program, projects on list will be sorted then.
+     */
     public final static String fileNameWithProjectListView = "projectsListView.dat";
+    /**
+     * Extension of MIDI files
+     */
     public final static String midiExtension = "mid";
 
     /**
-     * window size constants
+     * Height of Canvas
      */
     public static double Height = 200;
+    /**
+     * Window size constants for canvas Width
+     */
     public static double Width = Screen.getPrimary().getBounds().getWidth();
 
     /**
-     * Stroke settings
+     * Stroke thickness setting
      */
     public static int strokeLineWidthForSelection = 10;
+    public final static int strokeLineBorderWidth = 2;
 
     /**
-     * Music Key settings
+     * Music Key Width setting
      */
     public static double musicKeyWidth = 100.0;
     public static double getMusicKeyHeight()
@@ -48,15 +60,30 @@ public class GlobalSettings
 
         return height;
     }
-    public final static int numberOfPropertySquaresInPath = 3;
 
     /**
-     * Note settings
+     * Path model constant
+     */
+    public final static int numberOfPropertySquaresInPath = 3;
+    public final static int widthOfAreaWhereCanvasExtends = 300;
+    public static int canvasExtension = 300;
+    public static double getLinesStartHeight() { return Height / 5; }
+    /**
+     * Left and right margin of five lines
+     */
+    public static double getLinesMargins() { return Height / 10; }
+    /**
+     * Padding between another lines
+     */
+    public static double getLinesPadding() { return Height / 10; }
+
+    /**
+     * Note Width setting
      */
     public static int noteWidth = 100;
 
     /**
-     * Default music key selection for new path
+     * Default music key selection for new path setting
      */
     public static MusicKeySelection defaultMusicKey = MusicKeySelection.ViolinKey;
 }

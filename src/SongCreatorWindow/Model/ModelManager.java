@@ -1,6 +1,7 @@
 package SongCreatorWindow.Model;
 
 import SongCreatorWindow.Model.Core.*;
+import SongCreatorWindow.Model.Events.IModelEvent;
 import SongCreatorWindow.Model.Events.IMusicEvent;
 import SongCreatorWindow.Model.Events.INoteEvent;
 import SongCreatorWindow.Model.Events.IPathEvent;
@@ -50,6 +51,17 @@ public class ModelManager implements Serializable
 
     //Paths
     List<Path> musicPaths = new LinkedList<Path>();
+    public int getTheLatestTimeX()
+    {
+        int timeX = 0;
+
+        for(Path path : musicPaths)
+            for(IPlayable sound: path.getSounds())
+                if(sound.getTimeX() > timeX)
+                    timeX = sound.getTimeX();
+
+        return timeX;
+    }
     Path selectedPath = null;
 
     /**
@@ -61,6 +73,7 @@ public class ModelManager implements Serializable
     //events
     transient public List<IPathEvent> pathListeners = new LinkedList<>();
     transient public List<INoteEvent> noteListeners = new LinkedList<>();
+    transient public List<IModelEvent> modelListeners = new LinkedList<>();
 
     public ModelManager() { }
 
@@ -157,6 +170,7 @@ public class ModelManager implements Serializable
     public void replaceExistingModel(ModelManager modelManager)
     {
         clearModel();
+        fireOnModelLoaded(modelManager.getTheLatestTimeX());
 
         this.selectedDefaultKey = modelManager.getDefaultMusicKeySelection();
 
@@ -301,6 +315,18 @@ public class ModelManager implements Serializable
             pathListeners.add((IPathEvent) listener);
         if(listener instanceof INoteEvent)
             noteListeners.add((INoteEvent) listener);
+        if(listener instanceof IModelEvent)
+            modelListeners.add((IModelEvent) listener);
+    }
+
+    public void fireOnModelLoaded(int latestTimeX)
+    {
+        Iterator iterator = modelListeners.iterator();
+
+        while(iterator.hasNext()) {
+            IModelEvent modelEvent = (IModelEvent) iterator.next();
+            modelEvent.onModelLoaded(latestTimeX);
+        }
     }
 
     /**
