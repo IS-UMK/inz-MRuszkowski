@@ -13,7 +13,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
-import javafx.stage.Screen;
 import org.jfugue.player.Player;
 
 import javax.sound.midi.InvalidMidiDataException;
@@ -315,11 +314,11 @@ public class MainController
 
         System.out.println(String.format("User Clicked left mouse button at position: X - %f, Y - %f", x, y));
 
-        if(x > numberOfPropertySquaresInPath * Height + musicKeyWidth)
+        if(x > GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal())
         {
             int pathIndex = (int)y / (int)Height;
             System.out.println(String.format("The selected path where to insert note: %d", pathIndex));
-            int insertX = ((int)(x - 45) / 10) * 10;
+            int insertX = ((int)(x + GlobalSettings.fixedXPositionOfNotes) / 10) * 10;
             int insertY = ((int)((y - 80 - Height * pathIndex) / 10)) * 10;
 
             modelManager.addNote(pathIndex, insertX, insertY);

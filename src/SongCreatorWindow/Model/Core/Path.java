@@ -1,11 +1,11 @@
 package SongCreatorWindow.Model.Core;
 
+import SongCreatorWindow.Model.GlobalSettings;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
-import static SongCreatorWindow.Model.GlobalSettings.defaultMusicKey;
 
 /**
  *
@@ -101,21 +101,42 @@ public class Path implements Serializable
 
     public String getExtractedMusic()
     {
+        if(_sounds.size() == 0)
+            return "";
+
         var musicString = new StringBuilder();
 
         musicString.append(String.format("T%d V%d ", _tempo, _voice));
 
         int instrumentValue = Instrument.GetInstrumentValueByChosenName(getInstrument());
 
+        //Difference 100 (TimeX) is Equal to Rq/@"time+0.25" (np. @0.25, @0.5) (I guess that: Rq = @0.25, @ set time when sound occurs, R means rest)
+        /*
+        double time = (_sounds.get(0).getTimeX() - GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal()) / (GlobalSettings.Height * 2);
+        musicString.append(String.format("@%f ", time));
+        */
+
         if(instrumentValue == -1) {
             for (IPlayable s : _sounds)
-                musicString.append(String.format("%s ", s.ExtractJFugueSoundString()));
+                musicString.append(
+                        String.format(
+                                "@%f %s ",
+                                (s.getTimeX() - GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() - GlobalSettings.fixedXPositionOfNotes) / (GlobalSettings.Height * 2),
+                                s.ExtractJFugueSoundString()
+                        )
+                );
         }
         else{
             musicString.append(String.format("I%d ", instrumentValue));
 
             for (IPlayable s : _sounds)
-                musicString.append(String.format("%s ", s.ExtractJFugueSoundString().split(" ")[1]));
+                musicString.append(
+                        String.format(
+                                "@%s %s ",
+                                (s.getTimeX() - GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() - GlobalSettings.fixedXPositionOfNotes) / (GlobalSettings.Height * 2),
+                                s.ExtractJFugueSoundString().split(" ")[1]
+                        )
+                );
         }
 
         return musicString.toString();

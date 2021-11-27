@@ -238,6 +238,14 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent, 
         volumeSlider.setShowTickLabels(true);
         volumeSlider.setLayoutX(Height * 2.15);
         volumeSlider.setLayoutY(Height * canvasList.size() + Height * .75);
+        volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                path.setVolume(t1.byteValue());
+                System.out.println(String.format("Volume of path %s has been changed to %d", path.getName() , path.getVolume()));
+            }
+        });
+        volumeSlider.setValue(path.getVolume());
 
         //five lines for inserting notes
         gc.setLineWidth(GlobalSettings.strokeLineBorderWidth);

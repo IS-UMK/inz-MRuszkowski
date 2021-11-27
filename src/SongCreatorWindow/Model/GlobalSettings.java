@@ -66,6 +66,7 @@ public class GlobalSettings
      */
     public final static int numberOfPropertySquaresInPath = 3;
     public final static int widthOfAreaWhereCanvasExtends = 300;
+    public final static int fixedXPositionOfNotes = -40;
     public static int canvasExtension = 300;
     public static double getLinesStartHeight() { return Height / 5; }
     /**
@@ -76,6 +77,10 @@ public class GlobalSettings
      * Padding between another lines
      */
     public static double getLinesPadding() { return Height / 10; }
+    public static double getStartXofAreaWhereInsertingNotesIsLegal()
+    {
+        return numberOfPropertySquaresInPath * Height + musicKeyWidth;
+    }
 
     /**
      * Note Width setting
