@@ -2,6 +2,7 @@ package SongCreatorWindow.Controllers;
 
 import MainWindow.MainWindow;
 import SongCreatorWindow.Model.Core.GlobalLoaderDTO;
+import SongCreatorWindow.Model.Exceptions.CannotAddAnotherPathException;
 import SongCreatorWindow.Model.GlobalSettings;
 import SongCreatorWindow.Model.ModelManager;
 import SongCreatorWindow.View.ViewManagerModelChangesHandling;
@@ -229,7 +230,12 @@ public class MainController
         if(pathName == null)
             return;
 
-        modelManager.createPath(pathName);
+        try {
+            modelManager.createPath(pathName);
+        } catch (CannotAddAnotherPathException e) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, e.getMessage());
+            alert.showAndWait();
+        }
     }
 
     public void RenameSelected(ActionEvent actionEvent)

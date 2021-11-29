@@ -5,6 +5,7 @@ import SongCreatorWindow.Model.Events.IModelEvent;
 import SongCreatorWindow.Model.Events.IMusicEvent;
 import SongCreatorWindow.Model.Events.INoteEvent;
 import SongCreatorWindow.Model.Events.IPathEvent;
+import SongCreatorWindow.Model.Exceptions.CannotAddAnotherPathException;
 import org.jfugue.midi.MidiFileManager;
 import org.jfugue.pattern.Pattern;
 
@@ -148,7 +149,12 @@ public class ModelManager implements Serializable
 
             startX = (int) (numberOfPropertySquaresInPath * Height + musicKeyWidth);
 
-            modelManager.createPath(String.format("Path %d", i+1));
+            try {
+                modelManager.createPath(String.format("Path %d", i+1));
+            } catch (CannotAddAnotherPathException e) {
+                System.err.println(e.getMessage());
+                return modelManager;
+            }
 
             String[] sounds = pattern.split("I[0-9]{1,3}");
 
@@ -179,7 +185,12 @@ public class ModelManager implements Serializable
 
         for(Path path : modelManager.getPaths())
         {
-            createPath(path.getName(), path.getInstrument(), path.getTempo(), path.getVolume());
+            try {
+                createPath(path.getName(), path.getInstrument(), path.getTempo(), path.getVolume());
+            } catch (CannotAddAnotherPathException e) {
+                System.err.println(e.getMessage());
+                return;
+            }
 
             for(IPlayable sound : path.getSounds())
                 addNote(path.getVoice(), sound.getTimeX(), sound.getSoundHeight());
@@ -246,7 +257,7 @@ public class ModelManager implements Serializable
      * Create new path according to user typed values with selected piano as instrument, tempo 120 and volume level 50
      * @param pathName
      */
-    public void createPath(String pathName)
+    public void createPath(String pathName) throws CannotAddAnotherPathException
     {
         createPath(pathName, Instrument.getAllInstruments()[1], 120, (byte)50);
     }
@@ -255,9 +266,11 @@ public class ModelManager implements Serializable
      * Create new path according to user typed values with selected instrument
      * @param pathName
      */
-    public void createPath(String pathName, String instrument, int tempo, byte volume)
+    public void createPath(String pathName, String instrument, int tempo, byte volume) throws CannotAddAnotherPathException
     {
-        //
+        if(musicPaths.size() > 16)
+            throw new CannotAddAnotherPathException("Program does not support of handling more than 16 paths at once.");
+
         var path =
                 Path.CreatePath(
                         pathName,
