@@ -6,13 +6,14 @@ import SongCreatorWindow.Model.Exceptions.CannotAddAnotherPathException;
 import SongCreatorWindow.Model.GlobalSettings;
 import SongCreatorWindow.Model.ModelManager;
 import SongCreatorWindow.View.ViewManagerModelChangesHandling;
+import SongCreatorWindow.View.ViewMusicSymbolsSelectionHandling;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ZoomEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import org.jfugue.player.Player;
 
@@ -24,12 +25,10 @@ import static SongCreatorWindow.Model.GlobalSettings.*;
 
 public class MainController
 {
-    //TODO: Wyeliminować wzorzec "kula błota"
-
-    @FXML
-    BorderPane workSpace;
     @FXML
     AnchorPane anchorPaneWithPaths;
+    @FXML
+    AnchorPane anchorPaneWithNotesAndAccordsSelection;
 
     //Data structures for program logic (Model)
     @FXML
@@ -42,6 +41,7 @@ public class MainController
 
     ModelManager modelManager;
     ViewManagerModelChangesHandling viewManager;
+    ViewMusicSymbolsSelectionHandling musicSymbolsViewManager;
 
     GlobalLoaderDTO loader = GlobalLoaderDTO.getInstance();
 
@@ -55,6 +55,8 @@ public class MainController
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
+                musicSymbolsViewManager = new ViewMusicSymbolsSelectionHandling(anchorPaneWithNotesAndAccordsSelection);
+
                 modelManager = new ModelManager();
 
                 viewManager = new ViewManagerModelChangesHandling(modelManager, anchorPaneWithPaths, selectPathMenuItem, playMenuItem);
@@ -164,7 +166,9 @@ public class MainController
             return;
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are You sure to load project? Current work will be lost if is not saved.");
-        alert.showAndWait();
+
+        if(alert.showAndWait().get() != ButtonType.OK)
+            return;
 
         modelManager.replaceExistingModel(loadedProject);
     }
@@ -211,7 +215,9 @@ public class MainController
             return;
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are You sure to load project? Current work will be lost if is not saved.");
-        alert.showAndWait();
+
+        if(alert.showAndWait().get() != ButtonType.OK)
+            return;
 
         modelManager.replaceExistingModel(loadedProject);
     }
@@ -235,6 +241,18 @@ public class MainController
         } catch (CannotAddAnotherPathException e) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION, e.getMessage());
             alert.showAndWait();
+        }
+    }
+
+    public void DuplicateSelectedPath(ActionEvent actionEvent)
+    {
+        if(modelManager.getSelectedPath() == null)
+            return;
+
+        try {
+            modelManager.duplicateSelectedPath();
+        } catch (CannotAddAnotherPathException e) {
+            e.printStackTrace();
         }
     }
 
@@ -270,7 +288,22 @@ public class MainController
             return;
         }
 
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are You sure to delete path?");
+
+        if(alert.showAndWait().get() != ButtonType.OK)
+            return;
+
         modelManager.removeSelectedPath();
+    }
+
+    public void DeleteAllPaths(ActionEvent actionEvent)
+    {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are You sure to delete ALL path?");
+
+        if(alert.showAndWait().get() != ButtonType.OK)
+            return;
+
+        modelManager.clearModel();
     }
 
     public void RecordPath(ActionEvent actionEvent)
@@ -279,7 +312,17 @@ public class MainController
     }
     //endregion
 
-    //region Notes
+    //region Music Symbols
+    public void selectMusicSymbol(MouseEvent mouseEvent)
+    {
+        musicSymbolsViewManager.drawSelection(mouseEvent.getX(), mouseEvent.getY());
+    }
+
+    public void resizeMusicSymbolsInMenu(ZoomEvent zoomEvent)
+    {
+        musicSymbolsViewManager.redrawMusicSymbols();
+    }
+
     public void InsertNote(ActionEvent actionEvent)
     {
 
@@ -327,7 +370,7 @@ public class MainController
             int insertX = ((int)(x + GlobalSettings.fixedXPositionOfNotes) / 10) * 10;
             int insertY = ((int)((y - 80 - Height * pathIndex) / 10)) * 10;
 
-            modelManager.addNote(pathIndex, insertX, insertY);
+            modelManager.addMusicSymbol(pathIndex, insertX, insertY);
         }
     }
     //endregion

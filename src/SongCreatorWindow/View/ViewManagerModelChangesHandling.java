@@ -75,7 +75,8 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent, 
     @Override
     public void onNoteAdded(Path path, Note note)
     {
-        Image noteImage = ImageManager.getInstance().setDimensions(noteWidth, 100).getQuarterNote();
+        //TODO: Obrazy nut muszą być takie same w wielkości
+        Image noteImage = ImageManager.getInstance().setDimensions(GlobalSettings.noteWidth, GlobalSettings.noteHeight).getNote(GlobalSettings.chosenNote);
 
         var canvas = canvasMap.get(path);
 
@@ -241,7 +242,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent, 
         volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
-                path.setVolume(t1.byteValue());
+                path.setVolume((byte)(t1.byteValue() * 1.27));
                 System.out.println(String.format("Volume of path %s has been changed to %d", path.getName() , path.getVolume()));
             }
         });
@@ -293,7 +294,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent, 
                 interactionCanvas.setHeight(Height);
                 interactionCanvas.setLayoutY(Height * index);
 
-                gc.setStroke(Color.BLUE);
+                gc.setStroke(GlobalSettings.selectionColor);
                 gc.setLineWidth(strokeLineWidthForSelection);
                 gc.strokeRect(strokeLineWidthForSelection / 2, strokeLineWidthForSelection / 2,
                         canvasCurrentWidth - strokeLineWidthForSelection, Height - strokeLineWidthForSelection);

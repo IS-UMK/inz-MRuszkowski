@@ -1,6 +1,8 @@
 package SongCreatorWindow.Model;
 
 import SongCreatorWindow.Model.Core.MusicKeySelection;
+import SongCreatorWindow.Model.Core.NoteSelection;
+import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 
 public class GlobalSettings
@@ -36,6 +38,7 @@ public class GlobalSettings
      */
     public static int strokeLineWidthForSelection = 10;
     public final static int strokeLineBorderWidth = 2;
+    public static Color selectionColor = Color.BLUE;
 
     /**
      * Music Key Width setting
@@ -86,6 +89,8 @@ public class GlobalSettings
      * Note Width setting
      */
     public static int noteWidth = 100;
+    public static int noteHeight = 100;
+    public static NoteSelection chosenNote = NoteSelection.WholeNote;
 
     /**
      * Default music key selection for new path setting

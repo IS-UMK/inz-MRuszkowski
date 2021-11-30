@@ -1,7 +1,11 @@
 package Images;
 
 import SongCreatorWindow.Model.Core.MusicKeySelection;
+import SongCreatorWindow.Model.Core.NoteSelection;
 import javafx.scene.image.Image;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class ImageManager
 {
@@ -154,6 +158,70 @@ public class ImageManager
     //endregion
 
     //region Notes
+    public HashMap<NoteSelection, Image> getAllNotesWithNames()
+    {
+        var map = new LinkedHashMap<NoteSelection, Image>();
+
+        map.put(NoteSelection.WholeNote, getWholeNote());
+        map.put(NoteSelection.HalfNote, getHalfNote());
+        map.put(NoteSelection.QuarterNote, getQuarterNote());
+        map.put(NoteSelection.EighthNote, getEighthNote());
+        map.put(NoteSelection.SixteenthNote, getSixteenthNote());
+        map.put(NoteSelection.ThirtySecondNote, getThirtySecondNote());
+        map.put(NoteSelection.SixtyFourthNote, getSixtyFourthNote());
+        map.put(NoteSelection.OneHundredTwentyEighthNote, getOneHundredTwentyEighthNote());
+
+        return map;
+    }
+
+    public Image[] getAllNotes()
+    {
+        return new Image[]{
+                getWholeNote(),
+                getHalfNote(),
+                getQuarterNote(),
+                getEighthNote(),
+                getSixteenthNote(),
+                getThirtySecondNote(),
+                getSixtyFourthNote(),
+                getOneHundredTwentyEighthNote()
+        };
+    }
+
+    public Image getNote(NoteSelection noteSelection)
+    {
+        Image note = null;
+
+        switch (noteSelection) {
+            case WholeNote -> {
+                note = getWholeNote();
+            }
+            case HalfNote -> {
+                note = getHalfNote();
+            }
+            case QuarterNote -> {
+                note = getQuarterNote();
+            }
+            case EighthNote -> {
+                note = getEighthNote();
+            }
+            case SixteenthNote -> {
+                note = getSixteenthNote();
+            }
+            case ThirtySecondNote -> {
+                note = getThirtySecondNote();
+            }
+            case SixtyFourthNote -> {
+                note = getSixtyFourthNote();
+            }
+            case OneHundredTwentyEighthNote -> {
+                note = getOneHundredTwentyEighthNote();
+            }
+        }
+
+        return note;
+    }
+
     public Image getWholeNote()
     {
         if(reloadImage || _whole_NoteImage == null)

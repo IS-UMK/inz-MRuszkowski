@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane fx:id="workSpace" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SongCreatorWindow.Controllers.MainController">
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SongCreatorWindow.Controllers.MainController">
    <top>
       <MenuBar BorderPane.alignment="CENTER">
          <menus>
@@ -26,8 +26,10 @@
                   <MenuItem mnemonicParsing="false" onAction="#InsertNewPath" text="New Path" />
                   <Menu fx:id="selectPathMenuItem" mnemonicParsing="false" text="Select Path" />
                   <MenuItem mnemonicParsing="false" onAction="#UnselectPath" text="Unselect Path" />
+                  <MenuItem mnemonicParsing="false" onAction="#DuplicateSelectedPath" text="Duplicate Selected" />
                   <MenuItem mnemonicParsing="false" onAction="#RenameSelected" text="Rename Selected" />
                   <MenuItem mnemonicParsing="false" onAction="#DeleteSelected" text="Delete Selected" />
+                  <MenuItem mnemonicParsing="false" onAction="#DeleteAllPaths" text="Delete All Paths" />
                   <MenuItem mnemonicParsing="false" onAction="#RecordPath" text="Record Path" />
                </items>
             </Menu>
@@ -50,12 +52,12 @@
    <center>
       <SplitPane dividerPositions="0.8" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <items>
-            <ScrollPane fx:id="scrollPaneWithPaths" prefHeight="200.0" prefWidth="200.0">
+            <ScrollPane fx:id="scrollPaneWithPaths">
                <content>
                   <AnchorPane fx:id="anchorPaneWithPaths" onMouseClicked="#InsertNoteOnMouseClicked" />
                </content>
             </ScrollPane>
-            <AnchorPane maxWidth="400.0" minWidth="100.0" prefWidth="200.0" SplitPane.resizableWithParent="false" />
+            <AnchorPane fx:id="anchorPaneWithNotesAndAccordsSelection" maxWidth="400.0" minWidth="100.0" onMouseClicked="#selectMusicSymbol" prefWidth="200.0" SplitPane.resizableWithParent="false" />
          </items>
       </SplitPane>
    </center>

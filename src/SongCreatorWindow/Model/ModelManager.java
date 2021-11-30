@@ -164,7 +164,7 @@ public class ModelManager implements Serializable
             for(String sound : sounds)
             {
                 String[] notes = sound.split(" ");
-                modelManager.addNote(i++, startX, Integer.parseInt(notes[1]) * 10 + 40);
+                modelManager.addMusicSymbol(i++, startX, Integer.parseInt(notes[1]) * 10 + 40);
 
                 startX += noteWidth * 2;
             }
@@ -193,18 +193,18 @@ public class ModelManager implements Serializable
             }
 
             for(IPlayable sound : path.getSounds())
-                addNote(path.getVoice(), sound.getTimeX(), sound.getSoundHeight());
+                addMusicSymbol(path.getVoice(), sound.getTimeX(), sound.getSoundHeight());
         }
     }
     //endregion
 
-    //region Notes
-    public void addNote(int pathIndex, int insertX, int insertY)
+    //region Music Symbols
+    public void addMusicSymbol(int pathIndex, int insertX, int insertY)
     {
         int base = getBasePointSound();
         int move_sound_by = (insertY - 40) / 10;
 
-        Note note = Note.CreateNote(base - move_sound_by, 'q');
+        Note note = Note.CreateNote(base - move_sound_by, mapChosenNoteToDuration(GlobalSettings.chosenNote));
         note.setTimeX(insertX);
         note.setSoundHeight(insertY);
 
@@ -212,6 +212,40 @@ public class ModelManager implements Serializable
         path.addSound(note);
 
         fireOnNoteAdded(path, note);
+    }
+
+    private char mapChosenNoteToDuration(NoteSelection noteSelection)
+    {
+        char duration = 0;
+
+        switch (noteSelection) {
+            case WholeNote -> {
+                duration = Duration.Whole;
+            }
+            case HalfNote -> {
+                duration = Duration.Half;
+            }
+            case QuarterNote -> {
+                duration = Duration.Quater;
+            }
+            case EighthNote -> {
+                duration = Duration.Eighth;
+            }
+            case SixteenthNote -> {
+                duration = Duration.Sixteenth;
+            }
+            case ThirtySecondNote -> {
+                duration = Duration.Thirty_second;
+            }
+            case SixtyFourthNote -> {
+                duration = Duration.Sixty_fourth;
+            }
+            case OneHundredTwentyEighthNote -> {
+                duration = Duration.One_twenty_eighth;
+            }
+        }
+
+        return duration;
     }
     //endregion
 
@@ -263,6 +297,17 @@ public class ModelManager implements Serializable
     }
 
     /**
+     * Duplicates selected path
+     * @throws CannotAddAnotherPathException
+     */
+    public void duplicateSelectedPath() throws CannotAddAnotherPathException
+    {
+        createPath(selectedPath.getName(), selectedPath.getInstrument(), selectedPath.getTempo(), selectedPath.getVolume());
+
+        System.out.println(String.format("Path %s duplicated successfully", selectedPath.getName()));
+    }
+
+    /**
      * Create new path according to user typed values with selected instrument
      * @param pathName
      */
@@ -311,6 +356,18 @@ public class ModelManager implements Serializable
         System.out.println(String.format("Deleting path %s", selectedPath.getName()));
 
         fireOnPathDeleted(selectedPath);
+    }
+
+    public void clearModel()
+    {
+        //foreach on copied collection due to occurring error - if collection modified during loop, the Exception is thrown
+        for(Path path : getPaths())
+        {
+            this.setSelectedPath(path);
+            this.removeSelectedPath();
+        }
+
+        clearSelectionOfPath();
     }
     //endregion
 
@@ -429,18 +486,6 @@ public class ModelManager implements Serializable
         }
     }
     //endregion
-
-    public void clearModel()
-    {
-        //foreach on copied collection due to occurring error - if collection modified during loop, the Exception is thrown
-        for(Path path : getPaths())
-        {
-            this.setSelectedPath(path);
-            this.removeSelectedPath();
-        }
-
-        clearSelectionOfPath();
-    }
 
     /**
      * Method that checks if loaded file match the required extension used by program

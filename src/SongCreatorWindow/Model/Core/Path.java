@@ -79,7 +79,6 @@ public class Path implements Serializable
 
         _voice = voice;
         _tempo = tempo;
-        System.out.println();
     }
 
     public static Path CreatePath(String pathName, byte voice, MusicKeySelection musicKey, String selectedInstrument, int tempo, byte volumeLevel) { return new Path(pathName, voice, musicKey, selectedInstrument, tempo, volumeLevel); }
@@ -114,9 +113,10 @@ public class Path implements Serializable
             for (IPlayable s : _sounds)
                 musicString.append(
                         String.format(
-                                "@%s %s ",
+                                "@%s %sa%d ",
                                 getSoundTimeOccurrence(s),
-                                s.ExtractJFugueSoundString()
+                                s.ExtractJFugueSoundString(),
+                                getVolume()
                         )
                 );
         }
@@ -126,9 +126,10 @@ public class Path implements Serializable
             for (IPlayable s : _sounds)
                 musicString.append(
                         String.format(
-                                "@%s %s ",
+                                "@%s %sa%d ",
                                 getSoundTimeOccurrence(s),
-                                s.ExtractJFugueSoundString().split(" ")[1]
+                                s.ExtractJFugueSoundString().split(" ")[1],
+                                getVolume()
                         )
                 );
         }
