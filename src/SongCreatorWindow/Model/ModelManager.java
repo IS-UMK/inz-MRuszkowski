@@ -139,13 +139,12 @@ public class ModelManager implements Serializable
 
         int startX;
 
+        NoteSelection saveChoice = GlobalSettings.chosenNote;
+
         for(String pattern : patterns)
         {
-            if(i == 0)
-            {
-                i++;
+            if(pattern.equals(""))
                 continue;
-            }
 
             startX = (int) (numberOfPropertySquaresInPath * Height + musicKeyWidth);
 
@@ -163,12 +162,55 @@ public class ModelManager implements Serializable
 
             for(String sound : sounds)
             {
-                String[] notes = sound.split(" ");
-                modelManager.addMusicSymbol(i++, startX, Integer.parseInt(notes[1]) * 10 + 40);
+                if(sound.equals(""))
+                    continue;
 
-                startX += noteWidth * 2;
+                String[] notes = sound.split(" ");
+
+                for(String note: notes)
+                {
+                    if(note.equals(""))
+                        continue;
+
+                    String symbols = note.split("[0-9]")[0];
+
+                    if(symbols.equals("R/") || symbols.equals("@"))
+                    {
+                        if(symbols.equals("R/")) {
+                            symbols = note.split("/")[1];
+                        }
+                        else symbols =  note.split("@")[1];
+
+                        startX = (int)((Double.parseDouble(symbols) * 2 * GlobalSettings.Height) + GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() + GlobalSettings.fixedXPositionOfNotes);
+                    }
+                    else
+                    {
+                        String musicSoundLetter = symbols;
+                        symbols = note.split(symbols)[1];
+                        int octave = Character.getNumericValue(symbols.charAt(0));
+
+
+
+                        int noteValue = Note.mapNoteSymbolToNumericalValue(musicSoundLetter, octave);
+                        System.out.println(String.format("Note value: %d", noteValue));
+
+
+                        modelManager.addMusicSymbol(
+                                i,
+                                startX,
+                                (modelManager.getBasePointSound() - noteValue) * 10 + 40
+                        );
+
+                        System.out.println(String.format("Note height: %d", ((modelManager.getBasePointSound() - Note.mapNoteSymbolToNumericalValue(musicSoundLetter, octave)) * 10 + 40)));
+                    }
+
+                }
             }
+
+            i++;
         }
+
+        GlobalSettings.chosenNote = saveChoice;
 
         return modelManager;
     }
@@ -427,7 +469,7 @@ public class ModelManager implements Serializable
 
         while(iterator.hasNext()) {
             INoteEvent pathEvent = (INoteEvent) iterator.next();
-            pathEvent.onNoteAdded(path, note);
+            pathEvent.onMusicSymbolAdded(path, note);
         }
     }
 

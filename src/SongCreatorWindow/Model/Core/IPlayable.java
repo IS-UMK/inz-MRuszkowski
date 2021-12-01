@@ -17,10 +17,11 @@ public interface IPlayable extends Serializable {
      * @param x
      */
     void setTimeX(int x);
+    public NoteSelection getDuration();
+    public int getSoundHeight();
+    public void setSoundHeight(int y);
     /**
      * @return JFugue string
      */
-    public int getSoundHeight();
-    public void setSoundHeight(int y);
     String ExtractJFugueSoundString();
 }

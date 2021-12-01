@@ -24,6 +24,14 @@ public class Acord implements IPlayable{
     }
 
     @Override
+    public NoteSelection getDuration() {
+        if(notes.size() > 0)
+            return notes.get(0).getDuration();
+
+        return null;
+    }
+
+    @Override
     public int getSoundHeight() { return NoteHeight; }
 
     @Override

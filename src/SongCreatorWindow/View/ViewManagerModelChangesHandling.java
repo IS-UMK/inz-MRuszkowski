@@ -1,6 +1,7 @@
 package SongCreatorWindow.View;
 
 import Images.ImageManager;
+import SongCreatorWindow.Model.Core.IPlayable;
 import SongCreatorWindow.Model.Core.Instrument;
 import SongCreatorWindow.Model.Core.Note;
 import SongCreatorWindow.Model.Core.Path;
@@ -73,20 +74,20 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent, 
     }
 
     @Override
-    public void onNoteAdded(Path path, Note note)
+    public void onMusicSymbolAdded(Path path, IPlayable musicSound)
     {
         //TODO: Obrazy nut muszą być takie same w wielkości
-        Image noteImage = ImageManager.getInstance().setDimensions(GlobalSettings.noteWidth, GlobalSettings.noteHeight).getNote(GlobalSettings.chosenNote);
+        Image musicSymbolImage = ImageManager.getInstance().setDimensions(GlobalSettings.noteWidth, GlobalSettings.noteHeight).getNote(musicSound.getDuration());
 
         var canvas = canvasMap.get(path);
 
         var gc = canvas.getGraphicsContext2D();
 
-        if(note.getTimeX() >= canvas.getWidth() - GlobalSettings.widthOfAreaWhereCanvasExtends)
+        if(musicSound.getTimeX() >= canvas.getWidth() - GlobalSettings.widthOfAreaWhereCanvasExtends)
             addSpaceToCanvas();
 
-        gc.drawImage(noteImage, note.getTimeX(), note.getSoundHeight());
-        System.out.println(String.format("Note inserted at: X - %d, Y - %d", note.getTimeX(), note.getSoundHeight()));
+        gc.drawImage(musicSymbolImage, musicSound.getTimeX(), musicSound.getSoundHeight());
+        System.out.println(String.format("Note inserted at: X - %d, Y - %d", musicSound.getTimeX(), musicSound.getSoundHeight()));
     }
 
     private void addSpaceToCanvas()
@@ -270,10 +271,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent, 
         tempoMap.put(canvas, tempoTextField);
 
         //add created canvas and volume slider
-        anchorPaneWithPaths.getChildren().add(canvas);
-        anchorPaneWithPaths.getChildren().add(choiceBox);
-        anchorPaneWithPaths.getChildren().add(tempoTextField);
-        anchorPaneWithPaths.getChildren().add(volumeSlider);
+        anchorPaneWithPaths.getChildren().addAll(canvas, choiceBox, tempoTextField, volumeSlider);
 
         var pathToSelect = new MenuItem(path.getName());
         pathToSelect.setOnAction(new EventHandler<ActionEvent>() {

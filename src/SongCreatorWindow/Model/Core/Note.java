@@ -10,6 +10,25 @@ public class Note implements IPlayable{
      * Describes what is the note duration
      */
     public char NoteDuration;
+
+    @Override
+    public NoteSelection getDuration() {
+        NoteSelection duration = null;
+
+        switch (NoteDuration)
+        {
+            case 'w': duration = NoteSelection.WholeNote; break;
+            case 'h': duration = NoteSelection.HalfNote; break;
+            case 'q': duration = NoteSelection.QuarterNote; break;
+            case 'i': duration = NoteSelection.EighthNote; break;
+            case 's': duration = NoteSelection.SixteenthNote; break;
+            case 't': duration = NoteSelection.ThirtySecondNote; break;
+            case 'x': duration = NoteSelection.SixtyFourthNote; break;
+            case 'o': duration = NoteSelection.OneHundredTwentyEighthNote; break;
+        }
+
+        return duration;
+    }
     /**
      * Integer for instrument sound selection.
      */
@@ -55,6 +74,35 @@ public class Note implements IPlayable{
 
     public static Note CreateNote(int noteValue, char noteDuration, int instrument) { return new Note(noteValue, noteDuration, instrument); }
     public static Note CreateNote(int noteValue, char noteDuration) { return new Note(noteValue, noteDuration, 0); }
+    public static Note CreateNote(String noteSymbol, int octave, char noteDuration)
+    {
+        Note note = new Note(mapNoteSymbolToNumericalValue(noteSymbol, octave), noteDuration, 0);
+
+        return note;
+    }
+
+    public static int mapNoteSymbolToNumericalValue(String noteSymbol, int octave)
+    {
+        int baseNoteMIDIValue = -1;
+
+        switch(noteSymbol)
+        {
+            case "C": baseNoteMIDIValue = 0; break;
+            case "C#": baseNoteMIDIValue = 1; break;
+            case "D": baseNoteMIDIValue = 2; break;
+            case "Eb": baseNoteMIDIValue = 3; break;
+            case "E": baseNoteMIDIValue = 4; break;
+            case "F": baseNoteMIDIValue = 5; break;
+            case "F#": baseNoteMIDIValue = 6; break;
+            case "G": baseNoteMIDIValue = 7; break;
+            case "G#": baseNoteMIDIValue = 8; break;
+            case "A": baseNoteMIDIValue = 9; break;
+            case "Bb": baseNoteMIDIValue = 10; break;
+            case "B": baseNoteMIDIValue = 11; break;
+        }
+
+        return baseNoteMIDIValue + (octave * 12);
+    }
 
     @Override
     public String ExtractJFugueSoundString()
