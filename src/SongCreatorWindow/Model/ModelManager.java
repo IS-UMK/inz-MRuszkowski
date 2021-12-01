@@ -123,6 +123,14 @@ public class ModelManager implements Serializable
         System.out.println(String.format("Project has been exported to midi file: %s", fileName));
     }
 
+    /**
+     * Method that interprets MIDI file as a .mrinz music project. Method will NEVER return the same model due to errors while reading MIDI files.
+     * Model will be only similar and the original is not possible to restore.
+     * @param pathToProject
+     * @return ModelManager that represents similar music written in MIDI file
+     * @throws IOException
+     * @throws InvalidMidiDataException
+     */
     public static ModelManager importProjectFromMIDI(String pathToProject) throws IOException, InvalidMidiDataException
     {
         Pattern patternFromMidiFile = MidiFileManager.loadPatternFromMidi(new File(pathToProject));
@@ -167,15 +175,13 @@ public class ModelManager implements Serializable
                 if(sound.equals(""))
                     continue;
 
+                parsedValue = 0;
                 String[] notes = sound.split(" ");
-                rests = 0;
 
                 for(String note: notes)
                 {
                     if(note.equals(""))
                         continue;
-
-                    parsedValue = 0;
 
                     String symbols = note.split("[0-9]")[0];
 
@@ -204,25 +210,20 @@ public class ModelManager implements Serializable
                             }
                             else {
                                 symbols = note.split("/")[1];
-                                parsedValue = Double.parseDouble(symbols);
+                                parsedValue += Double.parseDouble(symbols);
                             }
                         }
                         else {
                             symbols =  note.split("@")[1];
-                            parsedValue = Double.parseDouble(symbols);
+                            parsedValue += Double.parseDouble(symbols);
                         }
 
-                        for(int k = startX; k < startX + 200; k++){
+                        for(int k = startX; k < startX + 600; k++){
                             var tmp = (k - GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() - GlobalSettings.fixedXPositionOfNotes) / (GlobalSettings.Height * 2);
                             System.out.println(String.format("TimeX %d: %f", k, tmp));
                         }
 
-
-                        if(note.charAt(0) == '@'){
-                            startX = (int)((parsedValue * 2 * GlobalSettings.Height) + GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() + GlobalSettings.fixedXPositionOfNotes);
-                            rests = 0;
-                        }
-                        else rests += (int)(parsedValue / .0025);
+                        startX = (int)((parsedValue * 2 * GlobalSettings.Height) + GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() + GlobalSettings.fixedXPositionOfNotes);
                     }
                     else
                     {
@@ -236,7 +237,7 @@ public class ModelManager implements Serializable
 
                         modelManager.addMusicSymbol(
                                 i,
-                                (int)(startX + rests),
+                                (int)(startX),
                                 (modelManager.getBasePointSound() - noteValue) * 10 + 40
                         );
                     }
