@@ -139,7 +139,7 @@ public class ModelManager implements Serializable
 
         int startX;
 
-        NoteSelection saveChoice = GlobalSettings.chosenNote;
+        char saveChoice = GlobalSettings.chosenNote;
 
         for(String pattern : patterns)
         {
@@ -181,7 +181,8 @@ public class ModelManager implements Serializable
                         }
                         else symbols =  note.split("@")[1];
 
-                        startX = (int)((Double.parseDouble(symbols) * 2 * GlobalSettings.Height) + GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() + GlobalSettings.fixedXPositionOfNotes);
+                        //startX += (int)((Double.parseDouble(symbols) * 2 * GlobalSettings.Height) + GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() + GlobalSettings.fixedXPositionOfNotes);
+                        startX += Double.parseDouble(symbols) - fixedXPositionOfNotes;
                     }
                     else
                     {
@@ -189,19 +190,15 @@ public class ModelManager implements Serializable
                         symbols = note.split(symbols)[1];
                         int octave = Character.getNumericValue(symbols.charAt(0));
 
-
+                        GlobalSettings.chosenNote = symbols.charAt(1);
 
                         int noteValue = Note.mapNoteSymbolToNumericalValue(musicSoundLetter, octave);
-                        System.out.println(String.format("Note value: %d", noteValue));
-
 
                         modelManager.addMusicSymbol(
                                 i,
                                 startX,
                                 (modelManager.getBasePointSound() - noteValue) * 10 + 40
                         );
-
-                        System.out.println(String.format("Note height: %d", ((modelManager.getBasePointSound() - Note.mapNoteSymbolToNumericalValue(musicSoundLetter, octave)) * 10 + 40)));
                     }
 
                 }
@@ -235,7 +232,7 @@ public class ModelManager implements Serializable
             }
 
             for(IPlayable sound : path.getSounds())
-                addMusicSymbol(path.getVoice(), sound.getTimeX(), sound.getSoundHeight());
+                addMusicSymbol(path.getVoice(), sound.getTimeX(), sound.getSoundHeight(), sound.getDuration());
         }
     }
     //endregion
@@ -243,10 +240,15 @@ public class ModelManager implements Serializable
     //region Music Symbols
     public void addMusicSymbol(int pathIndex, int insertX, int insertY)
     {
+        addMusicSymbol(pathIndex, insertX, insertY, GlobalSettings.chosenNote);
+    }
+
+    public void addMusicSymbol(int pathIndex, int insertX, int insertY, char duration)
+    {
         int base = getBasePointSound();
         int move_sound_by = (insertY - 40) / 10;
 
-        Note note = Note.CreateNote(base - move_sound_by, mapChosenNoteToDuration(GlobalSettings.chosenNote));
+        Note note = Note.CreateNote(base - move_sound_by, duration);
         note.setTimeX(insertX);
         note.setSoundHeight(insertY);
 
@@ -254,40 +256,6 @@ public class ModelManager implements Serializable
         path.addSound(note);
 
         fireOnNoteAdded(path, note);
-    }
-
-    private char mapChosenNoteToDuration(NoteSelection noteSelection)
-    {
-        char duration = 0;
-
-        switch (noteSelection) {
-            case WholeNote -> {
-                duration = Duration.Whole;
-            }
-            case HalfNote -> {
-                duration = Duration.Half;
-            }
-            case QuarterNote -> {
-                duration = Duration.Quater;
-            }
-            case EighthNote -> {
-                duration = Duration.Eighth;
-            }
-            case SixteenthNote -> {
-                duration = Duration.Sixteenth;
-            }
-            case ThirtySecondNote -> {
-                duration = Duration.Thirty_second;
-            }
-            case SixtyFourthNote -> {
-                duration = Duration.Sixty_fourth;
-            }
-            case OneHundredTwentyEighthNote -> {
-                duration = Duration.One_twenty_eighth;
-            }
-        }
-
-        return duration;
     }
     //endregion
 

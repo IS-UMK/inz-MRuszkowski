@@ -17,7 +17,7 @@ public interface IPlayable extends Serializable {
      * @param x
      */
     void setTimeX(int x);
-    public NoteSelection getDuration();
+    public Character getDuration();
     public int getSoundHeight();
     public void setSoundHeight(int y);
     /**

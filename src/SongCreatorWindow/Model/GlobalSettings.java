@@ -1,7 +1,6 @@
 package SongCreatorWindow.Model;
 
 import SongCreatorWindow.Model.Core.MusicKeySelection;
-import SongCreatorWindow.Model.Core.NoteSelection;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 
@@ -90,7 +89,7 @@ public class GlobalSettings
      */
     public static int noteWidth = 100;
     public static int noteHeight = 100;
-    public static NoteSelection chosenNote = NoteSelection.WholeNote;
+    public static char chosenNote = 'w';
 
     /**
      * Default music key selection for new path setting

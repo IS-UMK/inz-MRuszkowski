@@ -1,7 +1,6 @@
 package SongCreatorWindow.View;
 
 import Images.ImageManager;
-import SongCreatorWindow.Model.Core.NoteSelection;
 import SongCreatorWindow.Model.GlobalSettings;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
@@ -17,8 +16,8 @@ public class ViewMusicSymbolsSelectionHandling
     Canvas musicSymbolsCanvas;
     Canvas interactionCanvas;
 
-    HashMap<NoteSelection, Image> musicSymbolsNamesWithImages;
-    NoteSelection[][] choiceMap;
+    HashMap<Character, Image> musicSymbolsNamesWithImages;
+    Character[][] choiceMap;
     double nextImageInterval;
 
     public ViewMusicSymbolsSelectionHandling(AnchorPane anchorPaneWithNotesAndAccordsSelection)
@@ -29,7 +28,7 @@ public class ViewMusicSymbolsSelectionHandling
         interactionCanvas = new Canvas(0, 0);
 
         musicSymbolsNamesWithImages = ImageManager.getInstance().setDimensions(GlobalSettings.noteWidth, GlobalSettings.noteHeight).getAllNotesWithNames();
-        choiceMap = new NoteSelection[notesInRow][(musicSymbolsNamesWithImages.size() + 1) / 2];
+        choiceMap = new Character[notesInRow][(musicSymbolsNamesWithImages.size() + 1) / 2];
 
         anchorPaneWithNotesAndAccordsSelection.getChildren().add(musicSymbolsCanvas);
         anchorPaneWithNotesAndAccordsSelection.getChildren().add(interactionCanvas);
@@ -47,7 +46,7 @@ public class ViewMusicSymbolsSelectionHandling
 
         double drawXCord = 0 , drawYCord = 0;
 
-        for (NoteSelection musicSymbolName : musicSymbolsNamesWithImages.keySet())
+        for (Character musicSymbolName : musicSymbolsNamesWithImages.keySet())
         {
             gc.drawImage(musicSymbolsNamesWithImages.get(musicSymbolName), drawXCord, drawYCord, nextImageInterval, nextImageInterval);
             System.out.println(String.format("Symbol loaded at %f %f", drawXCord, drawYCord));

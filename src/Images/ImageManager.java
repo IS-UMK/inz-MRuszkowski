@@ -1,7 +1,7 @@
 package Images;
 
+import SongCreatorWindow.Model.Core.Duration;
 import SongCreatorWindow.Model.Core.MusicKeySelection;
-import SongCreatorWindow.Model.Core.NoteSelection;
 import javafx.scene.image.Image;
 
 import java.util.HashMap;
@@ -158,18 +158,18 @@ public class ImageManager
     //endregion
 
     //region Notes
-    public HashMap<NoteSelection, Image> getAllNotesWithNames()
+    public HashMap<Character, Image> getAllNotesWithNames()
     {
-        var map = new LinkedHashMap<NoteSelection, Image>();
+        var map = new LinkedHashMap<Character, Image>();
 
-        map.put(NoteSelection.WholeNote, getWholeNote());
-        map.put(NoteSelection.HalfNote, getHalfNote());
-        map.put(NoteSelection.QuarterNote, getQuarterNote());
-        map.put(NoteSelection.EighthNote, getEighthNote());
-        map.put(NoteSelection.SixteenthNote, getSixteenthNote());
-        map.put(NoteSelection.ThirtySecondNote, getThirtySecondNote());
-        map.put(NoteSelection.SixtyFourthNote, getSixtyFourthNote());
-        map.put(NoteSelection.OneHundredTwentyEighthNote, getOneHundredTwentyEighthNote());
+        map.put(Duration.Whole, getWholeNote());
+        map.put(Duration.Half, getHalfNote());
+        map.put(Duration.Quater, getQuarterNote());
+        map.put(Duration.Eighth, getEighthNote());
+        map.put(Duration.Sixteenth, getSixteenthNote());
+        map.put(Duration.Thirty_second, getThirtySecondNote());
+        map.put(Duration.Sixty_fourth, getSixtyFourthNote());
+        map.put(Duration.One_twenty_eighth, getOneHundredTwentyEighthNote());
 
         return map;
     }
@@ -188,33 +188,33 @@ public class ImageManager
         };
     }
 
-    public Image getNote(NoteSelection noteSelection)
+    public Image getNote(Character noteSelection)
     {
         Image note = null;
 
         switch (noteSelection) {
-            case WholeNote -> {
+            case 'w' -> {
                 note = getWholeNote();
             }
-            case HalfNote -> {
+            case 'h' -> {
                 note = getHalfNote();
             }
-            case QuarterNote -> {
+            case 'q' -> {
                 note = getQuarterNote();
             }
-            case EighthNote -> {
+            case 'i' -> {
                 note = getEighthNote();
             }
-            case SixteenthNote -> {
+            case 's' -> {
                 note = getSixteenthNote();
             }
-            case ThirtySecondNote -> {
+            case 't' -> {
                 note = getThirtySecondNote();
             }
-            case SixtyFourthNote -> {
+            case 'x' -> {
                 note = getSixtyFourthNote();
             }
-            case OneHundredTwentyEighthNote -> {
+            case 'o' -> {
                 note = getOneHundredTwentyEighthNote();
             }
         }

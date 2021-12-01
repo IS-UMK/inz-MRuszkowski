@@ -12,22 +12,9 @@ public class Note implements IPlayable{
     public char NoteDuration;
 
     @Override
-    public NoteSelection getDuration() {
-        NoteSelection duration = null;
-
-        switch (NoteDuration)
-        {
-            case 'w': duration = NoteSelection.WholeNote; break;
-            case 'h': duration = NoteSelection.HalfNote; break;
-            case 'q': duration = NoteSelection.QuarterNote; break;
-            case 'i': duration = NoteSelection.EighthNote; break;
-            case 's': duration = NoteSelection.SixteenthNote; break;
-            case 't': duration = NoteSelection.ThirtySecondNote; break;
-            case 'x': duration = NoteSelection.SixtyFourthNote; break;
-            case 'o': duration = NoteSelection.OneHundredTwentyEighthNote; break;
-        }
-
-        return duration;
+    public Character getDuration()
+    {
+        return NoteDuration;
     }
     /**
      * Integer for instrument sound selection.
