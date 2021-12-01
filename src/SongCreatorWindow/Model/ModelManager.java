@@ -138,6 +138,8 @@ public class ModelManager implements Serializable
         byte i = 0;
 
         int startX;
+        double parsedValue = 0;
+        double rests = 0;
 
         char saveChoice = GlobalSettings.chosenNote;
 
@@ -166,23 +168,61 @@ public class ModelManager implements Serializable
                     continue;
 
                 String[] notes = sound.split(" ");
+                rests = 0;
 
                 for(String note: notes)
                 {
                     if(note.equals(""))
                         continue;
 
+                    parsedValue = 0;
+
                     String symbols = note.split("[0-9]")[0];
 
-                    if(symbols.equals("R/") || symbols.equals("@"))
+                    if(symbols.charAt(0) == 'R' || symbols.charAt(0) == '@')
                     {
-                        if(symbols.equals("R/")) {
-                            symbols = note.split("/")[1];
-                        }
-                        else symbols =  note.split("@")[1];
+                        if(symbols.charAt(0) == 'R') {
+                            if(symbols.charAt(1) != '/'){
+                                symbols = symbols.substring(1);
 
-                        //startX += (int)((Double.parseDouble(symbols) * 2 * GlobalSettings.Height) + GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() + GlobalSettings.fixedXPositionOfNotes);
-                        startX += Double.parseDouble(symbols) - fixedXPositionOfNotes;
+                                int j;
+                                for(j = 0; j < symbols.length(); j++)
+                                {
+                                    switch (symbols.charAt(j))
+                                    {
+                                        case 'w': parsedValue += 1; break;
+                                        case 'h': parsedValue += 0.5; break;
+                                        case 'q': parsedValue += 0.25; break;
+                                        case 'i': parsedValue += 0.125; break;
+                                        case 's': parsedValue += 0.0625; break;
+                                        case 't': parsedValue += 0.03125; break;
+                                        case 'x': parsedValue += 0.015625; break;
+                                        case 'o': parsedValue += 0.0078125; break;
+                                        case '.': parsedValue *= 1.5; break;
+                                    }
+                                }
+                            }
+                            else {
+                                symbols = note.split("/")[1];
+                                parsedValue = Double.parseDouble(symbols);
+                            }
+                        }
+                        else {
+                            symbols =  note.split("@")[1];
+                            parsedValue = Double.parseDouble(symbols);
+                        }
+
+                        for(int k = startX; k < startX + 200; k++){
+                            var tmp = (k - GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() - GlobalSettings.fixedXPositionOfNotes) / (GlobalSettings.Height * 2);
+                            System.out.println(String.format("TimeX %d: %f", k, tmp));
+                        }
+
+
+                        if(note.charAt(0) == '@'){
+                            startX = (int)((parsedValue * 2 * GlobalSettings.Height) + GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() + GlobalSettings.fixedXPositionOfNotes);
+                            rests = 0;
+                        }
+                        else rests += (int)(parsedValue / .0025);
                     }
                     else
                     {
@@ -196,7 +236,7 @@ public class ModelManager implements Serializable
 
                         modelManager.addMusicSymbol(
                                 i,
-                                startX,
+                                (int)(startX + rests),
                                 (modelManager.getBasePointSound() - noteValue) * 10 + 40
                         );
                     }
