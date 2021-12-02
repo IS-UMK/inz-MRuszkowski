@@ -125,7 +125,7 @@ public class ModelManager implements Serializable
 
     /**
      * Method that interprets MIDI file as a .mrinz music project. Method will NEVER return the same model due to errors while reading MIDI files.
-     * Model will be only similar and the original is not possible to restore.
+     * Model will be only similar and the original is not possible to restore. Time when notes and accords occurs are often confused and sometimes event their order.
      * @param pathToProject
      * @return ModelManager that represents similar music written in MIDI file
      * @throws IOException
