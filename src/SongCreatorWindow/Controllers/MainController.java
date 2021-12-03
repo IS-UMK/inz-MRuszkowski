@@ -29,6 +29,10 @@ public class MainController
     AnchorPane anchorPaneWithPaths;
     @FXML
     AnchorPane anchorPaneWithNotesAndAccordsSelection;
+    @FXML
+    AnchorPane anchorPaneWithNotesAndAccordsProperties;
+    @FXML
+    AnchorPane anchorPaneWithCurrentlySelectedNoteOrAccordProperties;
 
     //Data structures for program logic (Model)
     @FXML
@@ -55,7 +59,12 @@ public class MainController
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                musicSymbolsViewManager = new ViewMusicSymbolsSelectionHandling(anchorPaneWithNotesAndAccordsSelection);
+                musicSymbolsViewManager =
+                        new ViewMusicSymbolsSelectionHandling(
+                            anchorPaneWithNotesAndAccordsSelection,
+                            anchorPaneWithNotesAndAccordsProperties,
+                            anchorPaneWithCurrentlySelectedNoteOrAccordProperties
+                        );
 
                 modelManager = new ModelManager();
 
@@ -315,12 +324,12 @@ public class MainController
     //region Music Symbols
     public void selectMusicSymbol(MouseEvent mouseEvent)
     {
-        musicSymbolsViewManager.drawSelection(mouseEvent.getX(), mouseEvent.getY());
+        musicSymbolsViewManager.drawSelectionOfNote(mouseEvent.getX(), mouseEvent.getY());
     }
 
     public void resizeMusicSymbolsInMenu(ZoomEvent zoomEvent)
     {
-        musicSymbolsViewManager.redrawMusicSymbols();
+        musicSymbolsViewManager.refreshPanel();
     }
 
     public void InsertNote(ActionEvent actionEvent)

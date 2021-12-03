@@ -125,7 +125,7 @@ public class ModelManager implements Serializable
 
     /**
      * Method that interprets MIDI file as a .mrinz music project. Method will NEVER return the same model due to errors while reading MIDI files.
-     * Model will be only similar and the original is not possible to restore. Time when notes and accords occurs are often confused and sometimes event their order.
+     * Model will be only similar and the original is not possible to restore. Time when notes and accords occurs are often confused and sometimes even their order.
      * @param pathToProject
      * @return ModelManager that represents similar music written in MIDI file
      * @throws IOException
@@ -223,7 +223,9 @@ public class ModelManager implements Serializable
                             System.out.println(String.format("TimeX %d: %f", k, tmp));
                         }
 
-                        startX = (int)((parsedValue * 2 * GlobalSettings.Height) + GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() + GlobalSettings.fixedXPositionOfNotes);
+                        if(symbols.charAt(0) == '@')
+                            startX = (int)((parsedValue * 2 * GlobalSettings.Height) + GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() + GlobalSettings.fixedXPositionOfNotes);
+                        else startX += (int)(parsedValue * 2 * GlobalSettings.Height);
                     }
                     else
                     {
@@ -266,7 +268,7 @@ public class ModelManager implements Serializable
         for(Path path : modelManager.getPaths())
         {
             try {
-                createPath(path.getName(), path.getInstrument(), path.getTempo(), path.getVolume());
+                createPath(path.getName(), path.getInstrument(), path.getTempo(), path.getVolume(), path.getMusicKeySelection());
             } catch (CannotAddAnotherPathException e) {
                 System.err.println(e.getMessage());
                 return;
@@ -339,12 +341,12 @@ public class ModelManager implements Serializable
     }
 
     /**
-     * Create new path according to user typed values with selected piano as instrument, tempo 120 and volume level 50
+     * Create new path according to user typed values with selected piano as instrument, tempo 120 and volume level 50 and selected Key
      * @param pathName
      */
     public void createPath(String pathName) throws CannotAddAnotherPathException
     {
-        createPath(pathName, Instrument.getAllInstruments()[1], 120, (byte)50);
+        createPath(pathName, Instrument.getAllInstruments()[1], 120, (byte)50, getDefaultMusicKeySelection());
     }
 
     /**
@@ -353,7 +355,7 @@ public class ModelManager implements Serializable
      */
     public void duplicateSelectedPath() throws CannotAddAnotherPathException
     {
-        createPath(selectedPath.getName(), selectedPath.getInstrument(), selectedPath.getTempo(), selectedPath.getVolume());
+        createPath(selectedPath.getName(), selectedPath.getInstrument(), selectedPath.getTempo(), selectedPath.getVolume(), selectedPath.getMusicKeySelection());
 
         System.out.println(String.format("Path %s duplicated successfully", selectedPath.getName()));
     }
@@ -362,7 +364,7 @@ public class ModelManager implements Serializable
      * Create new path according to user typed values with selected instrument
      * @param pathName
      */
-    public void createPath(String pathName, String instrument, int tempo, byte volume) throws CannotAddAnotherPathException
+    public void createPath(String pathName, String instrument, int tempo, byte volume, MusicKeySelection musicKey) throws CannotAddAnotherPathException
     {
         if(musicPaths.size() > 16)
             throw new CannotAddAnotherPathException("Program does not support of handling more than 16 paths at once.");
@@ -371,7 +373,7 @@ public class ModelManager implements Serializable
                 Path.CreatePath(
                         pathName,
                         (byte)musicPaths.size(),
-                        this.selectedDefaultKey,
+                        musicKey,
                         instrument,
                         tempo,
                         volume
