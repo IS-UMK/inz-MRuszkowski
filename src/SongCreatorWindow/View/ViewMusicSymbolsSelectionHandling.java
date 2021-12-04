@@ -1,23 +1,30 @@
 package SongCreatorWindow.View;
 
 import Images.ImageManager;
-import SongCreatorWindow.Model.Core.Duration;
+import SongCreatorWindow.Model.Core.Accord;
+import SongCreatorWindow.Model.Core.Instrument;
+import SongCreatorWindow.Model.Core.SoundTypeSelection;
+import SongCreatorWindow.Model.Core.TieSelection;
 import SongCreatorWindow.Model.GlobalSettings;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 import java.util.HashMap;
+
+import static SongCreatorWindow.Model.GlobalSettings.InstrumentChoice;
 
 public class ViewMusicSymbolsSelectionHandling
 {
     AnchorPane anchorPaneWithNotesAndAccordsSelection;
-    AnchorPane anchorPaneWithNotesAndAccordsProperties;
+    VBox vBoxWithNotesAndAccordsProperties;
     AnchorPane anchorPaneWithCurrentlySelectedNoteOrAccordProperties;
 
     //region Duration selection
@@ -32,16 +39,16 @@ public class ViewMusicSymbolsSelectionHandling
 
     //region Properties Selection
     Label[] labels;
-    ToggleGroup group;
-    RadioButton symbolNote;
-    RadioButton symbolAccord;
-    ChoiceBox choiceBox;
+    ToggleGroup groupForSoundType;
+    ToggleGroup groupForTie;
+    ChoiceBox instrumentChoiceBox;
+    ChoiceBox accordChoiceBox;
     //endregion
 
-    public ViewMusicSymbolsSelectionHandling(AnchorPane anchorPaneWithNotesAndAccordsSelection, AnchorPane anchorPaneWithNotesAndAccordsProperties, AnchorPane anchorPaneWithCurrentlySelectedNoteOrAccordProperties)
+    public ViewMusicSymbolsSelectionHandling(AnchorPane anchorPaneWithNotesAndAccordsSelection, VBox vBoxWithNotesAndAccordsProperties, AnchorPane anchorPaneWithCurrentlySelectedNoteOrAccordProperties)
     {
         this.anchorPaneWithNotesAndAccordsSelection = anchorPaneWithNotesAndAccordsSelection;
-        this.anchorPaneWithNotesAndAccordsProperties = anchorPaneWithNotesAndAccordsProperties;
+        this.vBoxWithNotesAndAccordsProperties = vBoxWithNotesAndAccordsProperties;
         this.anchorPaneWithCurrentlySelectedNoteOrAccordProperties = anchorPaneWithCurrentlySelectedNoteOrAccordProperties;
 
         //Duration selection configuration
@@ -56,18 +63,129 @@ public class ViewMusicSymbolsSelectionHandling
 
         //Properties selection configuration
         labels = new Label[]{
-                new Label("Type"),
-                new Label("Note Duration"),
-                new Label("Insertion time"),
-                new Label("Instrument")
+                new Label("Type: "),
+                new Label("Tie inclusion: "),
+                new Label("WARNING: Instrument for particular\nsound is used only when\nnone instrument for path is selected."),
+                new Label("Instrument: ")
         };
 
-        group = new ToggleGroup();
+        //Properties selection configuration - user selects between note and accord
+        groupForSoundType = new ToggleGroup();
 
-        symbolNote = new RadioButton("Single Note");
-        symbolAccord = new RadioButton("Accord");
+        RadioButton symbolNote = new RadioButton("Single Note ");
+        symbolNote.setUserData(SoundTypeSelection.Note);
 
-        choiceBox = new ChoiceBox(FXCollections.observableArrayList(Duration.class.getFields()));
+        RadioButton symbolAccord = new RadioButton("Accord ");
+        symbolAccord.setUserData(SoundTypeSelection.Accord);
+
+        String[] accordNames = Accord.AccordType.getAccordTypeNames();
+        accordChoiceBox = new ChoiceBox(FXCollections.observableArrayList(accordNames));
+        accordChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
+            @Override
+            public void changed(ObservableValue observableValue, Object o, Object t1) {
+                String accordName = (String) observableValue.getValue();
+                System.out.println(String.format("Accord %s selected", accordName));
+                GlobalSettings.accordSelectionName = accordName;
+            }
+        });
+        accordChoiceBox.setValue(accordNames[0]);
+        accordChoiceBox.setDisable(true);
+
+        groupForSoundType.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+            @Override
+            public void changed(ObservableValue<? extends Toggle> observableValue, Toggle toggle, Toggle t1) {
+                SoundTypeSelection choice = (SoundTypeSelection) t1.getUserData();
+                switch (choice)
+                {
+                    case Note -> {
+                        GlobalSettings.selectedTypeOfSoundToInsertInPath = SoundTypeSelection.Note;
+                        accordChoiceBox.setDisable(true);
+                    }
+                    case Accord -> {
+                        GlobalSettings.selectedTypeOfSoundToInsertInPath = SoundTypeSelection.Accord;
+                        accordChoiceBox.setDisable(false);
+                        System.out.println(String.format("Accord %s selected", GlobalSettings.accordSelectionName));
+                    }
+                }
+                System.out.println(String.format("Sound type set to %s", choice.toString()));
+            }
+        });
+
+        groupForSoundType.getToggles().addAll(symbolNote, symbolAccord);
+        groupForSoundType.selectToggle(symbolNote);
+
+        //Properties selection configuration - user selects tie type
+        groupForTie = new ToggleGroup();
+
+        RadioButton noneTie = new RadioButton("None ");
+        noneTie.setUserData(TieSelection.None);
+
+        RadioButton beginOfTie = new RadioButton("Begin ");
+        beginOfTie.setUserData(TieSelection.Begin);
+
+        RadioButton continueOfTie = new RadioButton("Continue ");
+        continueOfTie.setUserData(TieSelection.Continue);
+        continueOfTie.setDisable(true);
+
+        RadioButton endOfTie = new RadioButton("End ");
+        endOfTie.setUserData(TieSelection.End);
+        endOfTie.setDisable(true);
+
+        groupForTie.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+            @Override
+            public void changed(ObservableValue<? extends Toggle> observableValue, Toggle toggle, Toggle t1) {
+                TieSelection choice = (TieSelection) t1.getUserData();
+                switch (choice)
+                {
+                    case None -> {
+                        GlobalSettings.TieBetweenNotes = TieSelection.None;
+                    }
+                    case Begin -> {
+                        GlobalSettings.TieBetweenNotes = TieSelection.Begin;
+                    }
+                    case Continue -> {
+                        GlobalSettings.TieBetweenNotes = TieSelection.Continue;
+                    }
+                    case End -> {
+                        GlobalSettings.TieBetweenNotes = TieSelection.End;
+                    }
+                }
+                System.out.println(String.format("Tie selection set to %s", choice.toString()));
+            }
+        });
+
+        groupForTie.getToggles().addAll(noneTie, beginOfTie, continueOfTie, endOfTie);
+        groupForTie.selectToggle(noneTie);
+
+        //Properties selection configuration - user selects instrument for particular sound
+        var instruments = Instrument.getAllInstruments();
+        instrumentChoiceBox = new ChoiceBox(FXCollections.observableArrayList(instruments));
+        instrumentChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
+            @Override
+            public void changed(ObservableValue observableValue, Object o, Object t1) {
+                String instrumentName = (String) observableValue.getValue();
+                GlobalSettings.InstrumentForParticularNoteChoice = Instrument.getInstrumentValueByChosenName(instrumentName);
+                System.out.println(String.format("Instrument for next notes is set to %s", instrumentName));
+            }
+        });
+        instrumentChoiceBox.setValue(instruments[InstrumentChoice]);
+
+        //Add all components
+        var padding = new Insets(10);
+
+        HBox hbox1 = new HBox(labels[0], symbolNote, symbolAccord, accordChoiceBox);
+        hbox1.setPadding(padding);
+
+        HBox hbox2 = new HBox(labels[1], noneTie, beginOfTie, continueOfTie, endOfTie);
+        hbox2.setPadding(padding);
+
+        HBox hbox3 = new HBox(labels[2]);
+        hbox3.setPadding(padding);
+
+        HBox hbox4 = new HBox(labels[3], instrumentChoiceBox);
+        hbox4.setPadding(padding);
+
+        vBoxWithNotesAndAccordsProperties.getChildren().addAll(hbox1, hbox2, hbox3, hbox4);
 
         refreshPanel();
         drawSelectionOfNote(0, 0);

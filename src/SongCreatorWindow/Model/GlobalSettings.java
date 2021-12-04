@@ -1,6 +1,8 @@
 package SongCreatorWindow.Model;
 
 import SongCreatorWindow.Model.Core.MusicKeySelection;
+import SongCreatorWindow.Model.Core.SoundTypeSelection;
+import SongCreatorWindow.Model.Core.TieSelection;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 
@@ -95,4 +97,19 @@ public class GlobalSettings
      * Default music key selection for new path setting
      */
     public static MusicKeySelection defaultMusicKey = MusicKeySelection.ViolinKey;
+
+    /**
+     * Instrument selection for particular note
+     */
+    public static int InstrumentForParticularNoteChoice = 1;
+    /**
+     * Instrument selection for entire path
+     */
+    public static int InstrumentChoice = 1;
+    /**
+     * User chooses what type of sound will be inserted
+     */
+    public static SoundTypeSelection selectedTypeOfSoundToInsertInPath = SoundTypeSelection.Note;
+    public static TieSelection TieBetweenNotes = TieSelection.None;
+    public static String accordSelectionName = "maj";
 }

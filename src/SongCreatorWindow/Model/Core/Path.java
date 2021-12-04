@@ -107,7 +107,7 @@ public class Path implements Serializable
 
         musicString.append(String.format("T%d V%d ", _tempo, _voice));
 
-        int instrumentValue = Instrument.GetInstrumentValueByChosenName(getInstrument());
+        int instrumentValue = Instrument.getInstrumentValueByChosenName(getInstrument());
 
         if(instrumentValue == -1) {
             for (IPlayable s : _sounds)

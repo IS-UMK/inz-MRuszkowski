@@ -3,7 +3,7 @@ package SongCreatorWindow.Model;
 import SongCreatorWindow.Model.Core.*;
 import SongCreatorWindow.Model.Events.IModelEvent;
 import SongCreatorWindow.Model.Events.IMusicEvent;
-import SongCreatorWindow.Model.Events.INoteEvent;
+import SongCreatorWindow.Model.Events.ISoundEvent;
 import SongCreatorWindow.Model.Events.IPathEvent;
 import SongCreatorWindow.Model.Exceptions.CannotAddAnotherPathException;
 import org.jfugue.midi.MidiFileManager;
@@ -73,7 +73,7 @@ public class ModelManager implements Serializable
 
     //events
     transient public List<IPathEvent> pathListeners = new LinkedList<>();
-    transient public List<INoteEvent> noteListeners = new LinkedList<>();
+    transient public List<ISoundEvent> noteListeners = new LinkedList<>();
     transient public List<IModelEvent> modelListeners = new LinkedList<>();
 
     public ModelManager() { }
@@ -291,14 +291,32 @@ public class ModelManager implements Serializable
         int base = getBasePointSound();
         int move_sound_by = (insertY - 40) / 10;
 
-        Note note = Note.CreateNote(base - move_sound_by, duration);
+        IPlayable sound = null;
+
+        int instrument = GlobalSettings.InstrumentChoice;
+
+        Note note;
+        if(instrument > 0)
+            note = Note.CreateNote(base - move_sound_by, duration, GlobalSettings.InstrumentForParticularNoteChoice);
+        else note = Note.CreateNote(base - move_sound_by, duration);
         note.setTimeX(insertX);
         note.setSoundHeight(insertY);
 
-        Path path = musicPaths.get(pathIndex);
-        path.addSound(note);
+        switch (GlobalSettings.selectedTypeOfSoundToInsertInPath) {
+            case Note -> {
+                sound = note;
+            }
+            case Accord -> {
+                Accord accord = new Accord(note, GlobalSettings.accordSelectionName);
+                sound = accord;
+            }
+        }
 
-        fireOnNoteAdded(path, note);
+
+        Path path = musicPaths.get(pathIndex);
+        path.addSound(sound);
+
+        fireOnNoteAdded(path, sound);
     }
     //endregion
 
@@ -346,7 +364,7 @@ public class ModelManager implements Serializable
      */
     public void createPath(String pathName) throws CannotAddAnotherPathException
     {
-        createPath(pathName, Instrument.getAllInstruments()[1], 120, (byte)50, getDefaultMusicKeySelection());
+        createPath(pathName, Instrument.getAllInstruments()[GlobalSettings.InstrumentChoice], 120, (byte)50, getDefaultMusicKeySelection());
     }
 
     /**
@@ -453,8 +471,8 @@ public class ModelManager implements Serializable
     {
         if(listener instanceof IPathEvent)
             pathListeners.add((IPathEvent) listener);
-        if(listener instanceof INoteEvent)
-            noteListeners.add((INoteEvent) listener);
+        if(listener instanceof ISoundEvent)
+            noteListeners.add((ISoundEvent) listener);
         if(listener instanceof IModelEvent)
             modelListeners.add((IModelEvent) listener);
     }
@@ -474,12 +492,12 @@ public class ModelManager implements Serializable
      * @param path
      * @param note
      */
-    private void fireOnNoteAdded(Path path, Note note)
+    private void fireOnNoteAdded(Path path, IPlayable note)
     {
         Iterator iterator = pathListeners.iterator();
 
         while(iterator.hasNext()) {
-            INoteEvent pathEvent = (INoteEvent) iterator.next();
+            ISoundEvent pathEvent = (ISoundEvent) iterator.next();
             pathEvent.onMusicSymbolAdded(path, note);
         }
     }

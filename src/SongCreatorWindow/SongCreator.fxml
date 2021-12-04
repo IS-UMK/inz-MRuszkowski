@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
 
 <BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SongCreatorWindow.Controllers.MainController">
    <top>
@@ -59,25 +60,25 @@
                   <AnchorPane fx:id="anchorPaneWithPaths" onMouseClicked="#InsertNoteOnMouseClicked" />
                </content>
             </ScrollPane>
-            <Accordion maxWidth="400.0" minWidth="100.0" prefWidth="200.0">
-              <panes>
-                <TitledPane animated="false" text="Note Selection">
+            <TabPane maxWidth="400.0" minWidth="100.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
+              <tabs>
+                <Tab text="Note Selection">
                      <content>
                         <AnchorPane fx:id="anchorPaneWithNotesAndAccordsSelection" onMouseClicked="#selectMusicSymbol" />
                      </content>
-                </TitledPane>
-                <TitledPane animated="false" text="Sound Properties">
-                  <content>
-                    <AnchorPane fx:id="anchorPaneWithNotesAndAccordsProperties" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                  </content>
-                </TitledPane>
-                <TitledPane animated="false" text="Soud Options">
-                  <content>
+                </Tab>
+                <Tab text="Sound Properties">
+                     <content>
+                        <VBox fx:id="vBoxWithNotesAndAccordsProperties" prefHeight="200.0" prefWidth="100.0" />
+                     </content>
+                </Tab>
+                  <Tab text="Soud Options">
+                     <content>
                     <AnchorPane fx:id="anchorPaneWithCurrentlySelectedNoteOrAccordProperties" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                  </content>
-                </TitledPane>
-              </panes>
-            </Accordion>
+                     </content>
+                  </Tab>
+              </tabs>
+            </TabPane>
          </items>
       </SplitPane>
    </center>

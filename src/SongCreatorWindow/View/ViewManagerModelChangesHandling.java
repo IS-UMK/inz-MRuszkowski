@@ -1,12 +1,9 @@
 package SongCreatorWindow.View;
 
 import Images.ImageManager;
-import SongCreatorWindow.Model.Core.IPlayable;
-import SongCreatorWindow.Model.Core.Instrument;
-import SongCreatorWindow.Model.Core.Note;
-import SongCreatorWindow.Model.Core.Path;
+import SongCreatorWindow.Model.Core.*;
 import SongCreatorWindow.Model.Events.IModelEvent;
-import SongCreatorWindow.Model.Events.INoteEvent;
+import SongCreatorWindow.Model.Events.ISoundEvent;
 import SongCreatorWindow.Model.Events.IPathEvent;
 import SongCreatorWindow.Model.GlobalSettings;
 import SongCreatorWindow.Model.ModelManager;
@@ -23,14 +20,12 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static SongCreatorWindow.Model.GlobalSettings.*;
 import static SongCreatorWindow.Model.GlobalSettings.strokeLineWidthForSelection;
 
-public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent, IModelEvent
+public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent, IModelEvent
 {
     //Model
     ModelManager modelManager;
@@ -86,8 +81,37 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent, 
         if(musicSound.getTimeX() >= canvas.getWidth() - GlobalSettings.widthOfAreaWhereCanvasExtends)
             addSpaceToCanvas();
 
-        gc.drawImage(musicSymbolImage, musicSound.getTimeX(), musicSound.getSoundHeight());
-        System.out.println(String.format("Note inserted at: X - %d, Y - %d", musicSound.getTimeX(), musicSound.getSoundHeight()));
+        if(musicSound instanceof Note)
+        {
+            gc.drawImage(musicSymbolImage, musicSound.getTimeX(), musicSound.getSoundHeight());
+            System.out.println(String.format("Note inserted at: X - %d, Y - %d", musicSound.getTimeX(), musicSound.getSoundHeight()));
+        }
+        else if(musicSound instanceof Accord)
+        {
+            String[] accordIntervals = Accord.AccordType.getIntervalsOfAccord(GlobalSettings.accordSelectionName);
+
+            int soundHeight = musicSound.getSoundHeight();
+
+            gc.drawImage(musicSymbolImage, musicSound.getTimeX(), soundHeight);
+            System.out.println(String.format("Accord part inserted at: X - %d, Y - %d", musicSound.getTimeX(), soundHeight));
+
+            int drawAboveBy;
+            for(String interval : accordIntervals)
+            {
+                try
+                {
+                    drawAboveBy = Integer.parseInt(interval);
+                }
+                catch (Exception e)
+                {
+                    drawAboveBy = interval.charAt(1)-48;
+                }
+                drawAboveBy--;
+
+                gc.drawImage(musicSymbolImage, musicSound.getTimeX(), GlobalSettings.getLinesPadding() / -2 * drawAboveBy + soundHeight);
+                System.out.println(String.format("Accord part inserted at: X - %d, Y - %d", musicSound.getTimeX(), soundHeight));
+            }
+        }
     }
 
     private void addSpaceToCanvas()
@@ -168,8 +192,8 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent, 
         var instruments = Instrument.getAllInstruments();
 
         //Observable list where I can choose Instrument - create list with given instrument list
-        ChoiceBox choiceBox = new ChoiceBox(FXCollections.observableArrayList(instruments));
-        choiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
+        ChoiceBox instrumentChoiceBox = new ChoiceBox(FXCollections.observableArrayList(instruments));
+        instrumentChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
             @Override
             public void changed(ObservableValue observableValue, Object o, Object t1) {
                 String instrumentName = (String) observableValue.getValue();
@@ -191,11 +215,11 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent, 
         });
 
         //set layout of list created above
-        choiceBox.setLayoutX(1.1 * Height);
-        choiceBox.setLayoutY(Height * canvasList.size() + Height - Height/5);
-        choiceBox.setMinWidth(Height * .8);
-        choiceBox.setMaxWidth(Height * .8);
-        choiceBox.setValue(path.getInstrument());
+        instrumentChoiceBox.setLayoutX(1.1 * Height);
+        instrumentChoiceBox.setLayoutY(Height * canvasList.size() + Height - Height/5);
+        instrumentChoiceBox.setMinWidth(Height * .8);
+        instrumentChoiceBox.setMaxWidth(Height * .8);
+        instrumentChoiceBox.setValue(path.getInstrument());
 
         //display speaker, tempo selection and create volume slider
         gc.strokeRect(2 * Height, 0, Height, Height);
@@ -267,11 +291,11 @@ public class ViewManagerModelChangesHandling implements IPathEvent, INoteEvent, 
         canvasList.add(canvas);
         canvasMap.put(path, canvas);
         volumeSliderMap.put(canvas, volumeSlider);
-        choiceBoxMap.put(canvas, choiceBox);
+        choiceBoxMap.put(canvas, instrumentChoiceBox);
         tempoMap.put(canvas, tempoTextField);
 
         //add created canvas and volume slider
-        anchorPaneWithPaths.getChildren().addAll(canvas, choiceBox, tempoTextField, volumeSlider);
+        anchorPaneWithPaths.getChildren().addAll(canvas, instrumentChoiceBox, tempoTextField, volumeSlider);
 
         var pathToSelect = new MenuItem(path.getName());
         pathToSelect.setOnAction(new EventHandler<ActionEvent>() {

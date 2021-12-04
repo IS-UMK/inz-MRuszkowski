@@ -14,6 +14,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ZoomEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import org.jfugue.player.Player;
 
@@ -30,7 +31,7 @@ public class MainController
     @FXML
     AnchorPane anchorPaneWithNotesAndAccordsSelection;
     @FXML
-    AnchorPane anchorPaneWithNotesAndAccordsProperties;
+    VBox vBoxWithNotesAndAccordsProperties;
     @FXML
     AnchorPane anchorPaneWithCurrentlySelectedNoteOrAccordProperties;
 
@@ -62,7 +63,7 @@ public class MainController
                 musicSymbolsViewManager =
                         new ViewMusicSymbolsSelectionHandling(
                             anchorPaneWithNotesAndAccordsSelection,
-                            anchorPaneWithNotesAndAccordsProperties,
+                            vBoxWithNotesAndAccordsProperties,
                             anchorPaneWithCurrentlySelectedNoteOrAccordProperties
                         );
 

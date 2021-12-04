@@ -36,7 +36,7 @@ public class Instrument {
      *                       for example "Guitar - GUITAR HARMONICS"
      * @return Numeric value of Instrument, -1 means that instrument has not been found
      */
-    public static int GetInstrumentValueByChosenName(String providedChoice)
+    public static int getInstrumentValueByChosenName(String providedChoice)
     {
         String[] choice = providedChoice.split("-");
         choice[0] = choice[0].strip();
@@ -46,7 +46,6 @@ public class Instrument {
             for(Field field : subClass.getFields()) {
                 if(subClass.getName().split("\\$")[1].equals(choice[0]) && field.getName().replace('_', ' ').equals(choice[1]))
                 {
-                    System.err.println("Entered");
                     try {
                         return field.getInt(Class.forName(subClass.getName()));
                     } catch (IllegalAccessException e) {
