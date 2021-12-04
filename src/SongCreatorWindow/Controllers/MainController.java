@@ -11,6 +11,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ZoomEvent;
 import javafx.scene.layout.AnchorPane;
@@ -368,19 +369,20 @@ public class MainController
     //region MouseEvents
     public void InsertNoteOnMouseClicked(MouseEvent mouseEvent)
     {
-        double x = mouseEvent.getX();
-        double y = mouseEvent.getY();
+        if(mouseEvent.getButton() == MouseButton.PRIMARY) {
+            double x = mouseEvent.getX();
+            double y = mouseEvent.getY();
 
-        System.out.println(String.format("User Clicked left mouse button at position: X - %f, Y - %f", x, y));
+            System.out.println(String.format("User Clicked left mouse button at position: X - %f, Y - %f", x, y));
 
-        if(x > GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal())
-        {
-            int pathIndex = (int)y / (int)Height;
-            System.out.println(String.format("The selected path where to insert note: %d", pathIndex));
-            int insertX = ((int)(x + GlobalSettings.fixedXPositionOfNotes) / 10) * 10;
-            int insertY = ((int)((y - 80 - Height * pathIndex) / 10)) * 10;
+            if (x > GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal()) {
+                int pathIndex = (int) y / (int) Height;
+                System.out.println(String.format("The selected path where to insert note: %d", pathIndex));
+                int insertX = ((int) (x + GlobalSettings.fixedXPositionOfNotes) / 10) * 10;
+                int insertY = ((int) ((y - 80 - Height * pathIndex) / 10)) * 10;
 
-            modelManager.addMusicSymbol(pathIndex, insertX, insertY);
+                modelManager.addMusicSymbol(pathIndex, insertX, insertY);
+            }
         }
     }
     //endregion
