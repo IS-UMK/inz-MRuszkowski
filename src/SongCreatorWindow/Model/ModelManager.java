@@ -37,17 +37,28 @@ public class ModelManager implements Serializable
         switch (selectedDefaultKey)
         {
             case ViolinKey:
-                base = NoteToNumericValue.Get_Octave_5_sound_G(); // 67 - G5
+                base = 67;//NoteToNumericValue.Get_Octave_5_sound_G(); // 67 - G5
                 break;
             case BassKey:
-                base = NoteToNumericValue.Get_Octave_4_sound_F(); // 53 - F4
+                base = 53;//NoteToNumericValue.Get_Octave_4_sound_F(); // 53 - F4
                 break;
             case AltoKey:
-                base = NoteToNumericValue.Get_Octave_5_sound_C(); // 60 - C5
+                base = 60;//NoteToNumericValue.Get_Octave_5_sound_C(); // 60 - C5
                 break;
         }
 
         return base;
+    }
+    private String getCalculatedSoundValue(int insertY)
+    {
+        int base = getBasePointSound();
+        int move_sound_by = (insertY - 40) / 10;
+
+        List<Integer> numericalNoNFlatSounds = Note.getNonFlatSoundNumericalValues();
+
+        int numericalValueOfNote = numericalNoNFlatSounds.get(numericalNoNFlatSounds.indexOf(base) - move_sound_by);
+
+        return Note.mapNumericalValueOfNoteToSymbols(numericalValueOfNote);
     }
 
     //Paths
@@ -288,8 +299,6 @@ public class ModelManager implements Serializable
 
     public void addMusicSymbol(int pathIndex, int insertX, int insertY, char duration)
     {
-        int base = getBasePointSound();
-        int move_sound_by = (insertY - 40) / 10;
 
         IPlayable sound = null;
 
@@ -297,8 +306,8 @@ public class ModelManager implements Serializable
 
         Note note;
         if(instrument > 0)
-            note = Note.CreateNote(base - move_sound_by, duration, GlobalSettings.InstrumentForParticularNoteChoice);
-        else note = Note.CreateNote(base - move_sound_by, duration);
+            note = Note.CreateNote(getCalculatedSoundValue(insertY), duration, GlobalSettings.InstrumentForParticularNoteChoice);
+        else note = Note.CreateNote(getCalculatedSoundValue(insertY), duration);
         note.setTimeX(insertX);
         note.setSoundHeight(insertY);
 

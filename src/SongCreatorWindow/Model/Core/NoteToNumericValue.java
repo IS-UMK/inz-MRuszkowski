@@ -429,4 +429,22 @@ public class NoteToNumericValue {
     public static int Get_Octave_9_sound_B(){
         return Octave_9 + B;
     }
+
+    public static int[] getNumericalValuesOfNonFlatSounds()
+    {
+        return new int[]{
+                Get_Octave_0_sound_C(),
+                Get_Octave_1_sound_C(),
+                Get_Octave_2_sound_C(),
+                Get_Octave_3_sound_C(),
+                Get_Octave_4_sound_C(),
+                Get_Octave_5_sound_C(),
+                Get_Octave_6_sound_C(),
+                Get_Octave_7_sound_C(),
+                Get_Octave_8_sound_C(),
+                Get_Octave_9_sound_C(),
+                Get_Octave_10_sound_C(),
+
+        };
+    }
 }
