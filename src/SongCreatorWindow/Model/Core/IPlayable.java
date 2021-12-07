@@ -17,9 +17,11 @@ public interface IPlayable extends Serializable {
      * @param x
      */
     void setTimeX(int x);
-    public Character getDuration();
-    public int getSoundHeight();
-    public void setSoundHeight(int y);
+    Character getDuration();
+    int getSoundHeight();
+    void setSoundHeight(int y);
+    String getSoundType();
+    String getValue();
     /**
      * @return JFugue string
      */

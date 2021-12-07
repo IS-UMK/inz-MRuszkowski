@@ -18,7 +18,7 @@ public class Duration {
     /**
      * Char that represent quater note in JFugue library
      */
-    static public char Quater = 'q';
+    static public char Quarter = 'q';
     /**
      * Char that represent eighth note in JFugue library
      */
@@ -39,4 +39,53 @@ public class Duration {
      * Char that represent one-twenty-eighth note in JFugue library
      */
     static public char One_twenty_eighth = 'o';
+
+    static public String[] getDurations()
+    {
+        return new String[]{
+                "Whole",
+                "Half",
+                "Quarter",
+                "Eighth",
+                "Sixteenth",
+                "Thirty_second",
+                "Sixty_fourth",
+                "One_twenty_eighth"
+        };
+    }
+
+    static public String getDurationNameByCharacter(char c)
+    {
+        String duration = null;
+
+        switch (c)
+        {
+            case 'w' -> {
+                duration = "Whole";
+            }
+            case 'h' -> {
+                duration = "Half";
+            }
+            case 'q' -> {
+                duration = "Quarter";
+            }
+            case 'i' -> {
+                duration = "Eighth";
+            }
+            case 's' -> {
+                duration = "Sixteenth";
+            }
+            case 't' -> {
+                duration = "Thirty_second";
+            }
+            case 'x' -> {
+                duration = "Sixty_fourth";
+            }
+            case 'o' -> {
+                duration = "One_twenty_eighth";
+            }
+        }
+
+        return duration;
+    }
 }

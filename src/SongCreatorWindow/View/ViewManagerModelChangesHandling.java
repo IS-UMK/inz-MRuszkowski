@@ -2,9 +2,7 @@ package SongCreatorWindow.View;
 
 import Images.ImageManager;
 import SongCreatorWindow.Model.Core.*;
-import SongCreatorWindow.Model.Events.IModelEvent;
-import SongCreatorWindow.Model.Events.ISoundEvent;
-import SongCreatorWindow.Model.Events.IPathEvent;
+import SongCreatorWindow.Model.Events.*;
 import SongCreatorWindow.Model.GlobalSettings;
 import SongCreatorWindow.Model.ModelManager;
 import javafx.beans.value.ChangeListener;
@@ -17,6 +15,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
@@ -41,6 +40,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
     HashMap<Canvas, MenuItem> selectionMenuItemToCanvas;
 
     List<ImageView> musicSymbols;
+    List<IClickedEvent> listeners;
 
     //GUI components
     AnchorPane anchorPaneWithPaths;
@@ -62,6 +62,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         selectionMenuItemToCanvas = new HashMap<>();
 
         musicSymbols = new LinkedList<>();
+        listeners = new LinkedList<>();
 
         this.anchorPaneWithPaths = anchorPaneWithPaths;
         this.selectPathMenuItem = selectPathMenuItem;
@@ -80,6 +81,11 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         //TODO: Obrazy nut muszą być takiej same w wielkości
         Image musicSymbolImage = ImageManager.getInstance().setDimensions(GlobalSettings.noteWidth, GlobalSettings.noteHeight).getNote(musicSound.getDuration());
 
+        ImageView view = new ImageView();
+        //view.setPickOnBounds(true);
+        view.setFitWidth(musicSymbolImage.getWidth());
+        view.setPickOnBounds(true);
+
         var canvas = canvasMap.get(path);
 
         var gc = canvas.getGraphicsContext2D();
@@ -87,16 +93,14 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         if(musicSound.getTimeX() >= canvas.getWidth() - GlobalSettings.widthOfAreaWhereCanvasExtends)
             addSpaceToCanvas();
 
-        ImageView view = new ImageView();
-        view.setPickOnBounds(true);
-        view.setFitWidth(musicSymbolImage.getWidth());
-        view.setImage(musicSymbolImage);
-
         if(musicSound instanceof Note)
         {
+            gc.drawImage(musicSymbolImage, musicSound.getTimeX(), musicSound.getSoundHeight());
+
+            view.setLayoutX(musicSound.getTimeX());
+            view.setLayoutY(musicSound.getSoundHeight() + GlobalSettings.Height * path.getVoice());
             view.setFitHeight(musicSymbolImage.getHeight());
 
-            gc.drawImage(musicSymbolImage, musicSound.getTimeX(), musicSound.getSoundHeight());
             System.out.println(String.format("Note inserted at: X - %d, Y - %d", musicSound.getTimeX(), musicSound.getSoundHeight()));
         }
         else if(musicSound instanceof Accord)
@@ -109,6 +113,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
             System.out.println(String.format("Accord part inserted at: X - %d, Y - %d", musicSound.getTimeX(), soundHeight));
 
             int drawAboveBy = 0;
+            int intervalCount_MultipliedByPadding = 0;
             for(String interval : accordIntervals)
             {
                 try
@@ -122,23 +127,44 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
                 drawAboveBy--;
 
                 gc.drawImage(musicSymbolImage, musicSound.getTimeX(), GlobalSettings.getLinesPadding() / -2 * drawAboveBy + soundHeight);
+                intervalCount_MultipliedByPadding += GlobalSettings.getLinesPadding() / 2 * drawAboveBy;
+                view.setLayoutY(GlobalSettings.getLinesPadding() / -2 * drawAboveBy + soundHeight + GlobalSettings.Height * path.getVoice());
+
                 System.out.println(String.format("Accord part inserted at: X - %d, Y - %d", musicSound.getTimeX(), soundHeight));
             }
 
-            view.setFitHeight(GlobalSettings.getLinesPadding() / -2 * drawAboveBy);
+            view.setLayoutX(musicSound.getTimeX());
+            view.setFitHeight(musicSymbolImage.getHeight() + intervalCount_MultipliedByPadding);
         }
 
         view.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                System.out.println("Clicked");
+                if(mouseEvent.getButton() == MouseButton.SECONDARY) {
+                    System.out.println(String.format("Music Symbol Clicked at: %d %d", musicSound.getTimeX(), musicSound.getSoundHeight()));
+                    fireOnMusicSymbolClicked(path, musicSound);
+                }
             }
         });
 
-        view.setLayoutX(musicSound.getTimeX());
-        view.setLayoutY(musicSound.getSoundHeight() + 40);
-        anchorPaneWithPaths.getChildren().add(view);
         musicSymbols.add(view);
+        anchorPaneWithPaths.getChildren().add(view);
+    }
+
+    public void addListener(IClickedEvent listener)
+    {
+        listeners.add(listener);
+    }
+
+    private void fireOnMusicSymbolClicked(Path path, IPlayable musicSound)
+    {
+        Iterator iterator = listeners.iterator();
+
+        while(iterator.hasNext())
+        {
+            IClickedEvent clickedEvent = (IClickedEvent) iterator.next();
+            clickedEvent.onMusicSymbolClicked(path, musicSound);
+        }
     }
 
     private void addSpaceToCanvas()

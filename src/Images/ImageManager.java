@@ -164,7 +164,7 @@ public class ImageManager
 
         map.put(Duration.Whole, getWholeNote());
         map.put(Duration.Half, getHalfNote());
-        map.put(Duration.Quater, getQuarterNote());
+        map.put(Duration.Quarter, getQuarterNote());
         map.put(Duration.Eighth, getEighthNote());
         map.put(Duration.Sixteenth, getSixteenthNote());
         map.put(Duration.Thirty_second, getThirtySecondNote());

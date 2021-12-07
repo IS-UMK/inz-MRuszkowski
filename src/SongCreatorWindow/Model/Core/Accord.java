@@ -39,11 +39,22 @@ public class Accord implements IPlayable{
         NoteHeight = y;
     }
 
+    @Override
+    public String getSoundType() {
+        return "Accord";
+    }
+
     /**
      * Root Note where accord begins
      */
     Note rootNote;
     String JFugueAccordName;
+
+    @Override
+    public String getValue() {
+        return rootNote.getValue();
+    }
+
 
     public String getAccordName()
     {

@@ -51,10 +51,20 @@ public class Note implements IPlayable{
         NoteHeight = y;
     }
 
+    @Override
+    public String getSoundType() {
+        return "Note";
+    }
+
     /**
      * Determines octave and note value. In other words place in treble staff
      */
     public String NoteValue;
+
+    @Override
+    public String getValue() {
+        return NoteValue;
+    }
 
     private Note(String noteValue, char noteDuration, int instrument)
     {

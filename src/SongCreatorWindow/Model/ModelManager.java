@@ -321,8 +321,14 @@ public class ModelManager implements Serializable
             }
         }
 
-
-        Path path = musicPaths.get(pathIndex);
+        Path path;
+        try {
+            path = musicPaths.get(pathIndex);
+        }
+        catch(RuntimeException e)
+        {
+            path = musicPaths.get(pathIndex - 1);
+        }
         path.addSound(sound);
 
         fireOnNoteAdded(path, sound);
@@ -491,8 +497,11 @@ public class ModelManager implements Serializable
         Iterator iterator = modelListeners.iterator();
 
         while(iterator.hasNext()) {
-            IModelEvent modelEvent = (IModelEvent) iterator.next();
-            modelEvent.onModelLoaded(latestTimeX);
+            try{
+                IModelEvent modelEvent = (IModelEvent) iterator.next();
+                modelEvent.onModelLoaded(latestTimeX);
+            }
+            catch (Exception e){}
         }
     }
 
@@ -506,8 +515,11 @@ public class ModelManager implements Serializable
         Iterator iterator = pathListeners.iterator();
 
         while(iterator.hasNext()) {
-            ISoundEvent pathEvent = (ISoundEvent) iterator.next();
-            pathEvent.onMusicSymbolAdded(path, note);
+            try {
+                ISoundEvent pathEvent = (ISoundEvent) iterator.next();
+                pathEvent.onMusicSymbolAdded(path, note);
+            }
+            catch (Exception e){}
         }
     }
 
@@ -520,8 +532,11 @@ public class ModelManager implements Serializable
         Iterator iterator = pathListeners.iterator();
 
         while(iterator.hasNext()) {
-            IPathEvent pathEvent = (IPathEvent) iterator.next();
-            pathEvent.onPathCreated(path);
+            try{
+                IPathEvent pathEvent = (IPathEvent) iterator.next();
+                pathEvent.onPathCreated(path);
+            }
+            catch (Exception e){}
         }
     }
 
@@ -534,8 +549,11 @@ public class ModelManager implements Serializable
         Iterator iterator = pathListeners.iterator();
 
         while(iterator.hasNext()) {
-            IPathEvent pathEvent = (IPathEvent) iterator.next();
-            pathEvent.onPathNameRenamed(path);
+            try{
+                IPathEvent pathEvent = (IPathEvent) iterator.next();
+                pathEvent.onPathNameRenamed(path);
+            }
+            catch (Exception e){}
         }
     }
 
@@ -547,8 +565,11 @@ public class ModelManager implements Serializable
         Iterator iterator = pathListeners.iterator();
 
         while(iterator.hasNext()) {
-            IPathEvent pathEvent = (IPathEvent) iterator.next();
-            pathEvent.onPathClearSelection();
+            try {
+                IPathEvent pathEvent = (IPathEvent) iterator.next();
+                pathEvent.onPathClearSelection();
+            }
+            catch (Exception e){}
         }
     }
 
@@ -561,8 +582,11 @@ public class ModelManager implements Serializable
         Iterator iterator = pathListeners.iterator();
 
         while(iterator.hasNext()) {
-            IPathEvent pathEvent = (IPathEvent) iterator.next();
-            pathEvent.onPathDeleted(path);
+            try{
+                IPathEvent pathEvent = (IPathEvent) iterator.next();
+                pathEvent.onPathDeleted(path);
+            }
+            catch (Exception e){}
         }
     }
     //endregion

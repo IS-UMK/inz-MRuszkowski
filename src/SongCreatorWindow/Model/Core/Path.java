@@ -1,9 +1,11 @@
 package SongCreatorWindow.Model.Core;
 
+import SongCreatorWindow.Model.Events.IMusicSoundEditionEvent;
 import SongCreatorWindow.Model.GlobalSettings;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -64,6 +66,9 @@ public class Path implements Serializable
     List<IPlayable> _sounds;
     public List<IPlayable> getSounds() { return new ArrayList<IPlayable>(_sounds); }
 
+    IPlayable selectedMusicSound = null;
+    List<IMusicSoundEditionEvent> listeners;
+
     int _lenght;
 
     private Path(String pathName, byte voice, MusicKeySelection musicKey, String selectedInstrument, int tempo, byte volumeLevel)
@@ -75,6 +80,7 @@ public class Path implements Serializable
         _volumeLevel = volumeLevel;
 
         _sounds = new LinkedList<IPlayable>();
+        listeners = new LinkedList<>();
         //_lenght = 0;
 
         _voice = voice;
@@ -85,6 +91,7 @@ public class Path implements Serializable
     public static Path CreatePath(String pathName, byte voice, MusicKeySelection musicKey, String selectedInstrument, int tempo) { return new Path(pathName, voice, musicKey, selectedInstrument, tempo, (byte)50); }
     public static Path CreatePath(String pathName, byte voice, MusicKeySelection musicKey, String selectedInstrument) { return new Path(pathName, voice, musicKey, selectedInstrument, 120, (byte)50); }
 
+    //region MusicSounds
     public void addSound(IPlayable sound)
     {
         for(IPlayable s : _sounds)
@@ -97,6 +104,71 @@ public class Path implements Serializable
 
         _sounds.add(sound);
     }
+
+    /**
+     * Get music sound that is selected. Return null if none is chosen
+     * @return Music Sound or null
+     */
+    public IPlayable getSelectedMusicSound()
+    {
+        return selectedMusicSound;
+    }
+
+    /**
+     * Set path that will be now selected
+     * @param musicSound Chosen Music Sound
+     */
+    public void setSelectedMusicSound(IPlayable musicSound)
+    {
+        selectedMusicSound = musicSound;
+        fireOnMusicSoundSelected(this, musicSound);
+    }
+
+    /**
+     * Set selection of Music Sound to None (null)
+     */
+    public void clearSelectionOfMusicSound()
+    {
+        fireOnMusicSoundClearSelection(this, selectedMusicSound);
+        selectedMusicSound = null;
+    }
+
+    /**
+     * Find out what is the index of music sound previously selected
+     * @return index of selected path
+     */
+    public int getIndexOfSelectedMusicSound()
+    {
+        return _sounds.indexOf(selectedMusicSound);
+    }
+    //endregion
+
+    //region Events
+    public void addListener(IMusicSoundEditionEvent listener)
+    {
+        listeners.add(listener);
+    }
+
+    public void fireOnMusicSoundSelected(Path path, IPlayable musicSound)
+    {
+        Iterator iterator = listeners.iterator();
+
+        while(iterator.hasNext()) {
+            IMusicSoundEditionEvent modelEvent = (IMusicSoundEditionEvent) iterator.next();
+            modelEvent.onMusicSoundSelectedToEdition(path, musicSound);
+        }
+    }
+
+    private void fireOnMusicSoundClearSelection(Path path, IPlayable musicSound)
+    {
+        Iterator iterator = listeners.iterator();
+
+        while(iterator.hasNext()) {
+            IMusicSoundEditionEvent modelEvent = (IMusicSoundEditionEvent) iterator.next();
+            modelEvent.onMusicSoundClearSelection(path, musicSound);
+        }
+    }
+    //endregion
 
     public String getExtractedMusic()
     {
@@ -113,8 +185,8 @@ public class Path implements Serializable
             for (IPlayable s : _sounds)
                 musicString.append(
                         String.format(
-                                "@%s %sa%d ",
-                                getSoundTimeOccurrence(s),
+                                "@%f %sa%d ",
+                                Path.getSoundTimeOccurrence(s),
                                 s.ExtractJFugueSoundString(),
                                 getVolume()
                         )
@@ -126,8 +198,8 @@ public class Path implements Serializable
             for (IPlayable s : _sounds)
                 musicString.append(
                         String.format(
-                                "@%s %sa%d ",
-                                getSoundTimeOccurrence(s),
+                                "@%f %sa%d ",
+                                Path.getSoundTimeOccurrence(s),
                                 s.ExtractJFugueSoundString().split(" ")[1],
                                 getVolume()
                         )
@@ -137,9 +209,14 @@ public class Path implements Serializable
         return musicString.toString();
     }
 
-    private String getSoundTimeOccurrence(IPlayable sound)
+    public static double getSoundTimeOccurrence(IPlayable sound)
     {
-        return Double.toString((sound.getTimeX() - GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() - GlobalSettings.fixedXPositionOfNotes) / (GlobalSettings.Height * 2));
+        return (sound.getTimeX() - GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() - GlobalSettings.fixedXPositionOfNotes) / (GlobalSettings.Height * 2);
+    }
+
+    public static double getSoundTimeX(double occurrenceTime)
+    {
+        return occurrenceTime * 2 * GlobalSettings.Height + GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() + GlobalSettings.fixedXPositionOfNotes;
     }
 
     @Override

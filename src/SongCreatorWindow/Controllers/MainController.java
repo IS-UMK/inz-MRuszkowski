@@ -34,7 +34,7 @@ public class MainController
     @FXML
     VBox vBoxWithNotesAndAccordsProperties;
     @FXML
-    AnchorPane anchorPaneWithCurrentlySelectedNoteOrAccordProperties;
+    VBox vBoxPaneWithCurrentlySelectedNoteOrAccordProperties;
 
     //Data structures for program logic (Model)
     @FXML
@@ -48,6 +48,7 @@ public class MainController
     ModelManager modelManager;
     ViewManagerModelChangesHandling viewManager;
     ViewMusicSymbolsSelectionHandling musicSymbolsViewManager;
+    MusicSymbolsController musicSymbolsController;
 
     GlobalLoaderDTO loader = GlobalLoaderDTO.getInstance();
 
@@ -63,15 +64,19 @@ public class MainController
             public void run() {
                 musicSymbolsViewManager =
                         new ViewMusicSymbolsSelectionHandling(
-                            anchorPaneWithNotesAndAccordsSelection,
-                            vBoxWithNotesAndAccordsProperties,
-                            anchorPaneWithCurrentlySelectedNoteOrAccordProperties
+                                anchorPaneWithNotesAndAccordsSelection,
+                                vBoxWithNotesAndAccordsProperties,
+                                vBoxPaneWithCurrentlySelectedNoteOrAccordProperties
                         );
 
                 modelManager = new ModelManager();
 
                 viewManager = new ViewManagerModelChangesHandling(modelManager, anchorPaneWithPaths, selectPathMenuItem, playMenuItem);
                 modelManager.addListener(viewManager);
+
+                musicSymbolsController = new MusicSymbolsController(musicSymbolsViewManager);
+                modelManager.addListener(musicSymbolsController);
+                viewManager.addListener(musicSymbolsController);
 
 
                 if(loader.isHereProjectToLoad()) {
@@ -380,6 +385,7 @@ public class MainController
                 System.out.println(String.format("The selected path where to insert note: %d", pathIndex));
                 int insertX = ((int) (x + GlobalSettings.fixedXPositionOfNotes) / 10) * 10;
                 int insertY = ((int) ((y - 80 - Height * pathIndex) / 10)) * 10;
+                insertY = insertY > (Height - Height / 20) ?  insertY - (int)Height / 20 : insertY;
 
                 modelManager.addMusicSymbol(pathIndex, insertX, insertY);
             }
