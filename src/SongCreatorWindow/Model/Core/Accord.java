@@ -44,6 +44,14 @@ public class Accord implements IPlayable{
         return "Accord";
     }
 
+    @Override
+    public void setVolume(byte volume){ rootNote.setVolume(volume); }
+
+    @Override
+    public byte getVolume() {
+        return rootNote.getVolume();
+    }
+
     /**
      * Root Note where accord begins
      */
@@ -71,12 +79,30 @@ public class Accord implements IPlayable{
     }
 
     @Override
-    public String ExtractJFugueSoundString() {
+    public String ExtractJFugueSoundString(boolean withInstrument) {
         
         var musicString = new StringBuilder();
-        
-        musicString.append(String.format("%s+", rootNote.ExtractJFugueSoundString()));
-        musicString.insert(musicString.length() - 2, Accord.AccordType.getAccordValueByName(getAccordName()));
+
+        String[] accordInterval = AccordType.getIntervalsOfAccord(JFugueAccordName);
+        List<Integer> nonFlatsSounds = Note.getNonFlatSoundNumericalValues();
+
+        musicString.append(String.format("%s", rootNote.ExtractJFugueSoundString(withInstrument)));
+        musicString.append("+");
+
+        for(String interval : accordInterval)
+        {
+            int indexOfValue = nonFlatsSounds.indexOf(rootNote.getNumericalNoteValue());
+            int newValue = nonFlatsSounds.get(indexOfValue + Integer.parseInt(interval.substring(0, 1)) - 1);
+            String newSound = Note.mapNumericalValueOfNoteToSymbols(newValue);
+
+            if(interval.length() > 1)
+                newSound = Note.modifySingleSound(newSound, SoundModification.Flat);
+
+            musicString.append(newSound);
+            musicString.append(rootNote.getDuration());
+            musicString.append("a" + rootNote.getVolume());
+            musicString.append("+");
+        }
 
         musicString.deleteCharAt(musicString.length() - 1); //Remove the last '+' symbol
         return musicString.toString();
@@ -177,122 +203,122 @@ public class Accord implements IPlayable{
          * Intervals 1, b3, 5
          */
         public static String Minor = "min";
-        public static String[] getMinorIntervals(){ return new String[]{ "b3", "5" }; }
+        public static String[] getMinorIntervals(){ return new String[]{ "3b", "5" }; }
         /**
          * Intervals 1, b3, 5, 6
          */
         public static String Minor6th = "min6";
-        public static String[] getMinor6thIntervals(){ return new String[]{ "b3", "5", "6" }; }
+        public static String[] getMinor6thIntervals(){ return new String[]{ "3b", "5", "6" }; }
         /**
          * Intervals 1, b3, 5, b7
          */
         public static String Minor7th = "min7";
-        public static String[] getMinor7thIntervals(){ return new String[]{ "b3", "5", "b7" }; }
+        public static String[] getMinor7thIntervals(){ return new String[]{ "3b", "5", "7b" }; }
         /**
          * Intervals 1, b3, 5, b7, 9
          */
         public static String Minor9th = "min9";
-        public static String[] getMinor9thIntervals(){ return new String[]{ "b3", "5", "b7", "9" }; }
+        public static String[] getMinor9thIntervals(){ return new String[]{ "3b", "5", "7b", "9" }; }
         /**
          * Intervals 1, b3, 5, b7, 9, 11
          */
         public static String Minor11th = "min11";
-        public static String[] getMinor11thIntervals(){ return new String[]{ "b3", "5", "b7", "9", "11" }; }
+        public static String[] getMinor11thIntervals(){ return new String[]{ "3b", "5", "7b", "9", "11" }; }
         /**
          * Intervals 1, b3, 5, b7, 11
          */
         public static String Minor_7by11 = "min7%11";
-        public static String[] getMinor_7by11Intervals(){ return new String[]{ "b3", "5", "b7", "11" }; }
+        public static String[] getMinor_7by11Intervals(){ return new String[]{ "3b", "5", "7b", "11" }; }
         /**
          * Intervals 1, b3, 5, 9
          */
         public static String MinorAdded9th = "minadd9";
-        public static String[] getMinorAdded9thIntervals(){ return new String[]{ "b3", "5", "9" }; }
+        public static String[] getMinorAdded9thIntervals(){ return new String[]{ "3b", "5", "9" }; }
         /**
          * Intervals 1, b3, 5, 6
          */
         public static String Minor_6by9 = "min6%9";
-        public static String[] getMinor_6by9Intervals(){ return new String[]{ "b3", "5", "6" }; }
+        public static String[] getMinor_6by9Intervals(){ return new String[]{ "3b", "5", "6" }; }
         /**
          * Intervals 1, b3, 5, 7
          */
         public static String MinorMajor7th = "minmaj7";
-        public static String[] getMinorMajor7thIntervals(){ return new String[]{ "b3", "5", "7" }; }
+        public static String[] getMinorMajor7thIntervals(){ return new String[]{ "3b", "5", "7" }; }
         /**
          * Intervals 1, b3, 5, 7 ,9
          */
         public static String MinorMajor9th = "minmaj9";
-        public static String[] getMinorMajor9thIntervals(){ return new String[]{ "b3", "5", "7", "9" }; }
+        public static String[] getMinorMajor9thIntervals(){ return new String[]{ "3b", "5", "7", "9" }; }
         /**
          * Intervals 1, 3, 5, b7
          */
         public static String Dominant7th = "dom7";
-        public static String[] getDominant7thIntervals(){ return new String[]{ "3", "5", "b7" }; }
+        public static String[] getDominant7thIntervals(){ return new String[]{ "3", "5", "7b" }; }
         /**
          * Intervals 1, 3, 5, 6, b7
          */
         public static String Dominant_7by6 = "dom7%6";
-        public static String[] getDominant_7by6Intervals(){ return new String[]{ "3", "5", "6", "b7" }; }
+        public static String[] getDominant_7by6Intervals(){ return new String[]{ "3", "5", "6", "7b" }; }
         /**
          * Intervals 1, 3, 5, b7, 11
          */
         public static String Dominant_7by11 = "dom7%11";
-        public static String[] getDominant_7by11Intervals(){ return new String[]{ "3", "5", "b7", "11" }; }
+        public static String[] getDominant_7by11Intervals(){ return new String[]{ "3", "5", "7b", "11" }; }
         /**
          * Intervals 1, 4, 5, b7
          */
         public static String Dominant7th_Sus = "dom7sus";
-        public static String[] getDominant7th_SusIntervals(){ return new String[]{ "4", "5", "b7" }; }
+        public static String[] getDominant7th_SusIntervals(){ return new String[]{ "4", "5", "7b" }; }
         /**
          * Intervals 1, 4, 5, 6, b7
          */
         public static String Dominant_7by6_Sus = "dom7%6sus";
-        public static String[] getDominant_7by6_SusIntervals(){ return new String[]{ "4", "5", "6", "b7" }; }
+        public static String[] getDominant_7by6_SusIntervals(){ return new String[]{ "4", "5", "6", "7b" }; }
         /**
          * Intervals 1, 3, 5, b7, 9
          */
         public static String Dominant9th = "dom9";
-        public static String[] getDominant9thIntervals(){ return new String[]{ "3", "5", "b7", "9" }; }
+        public static String[] getDominant9thIntervals(){ return new String[]{ "3", "5", "7b", "9" }; }
         /**
          * Intervals 1, 3, 5, b7, 9, 11
          */
         public static String Dominant11th = "dom11";
-        public static String[] getDominant11thIntervals(){ return new String[]{ "3", "5", "b7", "9", "11" }; }
+        public static String[] getDominant11thIntervals(){ return new String[]{ "3", "5", "7b", "9", "11" }; }
         /**
          * Intervals 1, 3, 5, b7, 9, 13
          */
         public static String Dominant13th = "dom13";
-        public static String[] getDominant13thIntervals(){ return new String[]{ "3", "5", "b7", "9", "13" }; }
+        public static String[] getDominant13thIntervals(){ return new String[]{ "3", "5", "7b", "9", "13" }; }
         /**
          * Intervals 1, 3, 5, b7, 11, 13
          */
         public static String Dominant13th_Sus = "dom13sus";
-        public static String[] getDominant13th_SusIntervals(){ return new String[]{ "3", "5", "b7", "11", "13" }; }
+        public static String[] getDominant13th_SusIntervals(){ return new String[]{ "3", "5", "7b", "11", "13" }; }
         /**
          * Intervals 1, 3, 5, b7, 9, 11, 13
          */
         public static String Dominant7th_6by11 = "dom7%6%11";
-        public static String[] getDominant7th_6by11Intervals(){ return new String[]{ "3", "5", "b7", "9", "11", "13" }; }
+        public static String[] getDominant7th_6by11Intervals(){ return new String[]{ "3", "5", "7b", "9", "11", "13" }; }
         /**
          * Intervals 1, 3, #5
          */
         public static String Augmented = "aug";
-        public static String[] getAugmentedIntervals(){ return new String[]{ "3", "#5" }; }
+        public static String[] getAugmentedIntervals(){ return new String[]{ "3", "5#" }; }
         /**
          * Intervals 1, 3, #5, b7
          */
         public static String Augmented7th = "aug7";
-        public static String[] getAugmented7thIntervals(){ return new String[]{ "3", "#5", "b7" }; }
+        public static String[] getAugmented7thIntervals(){ return new String[]{ "3", "5#", "b7" }; }
         /**
          * Intervals 1, b3, b5
          */
         public static String Diminished = "dim";
-        public static String[] getDiminishedIntervals(){ return new String[]{ "b3", "5" }; }
+        public static String[] getDiminishedIntervals(){ return new String[]{ "3b", "5" }; }
         /**
          * Intervals 1, b3, b5, 6
          */
         public static String Diminished7th = "dim7";
-        public static String[] getDiminished7thIntervals(){ return new String[]{ "b3", "b5", "6" }; }
+        public static String[] getDiminished7thIntervals(){ return new String[]{ "3b", "5b", "6" }; }
         /**
          * Intervals 1, 2, 5
          */

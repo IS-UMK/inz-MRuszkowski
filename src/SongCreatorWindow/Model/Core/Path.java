@@ -182,36 +182,38 @@ public class Path implements Serializable
         int instrumentValue = Instrument.getInstrumentValueByChosenName(getInstrument());
 
         if(instrumentValue == -1) {
-            for (IPlayable s : _sounds)
+            for (IPlayable s : _sounds) {
+                s.setVolume(this.getVolume());
                 musicString.append(
                         String.format(
-                                "@%f %sa%d ",
-                                Path.getSoundTimeOccurrence(s),
-                                s.ExtractJFugueSoundString(),
-                                getVolume()
+                                "@%f %s ",
+                                Path.getSoundTimeOccurrence(s.getTimeX()),
+                                s.ExtractJFugueSoundString(true)
                         )
                 );
+            }
         }
         else{
             musicString.append(String.format("I%d ", instrumentValue));
 
-            for (IPlayable s : _sounds)
+            for (IPlayable s : _sounds){
+                s.setVolume(this.getVolume());
                 musicString.append(
                         String.format(
-                                "@%f %sa%d ",
-                                Path.getSoundTimeOccurrence(s),
-                                s.ExtractJFugueSoundString().split(" ")[1],
-                                getVolume()
+                                "@%f %s ",
+                                Path.getSoundTimeOccurrence(s.getTimeX()),
+                                s.ExtractJFugueSoundString(false)
                         )
                 );
+            }
         }
 
         return musicString.toString();
     }
 
-    public static double getSoundTimeOccurrence(IPlayable sound)
+    public static double getSoundTimeOccurrence(double timeX)
     {
-        return (sound.getTimeX() - GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() - GlobalSettings.fixedXPositionOfNotes) / (GlobalSettings.Height * 2);
+        return (timeX - GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() - GlobalSettings.fixedXPositionOfNotes) / (GlobalSettings.Height * 2);
     }
 
     public static double getSoundTimeX(double occurrenceTime)

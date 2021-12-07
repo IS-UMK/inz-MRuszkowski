@@ -22,8 +22,10 @@ public interface IPlayable extends Serializable {
     void setSoundHeight(int y);
     String getSoundType();
     String getValue();
+    void setVolume(byte volume);
+    byte getVolume();
     /**
      * @return JFugue string
      */
-    String ExtractJFugueSoundString();
+    String ExtractJFugueSoundString(boolean withInstrument);
 }

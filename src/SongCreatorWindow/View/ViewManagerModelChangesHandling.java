@@ -122,7 +122,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
                 }
                 catch (Exception e)
                 {
-                    drawAboveBy = interval.charAt(1)-48;
+                    drawAboveBy = interval.charAt(0)-48;
                 }
                 drawAboveBy--;
 

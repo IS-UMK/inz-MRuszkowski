@@ -307,7 +307,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         groupForSoundTypeOption.getToggles().addAll(symbolNoteOption, symbolAccordOption);
         boolean isNote = musicSound.getSoundType().equals("Note") ? true : false;
         groupForSoundTypeOption.selectToggle(isNote ? symbolNoteOption : symbolAccordOption);
-        accordChoiceBoxOption.setDisable(!isNote);
+        accordChoiceBoxOption.setDisable(isNote);
 
         ChoiceBox musicSymbolDuration = new ChoiceBox(FXCollections.observableArrayList(Duration.getDurations()));
         musicSymbolDuration.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
@@ -351,7 +351,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         octaveTextField.setText(octave);
 
         //Occurrence Time
-        String time = Double.toString(Path.getSoundTimeOccurrence(musicSound));
+        String time = Double.toString(Path.getSoundTimeOccurrence(musicSound.getTimeX()));
         TextField occurrenceTimeTextField = new TextField(time);
         occurrenceTimeTextField.textProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -362,7 +362,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
                     occurrenceTimeTextField.setText(oldValue);
                     return;
                 }
-                
+
                 occurrenceTimeTextField.setText(newValue);
                 System.out.println(String.format("Occurrence time set to %s", occurrenceTime));
             }

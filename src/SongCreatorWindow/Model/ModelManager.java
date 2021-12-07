@@ -390,6 +390,11 @@ public class ModelManager implements Serializable
     {
         createPath(selectedPath.getName(), selectedPath.getInstrument(), selectedPath.getTempo(), selectedPath.getVolume(), selectedPath.getMusicKeySelection());
 
+        var newPath = musicPaths.get(musicPaths.size() - 1);
+
+        for(IPlayable sound : selectedPath.getSounds())
+            newPath.addSound(sound);
+
         System.out.println(String.format("Path %s duplicated successfully", selectedPath.getName()));
     }
 

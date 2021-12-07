@@ -27,6 +27,8 @@ public class Note implements IPlayable{
     /**
      * In which moment the note occurs
      */
+
+    public byte Volume;
     int TimeX;
     int NoteHeight;
 
@@ -56,6 +58,17 @@ public class Note implements IPlayable{
         return "Note";
     }
 
+    @Override
+    public void setVolume(byte volume){
+        Volume = volume;
+    }
+
+    @Override
+    public byte getVolume()
+    {
+        return Volume;
+    }
+
     /**
      * Determines octave and note value. In other words place in treble staff
      */
@@ -80,6 +93,12 @@ public class Note implements IPlayable{
         Note note = new Note(noteSymbol + octave, noteDuration, 0);
 
         return note;
+    }
+
+    public int getNumericalNoteValue()
+    {
+        String symbols = NoteValue.split("[0-9]")[0];
+        return Note.mapNoteSymbolToNumericalValue(symbols, Integer.parseInt(NoteValue.substring(symbols.length())));
     }
 
     public static int mapNoteSymbolToNumericalValue(String noteSymbol, int octave)
@@ -162,9 +181,53 @@ public class Note implements IPlayable{
         return list;
     }
 
-    @Override
-    public String ExtractJFugueSoundString()
+    public static String modifySingleSound(String symbols, SoundModification modification)
     {
-        return String.format("I%d %s%c", Instrument, NoteValue, NoteDuration);
+        char sound = symbols.charAt(0);
+        int octave = Integer.parseInt(symbols.substring(symbols.split("[0-9]")[0].length()));
+
+        return modifySingleSound(sound, octave, modification);
+    }
+
+    public static String modifySingleSound(char sound, int octave, SoundModification modification)
+    {
+        StringBuilder modified = new StringBuilder();
+        modified.append(sound);
+
+        switch(modification){
+            case Sharp -> {
+                if (sound != 'E' && sound != 'B') {
+                    if(sound != 'A' || sound != 'D')
+                        modified.append("#");
+                }
+                else{
+                    modified.append("b");
+                }
+            }
+
+            case Flat -> {
+                if (sound != 'C' && sound != 'F') {
+                    if(sound == 'E' || sound == 'B')
+                        modified.append("b");
+                    else{
+                        modified.deleteCharAt(modified.length() - 1);
+                        switch (sound){
+                            case 'D' -> { modified.append("C#"); }
+                            case 'G' -> { modified.append("F#"); }
+                            case 'A' -> { modified.append("G#"); }
+                        }
+                    }
+                }
+            }
+        }
+
+        modified.append(octave);
+        return modified.toString();
+    }
+
+    @Override
+    public String ExtractJFugueSoundString(boolean withInstrument)
+    {
+        return withInstrument ? String.format("I%d %s%ca%d", Instrument, NoteValue, NoteDuration, Volume) : String.format("%s%ca%d", NoteValue, NoteDuration, Volume);
     }
 }
