@@ -355,12 +355,16 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         TextField occurrenceTimeTextField = new TextField(time);
         occurrenceTimeTextField.textProperty().addListener(new ChangeListener<String>() {
             @Override
-            public void changed(ObservableValue<? extends String> observableValue, String newValue, String oldValue) {
+            public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
                 String occurrenceTime = (String) observableValue.getValue();
-                if (!newValue.matches("^\\d+(\\.\\d+)*$")) {
-                    octaveTextField.setText(newValue.replaceAll("[^\\d]", ""));
-                    System.out.println(String.format("Occurrence time set to %s", occurrenceTime));
+
+                if (!newValue.matches("(?<=^| )\\d+(\\.\\d+)?(?=$| )|(?<=^| )\\.\\d+(?=$| )")) {
+                    occurrenceTimeTextField.setText(oldValue);
+                    return;
                 }
+                
+                occurrenceTimeTextField.setText(newValue);
+                System.out.println(String.format("Occurrence time set to %s", occurrenceTime));
             }
         });
         occurrenceTimeTextField.setText(time);

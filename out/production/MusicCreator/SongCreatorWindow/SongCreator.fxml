@@ -74,7 +74,7 @@
                 </Tab>
                   <Tab text="Soud Options">
                      <content>
-                    <AnchorPane fx:id="anchorPaneWithCurrentlySelectedNoteOrAccordProperties" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                        <VBox fx:id="vBoxPaneWithCurrentlySelectedNoteOrAccordProperties" prefHeight="200.0" prefWidth="100.0" />
                      </content>
                   </Tab>
               </tabs>
