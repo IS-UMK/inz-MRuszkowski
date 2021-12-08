@@ -373,6 +373,10 @@ public class ModelManager implements Serializable
         return musicPaths.indexOf(selectedPath);
     }
 
+    public int getIndexOfPath(Path path) {
+        return musicPaths.indexOf(path);
+    }
+
     /**
      * Create new path according to user typed values with selected piano as instrument, tempo 120 and volume level 50 and selected Key
      * @param pathName
@@ -390,10 +394,11 @@ public class ModelManager implements Serializable
     {
         createPath(selectedPath.getName(), selectedPath.getInstrument(), selectedPath.getTempo(), selectedPath.getVolume(), selectedPath.getMusicKeySelection());
 
-        var newPath = musicPaths.get(musicPaths.size() - 1);
+        Path newPath = musicPaths.get(musicPaths.size() - 1);
+        int pathIndex = musicPaths.indexOf(newPath);
 
         for(IPlayable sound : selectedPath.getSounds())
-            newPath.addSound(sound);
+            addMusicSymbol(pathIndex, sound.getTimeX(), sound.getSoundHeight(), sound.getDuration());
 
         System.out.println(String.format("Path %s duplicated successfully", selectedPath.getName()));
     }

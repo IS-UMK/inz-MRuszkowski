@@ -74,7 +74,7 @@ public class MainController
                 viewManager = new ViewManagerModelChangesHandling(modelManager, anchorPaneWithPaths, selectPathMenuItem, playMenuItem);
                 modelManager.addListener(viewManager);
 
-                musicSymbolsController = new MusicSymbolsController(musicSymbolsViewManager);
+                musicSymbolsController = new MusicSymbolsController(viewManager, musicSymbolsViewManager);
                 modelManager.addListener(musicSymbolsController);
                 viewManager.addListener(musicSymbolsController);
 

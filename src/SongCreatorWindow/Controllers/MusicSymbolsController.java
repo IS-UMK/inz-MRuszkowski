@@ -4,15 +4,18 @@ import SongCreatorWindow.Model.Core.IPlayable;
 import SongCreatorWindow.Model.Core.Path;
 import SongCreatorWindow.Model.Events.IClickedEvent;
 import SongCreatorWindow.Model.Events.IPathEvent;
+import SongCreatorWindow.View.ViewManagerModelChangesHandling;
 import SongCreatorWindow.View.ViewMusicSymbolsSelectionHandling;
 
 public class MusicSymbolsController implements IClickedEvent, IPathEvent
 {
-    ViewMusicSymbolsSelectionHandling view;
+    ViewManagerModelChangesHandling modelView;
+    ViewMusicSymbolsSelectionHandling symbolsView;
 
-    public MusicSymbolsController(ViewMusicSymbolsSelectionHandling view)
+    public MusicSymbolsController(ViewManagerModelChangesHandling modelView, ViewMusicSymbolsSelectionHandling symbolsView)
     {
-        this.view = view;
+        this.symbolsView = symbolsView;
+        this.modelView = modelView;
     }
 
     @Override
@@ -23,7 +26,8 @@ public class MusicSymbolsController implements IClickedEvent, IPathEvent
 
     @Override
     public void onPathCreated(Path path) {
-        path.addListener(this.view);
+        path.addListener(this.symbolsView);
+        path.addListener(this.modelView);
     }
 
     @Override

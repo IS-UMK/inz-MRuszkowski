@@ -26,7 +26,7 @@ import java.util.*;
 import static SongCreatorWindow.Model.GlobalSettings.*;
 import static SongCreatorWindow.Model.GlobalSettings.strokeLineWidthForSelection;
 
-public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent, IModelEvent
+public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent, IModelEvent, IMusicSoundEditionEvent
 {
     //Model
     ModelManager modelManager;
@@ -49,6 +49,8 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
     Canvas interactionCanvas;
     double canvasCurrentWidth = Width;
+
+    Canvas soundEditionCanvas;
 
     public ViewManagerModelChangesHandling(ModelManager modelManager, AnchorPane anchorPaneWithPaths, Menu selectPathMenuItem, MenuItem playMenuItem)
     {
@@ -453,6 +455,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         selectionMenuItemToCanvas.remove(pathSelectionMenuItem);
 
         onPathClearSelection();
+        onMusicSoundClearSelection();
     }
 
     @Override
@@ -460,11 +463,57 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
     {
         if(interactionCanvas == null)
         {
-            interactionCanvas = new Canvas(Width, Height);
+            interactionCanvas = new Canvas(GlobalSettings.Width, GlobalSettings.Height);
             anchorPaneWithPaths.getChildren().add(interactionCanvas);
         }
 
         interactionCanvas.getGraphicsContext2D().clearRect(0, 0, interactionCanvas.getWidth(), interactionCanvas.getHeight());
         interactionCanvas.setHeight(0);
+    }
+
+    @Override
+    public void onMusicSoundSelectedToEdition(Path path, IPlayable musicSound)
+    {
+        if(soundEditionCanvas == null)
+        {
+            soundEditionCanvas = new Canvas(0, 0);
+            anchorPaneWithPaths.getChildren().add(soundEditionCanvas);
+        }
+
+        soundEditionCanvas.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                System.out.println("Unselecting sound");
+                path.clearSelectionOfMusicSound();
+            }
+        });
+
+        onMusicSoundClearSelection();
+
+        var gc = soundEditionCanvas.getGraphicsContext2D();
+
+        int index = modelManager.getIndexOfPath(path);
+
+        soundEditionCanvas.setWidth(GlobalSettings.noteWidth);
+        soundEditionCanvas.setHeight(GlobalSettings.noteHeight);
+        soundEditionCanvas.setLayoutX(musicSound.getTimeX());
+        soundEditionCanvas.setLayoutY(musicSound.getSoundHeight() + GlobalSettings.Height * index);
+
+        gc.setLineWidth(GlobalSettings.strokeLineWidthForSelection);
+        gc.setStroke(GlobalSettings.selectionColor);
+
+        gc.strokeRect(strokeLineWidthForSelection / 2, strokeLineWidthForSelection / 2,
+                soundEditionCanvas.getWidth() - strokeLineWidthForSelection, soundEditionCanvas.getHeight() - strokeLineWidthForSelection);
+    }
+
+    @Override
+    public void onMusicSoundClearSelection() {
+        soundEditionCanvas.getGraphicsContext2D().clearRect(0, 0, soundEditionCanvas.getWidth(), soundEditionCanvas.getHeight());
+        soundEditionCanvas.setHeight(0);
+    }
+
+    @Override
+    public void onMusicSoundTieCheck(IPlayable musicSound, TieSelection lastTie) {
+
     }
 }

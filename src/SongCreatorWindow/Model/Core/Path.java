@@ -94,6 +94,9 @@ public class Path implements Serializable
     //region MusicSounds
     public void addSound(IPlayable sound)
     {
+        fireOnMusicSoundTieCheck(sound);
+        sound.setSoundConcatenation(GlobalSettings.TieBetweenNotes);
+
         for(IPlayable s : _sounds)
             if(s.getTimeX() > sound.getTimeX())
             {
@@ -129,7 +132,7 @@ public class Path implements Serializable
      */
     public void clearSelectionOfMusicSound()
     {
-        fireOnMusicSoundClearSelection(this, selectedMusicSound);
+        fireOnMusicSoundClearSelection();
         selectedMusicSound = null;
     }
 
@@ -159,13 +162,26 @@ public class Path implements Serializable
         }
     }
 
-    private void fireOnMusicSoundClearSelection(Path path, IPlayable musicSound)
+    private void fireOnMusicSoundClearSelection()
     {
         Iterator iterator = listeners.iterator();
 
         while(iterator.hasNext()) {
             IMusicSoundEditionEvent modelEvent = (IMusicSoundEditionEvent) iterator.next();
-            modelEvent.onMusicSoundClearSelection(path, musicSound);
+            modelEvent.onMusicSoundClearSelection();
+        }
+    }
+
+    private void fireOnMusicSoundTieCheck(IPlayable musicSound)
+    {
+        int size = _sounds.size();
+        TieSelection lastTie = size > 0 ? _sounds.get(size - 1).getSoundConcatenation() : TieSelection.None;
+
+        Iterator iterator = listeners.iterator();
+
+        while(iterator.hasNext()) {
+            IMusicSoundEditionEvent modelEvent = (IMusicSoundEditionEvent) iterator.next();
+            modelEvent.onMusicSoundTieCheck(musicSound, lastTie);
         }
     }
     //endregion

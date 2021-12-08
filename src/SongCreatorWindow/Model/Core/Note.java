@@ -13,7 +13,7 @@ public class Note implements IPlayable{
     /**
      * Describes what is the note duration
      */
-    public char NoteDuration;
+    char NoteDuration;
 
     @Override
     public Character getDuration()
@@ -23,12 +23,12 @@ public class Note implements IPlayable{
     /**
      * Integer for instrument sound selection.
      */
-    public int Instrument;
+    int Instrument;
     /**
      * In which moment the note occurs
      */
 
-    public byte Volume;
+    byte Volume;
     int TimeX;
     int NoteHeight;
 
@@ -72,18 +72,26 @@ public class Note implements IPlayable{
     /**
      * Determines octave and note value. In other words place in treble staff
      */
-    public String NoteValue;
+    String NoteValue;
 
     @Override
     public String getValue() {
         return NoteValue;
     }
 
+     TieSelection noteConcatenation;
+    @Override
+    public TieSelection getSoundConcatenation() { return noteConcatenation; }
+    @Override
+    public void setSoundConcatenation(TieSelection tie) { noteConcatenation = tie; }
+
     private Note(String noteValue, char noteDuration, int instrument)
     {
         NoteValue = noteValue;
         NoteDuration = noteDuration;
         Instrument = instrument;
+
+        noteConcatenation = TieSelection.None;
     }
 
     public static Note CreateNote(String noteValue, char noteDuration, int instrument) { return new Note(noteValue, noteDuration, instrument); }

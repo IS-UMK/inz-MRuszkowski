@@ -24,6 +24,8 @@ public interface IPlayable extends Serializable {
     String getValue();
     void setVolume(byte volume);
     byte getVolume();
+    TieSelection getSoundConcatenation();
+    void setSoundConcatenation(TieSelection tie);
     /**
      * @return JFugue string
      */

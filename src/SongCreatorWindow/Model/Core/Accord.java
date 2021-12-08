@@ -52,6 +52,16 @@ public class Accord implements IPlayable{
         return rootNote.getVolume();
     }
 
+    @Override
+    public TieSelection getSoundConcatenation() {
+        return rootNote.getSoundConcatenation();
+    }
+
+    @Override
+    public void setSoundConcatenation(TieSelection tie) {
+        rootNote.setSoundConcatenation(tie);
+    }
+
     /**
      * Root Note where accord begins
      */
