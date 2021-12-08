@@ -74,7 +74,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
 
     ChoiceBox instrumentChoiceBoxForCurrentlySelectedSoundToEdition;
 
-    ChoiceBox SoundTieChoiceBox;
+    Label soundTieLabel;
 
     List<HBox> optionsContent;
     //endregion
@@ -434,16 +434,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
 
         tiesTypes.remove(tiesTypes.size() - 1); // remove artifact - $VALUES
 
-        SoundTieChoiceBox = new ChoiceBox(FXCollections.observableArrayList(tiesTypes));
-        SoundTieChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
-            @Override
-            public void changed(ObservableValue observableValue, Object oldValue, Object newValue) {
-                String tieType = (String) observableValue.getValue();
-                System.out.println(String.format("Sound Tie type set to %s", tieType));
-                //add code for change
-            }
-        });
-        SoundTieChoiceBox.setValue(musicSound.getSoundConcatenation().toString());
+        soundTieLabel = new Label(musicSound.getSoundConcatenation().toString());
 
         Insets padding = new Insets(10);
 
@@ -465,7 +456,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         HBox hbox16 = new HBox(optionLabels[5], instrumentChoiceBoxForCurrentlySelectedSoundToEdition);
         hbox16.setPadding(padding);
 
-        HBox hbox17 = new HBox(optionLabels[6], SoundTieChoiceBox);
+        HBox hbox17 = new HBox(optionLabels[6], soundTieLabel);
         hbox17.setPadding(padding);
 
         vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().addAll(hbox11, hbox12, hbox13, hbox14, hbox15, hbox16, hbox17);
@@ -522,11 +513,11 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
     }
 
     @Override
-    public void onMusicSoundTieCheck(IPlayable musicSound, TieSelection lastTie)
+    public void onMusicSoundTieCheck(IPlayable musicSound, TieSelection previousTie)
     {
-        TieSelection tie = musicSound.getSoundConcatenation();
+        TieSelection tie = GlobalSettings.TieBetweenNotes;//musicSound.getSoundConcatenation();
 
-        switch (lastTie) {
+        switch (previousTie) {
             case None, End -> {
                 if(tie == TieSelection.Continue || tie == TieSelection.End)
                     groupForTie.selectToggle(noneTie);

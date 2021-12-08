@@ -513,7 +513,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
     }
 
     @Override
-    public void onMusicSoundTieCheck(IPlayable musicSound, TieSelection lastTie) {
+    public void onMusicSoundTieCheck(IPlayable musicSound, TieSelection previousTie) {
 
     }
 }

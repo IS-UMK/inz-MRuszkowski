@@ -236,6 +236,26 @@ public class Note implements IPlayable{
     @Override
     public String ExtractJFugueSoundString(boolean withInstrument)
     {
-        return withInstrument ? String.format("I%d %s%ca%d", Instrument, NoteValue, NoteDuration, Volume) : String.format("%s%ca%d", NoteValue, NoteDuration, Volume);
+        StringBuilder musicString = new StringBuilder();
+
+        if(withInstrument)
+            musicString.append(String.format("I%d ", Instrument));
+
+        switch (noteConcatenation) {
+            case None -> {
+                musicString.append(String.format("%s%ca%d", NoteValue, NoteDuration, Volume));
+            }
+            case Begin -> {
+                musicString.append(String.format("%s%c-a%d", NoteValue, NoteDuration, Volume));
+            }
+            case Continue -> {
+                musicString.append(String.format("%s-%c-a%d", NoteValue, NoteDuration, Volume));
+            }
+            case End -> {
+                musicString.append(String.format("%s-%ca%d", NoteValue, NoteDuration, Volume));
+            }
+        }
+
+        return musicString.toString();
     }
 }

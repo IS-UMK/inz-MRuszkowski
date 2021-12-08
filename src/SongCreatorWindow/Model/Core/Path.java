@@ -94,18 +94,22 @@ public class Path implements Serializable
     //region MusicSounds
     public void addSound(IPlayable sound)
     {
-        fireOnMusicSoundTieCheck(sound);
-        sound.setSoundConcatenation(GlobalSettings.TieBetweenNotes);
+        boolean added = false;
 
         for(IPlayable s : _sounds)
             if(s.getTimeX() > sound.getTimeX())
             {
                 int index = _sounds.indexOf(s);
                 _sounds.add(index, sound);
-                return;
+                added = true;
+                break;
             }
 
-        _sounds.add(sound);
+        if(!added)
+            _sounds.add(sound);
+
+        fireOnMusicSoundTieCheck(sound);
+        sound.setSoundConcatenation(GlobalSettings.TieBetweenNotes);
     }
 
     /**
@@ -174,14 +178,14 @@ public class Path implements Serializable
 
     private void fireOnMusicSoundTieCheck(IPlayable musicSound)
     {
-        int size = _sounds.size();
-        TieSelection lastTie = size > 0 ? _sounds.get(size - 1).getSoundConcatenation() : TieSelection.None;
+        int index = _sounds.indexOf(musicSound);
+        TieSelection previousTie = index != 0 && _sounds.size() > 1 ? _sounds.get(index - 1).getSoundConcatenation() : TieSelection.None;
 
         Iterator iterator = listeners.iterator();
 
         while(iterator.hasNext()) {
             IMusicSoundEditionEvent modelEvent = (IMusicSoundEditionEvent) iterator.next();
-            modelEvent.onMusicSoundTieCheck(musicSound, lastTie);
+            modelEvent.onMusicSoundTieCheck(musicSound, previousTie);
         }
     }
     //endregion
@@ -202,7 +206,7 @@ public class Path implements Serializable
                 s.setVolume(this.getVolume());
                 musicString.append(
                         String.format(
-                                "@%f %s ",
+                                "@%s %s ",
                                 Path.getSoundTimeOccurrence(s.getTimeX()),
                                 s.ExtractJFugueSoundString(true)
                         )
@@ -216,7 +220,7 @@ public class Path implements Serializable
                 s.setVolume(this.getVolume());
                 musicString.append(
                         String.format(
-                                "@%f %s ",
+                                "@%s %s ",
                                 Path.getSoundTimeOccurrence(s.getTimeX()),
                                 s.ExtractJFugueSoundString(false)
                         )
