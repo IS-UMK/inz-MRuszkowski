@@ -378,7 +378,8 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
             @Override
             public void changed(ObservableValue observableValue, Object oldValue, Object newValue) {
                 if(oldValue.equals("") || newValue.equals("")){
-                    System.err.println("AAAAAAAAAAAAAAAAAAAAAA");
+                    System.err.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                    System.err.println("Old " + oldValue + " new " + newValue);
                     return;
                 }
 

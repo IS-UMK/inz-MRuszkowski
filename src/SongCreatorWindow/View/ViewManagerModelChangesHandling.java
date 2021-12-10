@@ -553,6 +553,8 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         var view = musicSymbols.get(musicSound);
 
         view.setLayoutY(musicSound.getSoundHeight());
+
+        onMusicSoundModified(path, musicSound);
         onMusicSoundSelectedToEdition(path, musicSound);
     }
 
