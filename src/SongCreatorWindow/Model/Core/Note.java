@@ -87,7 +87,7 @@ public class Note implements IPlayable{
     @Override
     public void setValue(String value) { noteValue = value; }
 
-     TieSelection noteConcatenation;
+    TieSelection noteConcatenation;
     @Override
     public TieSelection getSoundConcatenation() { return noteConcatenation; }
     @Override
@@ -98,19 +98,22 @@ public class Note implements IPlayable{
         this.instrument = instrumentValue;
     }
 
+    SoundModification modification = SoundModification.None;
     boolean sharpness = false;
     @Override
     public void setSharpness(boolean isSharp) {
-        if(sharpness == isSharp)
+        if(sharpness == isSharp || flatness)
             return;
 
         sharpness = isSharp;
 
         if(isSharp){
             noteValue = Note.modifySingleSound(noteValue, SoundModification.Sharp);
+            modification = SoundModification.Sharp;
         }
         else{
-            noteValue.replace("#", "");
+            noteValue = noteValue.replace("#", "");
+            modification = SoundModification.None;
         }
     }
     @Override
@@ -121,21 +124,28 @@ public class Note implements IPlayable{
     boolean flatness = false;
     @Override
     public void setFlatness(boolean isFlat) {
-        if(flatness == isFlat)
+        if(flatness == isFlat || sharpness)
             return;
 
         flatness = isFlat;
 
         if(isFlat){
             noteValue = Note.modifySingleSound(noteValue, SoundModification.Flat);
+            modification = SoundModification.Flat;
         }
         else{
-            noteValue.replace("b", "");
+            noteValue = noteValue.replace("b", "");
+            modification = SoundModification.None;
         }
     }
     @Override
     public boolean isFlat() {
         return flatness;
+    }
+
+    @Override
+    public SoundModification getModification() {
+        return modification;
     }
 
     private Note(String noteValue, char noteDuration, int instrument)
@@ -164,18 +174,27 @@ public class Note implements IPlayable{
 
     public static int mapNoteSymbolToNumericalValue(String noteSymbol, int octave)
     {
+        /*if (sound != 'E' && sound != 'B') {
+                    modified.append("#");
+                }
+            }
+
+            case Flat -> {
+                if (sound != 'C' && sound != 'F') {
+                    modified.append("b");
+                }*/
         int baseNoteMIDIValue = switch (noteSymbol) {
             case "C" -> 0;
-            case "C#" -> 1;
+            case "C#", "Db" -> 1;
             case "D" -> 2;
-            case "Eb" -> 3;
+            case "D#", "Eb" -> 3;
             case "E" -> 4;
             case "F" -> 5;
-            case "F#" -> 6;
+            case "F#", "Gb" -> 6;
             case "G" -> 7;
-            case "G#" -> 8;
+            case "G#", "Ab" -> 8;
             case "A" -> 9;
-            case "Bb" -> 10;
+            case "Bb", "A#" -> 10;
             case "B" -> 11;
             default -> -1;
         };
@@ -192,32 +211,32 @@ public class Note implements IPlayable{
 
         switch (sound)
         {
-            case 0 -> { symbols.append("C"); }
-            case 1 -> { symbols.append("C#"); }
-            case 2 -> { symbols.append("D"); }
-            case 3 -> { symbols.append("Eb"); }
-            case 4 -> { symbols.append("E"); }
-            case 5 -> { symbols.append("F"); }
-            case 6 -> { symbols.append("F#"); }
-            case 7 -> { symbols.append("G"); }
-            case 8 -> { symbols.append("G#"); }
-            case 9 -> { symbols.append("A"); }
-            case 10 -> { symbols.append("Bb"); }
-            case 11 -> { symbols.append("B"); }
+            case 0 -> symbols.append("C");
+            case 1 -> symbols.append("C#");
+            case 2 -> symbols.append("D");
+            case 3 -> symbols.append("Eb");
+            case 4 -> symbols.append("E");
+            case 5 -> symbols.append("F");
+            case 6 -> symbols.append("F#");
+            case 7 -> symbols.append("G");
+            case 8 -> symbols.append("G#");
+            case 9 -> symbols.append("A");
+            case 10 -> symbols.append("Bb");
+            case 11 -> symbols.append("B");
         }
 
         switch (octave)
         {
-            case 1 -> { symbols.append("1"); }
-            case 2 -> { symbols.append("2"); }
-            case 3 -> { symbols.append("3"); }
-            case 4 -> { symbols.append("4"); }
-            case 5 -> { symbols.append("5"); }
-            case 6 -> { symbols.append("6"); }
-            case 7 -> { symbols.append("7"); }
-            case 8 -> { symbols.append("8"); }
-            case 9 -> { symbols.append("9"); }
-            case 10 -> { symbols.append("10"); }
+            case 1 -> symbols.append("1");
+            case 2 -> symbols.append("2");
+            case 3 -> symbols.append("3");
+            case 4 -> symbols.append("4");
+            case 5 -> symbols.append("5");
+            case 6 -> symbols.append("6");
+            case 7 -> symbols.append("7");
+            case 8 -> symbols.append("8");
+            case 9 -> symbols.append("9");
+            case 10 -> symbols.append("10");
         }
 
         return symbols.toString();
@@ -259,26 +278,13 @@ public class Note implements IPlayable{
         switch(modification){
             case Sharp -> {
                 if (sound != 'E' && sound != 'B') {
-                    if(sound != 'A' && sound != 'D')
-                        modified.append("#");
-                }
-                else{
-                    modified.append("b");
+                    modified.append("#");
                 }
             }
 
             case Flat -> {
                 if (sound != 'C' && sound != 'F') {
-                    if(sound == 'E' || sound == 'B')
-                        modified.append("b");
-                    else{
-                        modified.deleteCharAt(modified.length() - 1);
-                        switch (sound){
-                            case 'D' -> modified.append("C#");
-                            case 'G' -> modified.append("F#");
-                            case 'A' -> modified.append("G#");
-                        }
-                    }
+                    modified.append("b");
                 }
             }
         }
@@ -296,18 +302,10 @@ public class Note implements IPlayable{
             musicString.append(String.format("I%d ", instrument));
 
         switch (noteConcatenation) {
-            case None -> {
-                musicString.append(String.format("%s%ca%d", noteValue, noteDuration, volume));
-            }
-            case Begin -> {
-                musicString.append(String.format("%s%c-a%d", noteValue, noteDuration, volume));
-            }
-            case Continue -> {
-                musicString.append(String.format("%s-%c-a%d", noteValue, noteDuration, volume));
-            }
-            case End -> {
-                musicString.append(String.format("%s-%ca%d", noteValue, noteDuration, volume));
-            }
+            case None -> musicString.append(String.format("%s%ca%d", noteValue, noteDuration, volume));
+            case Begin -> musicString.append(String.format("%s%c-a%d", noteValue, noteDuration, volume));
+            case Continue -> musicString.append(String.format("%s-%c-a%d", noteValue, noteDuration, volume));
+            case End -> musicString.append(String.format("%s-%ca%d", noteValue, noteDuration, volume));
         }
 
         return musicString.toString();

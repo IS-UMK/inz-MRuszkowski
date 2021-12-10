@@ -42,6 +42,7 @@ public interface IPlayable extends Serializable {
     void setFlatness(boolean isFlat);
     boolean isSharp();
     boolean isFlat();
+    SoundModification getModification();
     /**
      * @return JFugue string
      */

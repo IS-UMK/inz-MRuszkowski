@@ -144,6 +144,11 @@ public class Path implements Serializable
 
         musicSound.setValue(Note.mapNumericalValueOfNoteToSymbols(newValue));
 
+        if(musicSound.isSharp())
+            musicSound.setSharpness(false);
+        if(musicSound.isFlat())
+            musicSound.setFlatness(false);
+
         fireOnMusicSoundHeightChange(this, musicSound);
     }
 
@@ -163,6 +168,33 @@ public class Path implements Serializable
             return;
 
         musicSound.setInstrument(Instrument.getInstrumentValueByChosenName(instrumentName));
+    }
+
+    public void setSoundModification(IPlayable musicSound, SoundModification modification)
+    {
+        if(_sounds.indexOf(musicSound) == -1)
+            return;
+
+        switch (modification) {
+            case None -> {
+                musicSound.setFlatness(false);
+                musicSound.setSharpness(false);
+            }
+            case Sharp -> {
+                if(musicSound.isFlat())
+                    musicSound.setFlatness(false);
+
+                musicSound.setSharpness(true);
+            }
+            case Flat -> {
+                if(musicSound.isSharp())
+                    musicSound.setSharpness(false);
+
+                musicSound.setFlatness(true);
+            }
+        }
+
+        fireOnMusicSoundModified(this, musicSound);
     }
 
     /**
@@ -300,6 +332,16 @@ public class Path implements Serializable
         while(iterator.hasNext()) {
             IMusicSoundEditionEvent modelEvent = (IMusicSoundEditionEvent) iterator.next();
             modelEvent.onMusicSoundDurationChange(path, musicSound);
+        }
+    }
+
+    private void fireOnMusicSoundModified(Path path, IPlayable musicSound)
+    {
+        Iterator iterator = listeners.iterator();
+
+        while(iterator.hasNext()) {
+            IMusicSoundEditionEvent modelEvent = (IMusicSoundEditionEvent) iterator.next();
+            modelEvent.onMusicSoundModified(path, musicSound);
         }
     }
     //endregion

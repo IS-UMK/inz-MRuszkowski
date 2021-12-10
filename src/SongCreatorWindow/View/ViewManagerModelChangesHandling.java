@@ -41,6 +41,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
     HashMap<Canvas, MenuItem> selectionMenuItemToCanvas;
 
     HashMap<IPlayable, ImageView> musicSymbols;
+    HashMap<IPlayable, ImageView> modificationSymbols;
     List<IClickedEvent> listeners;
 
     //GUI components
@@ -65,6 +66,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         selectionMenuItemToCanvas = new HashMap<>();
 
         musicSymbols = new HashMap<>();
+        modificationSymbols = new HashMap<>();
         listeners = new LinkedList<>();
 
         this.anchorPaneWithPaths = anchorPaneWithPaths;
@@ -559,5 +561,40 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         var view = musicSymbols.get(musicSound);
 
         view.setImage(ImageManager.getInstance().getNote(musicSound.getDuration()));
+    }
+
+    @Override
+    public void onMusicSoundModified(Path path, IPlayable musicSound) {
+        int symbolDim = 33;
+
+        Image modificationSymbol = switch (musicSound.getModification())
+        {
+            case None -> ImageManager.getInstance().setDimensions(symbolDim, symbolDim).getModificationSymbol(SoundModification.None);
+            case Sharp -> ImageManager.getInstance().setDimensions(symbolDim, symbolDim).getModificationSymbol(SoundModification.Sharp);
+            case Flat -> ImageManager.getInstance().setDimensions(symbolDim, symbolDim).getModificationSymbol(SoundModification.Flat);
+        };
+
+        var previousView = modificationSymbols.get(musicSound);
+        if(previousView != null) {
+            previousView.setImage(null);
+            modificationSymbols.remove(previousView);
+        }
+
+        if(modificationSymbol != null) {
+            var view = new ImageView(modificationSymbol);
+
+            int insertX = musicSound.getTimeX() - symbolDim / 2;
+            int insertY = musicSound.getSoundHeight() + GlobalSettings.noteHeight - (int) (symbolDim * 1.2);
+
+            view.setFitWidth(symbolDim);
+            view.setFitHeight(symbolDim);
+            view.setLayoutX(insertX);
+            view.setLayoutY(insertY);
+
+            System.out.println(String.format("Modification symbol inserted at: %d %d", insertX, insertY));
+
+            modificationSymbols.put(musicSound, view);
+            anchorPaneWithPaths.getChildren().add(view);
+        }
     }
 }

@@ -35,6 +35,8 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
     double nextImageInterval;
     //endregion
 
+    Insets padding = new Insets(10);
+
     //region Properties selection configuration
     Label[] accordLabels;
 
@@ -203,7 +205,6 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         instrumentChoiceBoxForNextSound.setValue(instruments[InstrumentChoice]);
 
         //Add all components
-        var padding = new Insets(10);
 
         HBox hbox1 = new HBox(accordLabels[0], symbolNote, symbolAccord, accordChoiceBox);
         hbox1.setPadding(padding);
@@ -376,9 +377,14 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         var soundChoiceBoxListener = new ChangeListener() {
             @Override
             public void changed(ObservableValue observableValue, Object oldValue, Object newValue) {
+                if(oldValue.equals("") || newValue.equals("")){
+                    System.err.println("AAAAAAAAAAAAAAAAAAAAAA");
+                    return;
+                }
+
                 String sound = (String) observableValue.getValue();
-                int oldIndex = availableSounds.indexOf(oldValue);
-                int newIndex = availableSounds.indexOf(newValue);
+                int oldIndex = availableSounds.indexOf(((String)oldValue).substring(0, 1));
+                int newIndex = availableSounds.indexOf(((String)newValue).substring(0, 1));
 
                 path.changeSoundHeight(musicSound, newIndex - oldIndex, 0);
 
@@ -471,8 +477,6 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
 
         soundTieLabel = new Label(musicSound.getSoundConcatenation().toString());
 
-        Insets padding = new Insets(10);
-
         HBox hbox11 = new HBox(optionLabels[0], symbolNoteOption, symbolAccordOption, accordChoiceBoxOption);
         hbox11.setPadding(padding);
 
@@ -496,37 +500,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
 
         vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().addAll(hbox11, hbox12, hbox13, hbox14, hbox15, hbox16, hbox17);
 
-        ToggleGroup modificationOfSound = new ToggleGroup();
-        RadioButton noneModificationOfSound = new RadioButton("None ");
-        modificationOfSound.getToggles().add(noneModificationOfSound);
-
-        HBox hbox18 = new HBox(optionLabels[7], noneModificationOfSound);
-        hbox18.setPadding(padding);
-
-        if(sound.length() == 1)
-            modificationOfSound.selectToggle(noneModificationOfSound);
-
-        //sharp
-        if(sound.charAt(0) != 'E' && sound.charAt(0) != 'B')
-        {
-            RadioButton SharpModificationOfSound = new RadioButton("Sharp ");
-            modificationOfSound.getToggles().add(SharpModificationOfSound);
-            hbox18.getChildren().add(SharpModificationOfSound);
-
-            if(sound.length() > 1 && sound.charAt(1) == '#')
-                modificationOfSound.selectToggle(SharpModificationOfSound);
-        }
-
-        //flat
-        if(sound.charAt(0) != 'C' && sound.charAt(0) != 'F')
-        {
-            RadioButton flatModificationOfSound = new RadioButton("Flat ");
-            modificationOfSound.getToggles().add(flatModificationOfSound);
-            hbox18.getChildren().add(flatModificationOfSound);
-
-            if(sound.length() > 1 && sound.charAt(1) == 'b')
-                modificationOfSound.selectToggle(flatModificationOfSound);
-        }
+        HBox hbox18 = createModificationSection(path, musicSound);
 
         vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().add(hbox18);
 
@@ -538,6 +512,57 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         optionsContent.add(hbox16);
         optionsContent.add(hbox17);
         optionsContent.add(hbox18);
+    }
+
+    private HBox createModificationSection(Path path, IPlayable musicSound) {
+        String sound = musicSound.getValue().split("[0-9]")[0];
+
+        ToggleGroup modificationOfSound = new ToggleGroup();
+        RadioButton noneModificationOfSound = new RadioButton("None ");
+        noneModificationOfSound.setUserData(SoundModification.None);
+        modificationOfSound.getToggles().add(noneModificationOfSound);
+
+        HBox hbox18 = new HBox(optionLabels[7], noneModificationOfSound);
+        hbox18.setPadding(padding);
+
+        if(sound.length() == 1)
+            modificationOfSound.selectToggle(noneModificationOfSound);
+
+        //sharp
+        if(sound.charAt(0) != 'E' && sound.charAt(0) != 'B')
+        {
+            RadioButton sharpModificationOfSound = new RadioButton("Sharp ");
+            sharpModificationOfSound.setUserData(SoundModification.Sharp);
+
+            modificationOfSound.getToggles().add(sharpModificationOfSound);
+            hbox18.getChildren().add(sharpModificationOfSound);
+
+            if(sound.length() > 1 && sound.charAt(1) == '#')
+                modificationOfSound.selectToggle(sharpModificationOfSound);
+        }
+
+        //flat
+        if(sound.charAt(0) != 'C' && sound.charAt(0) != 'F')
+        {
+            RadioButton flatModificationOfSound = new RadioButton("Flat ");
+            flatModificationOfSound.setUserData(SoundModification.Flat);
+
+            modificationOfSound.getToggles().add(flatModificationOfSound);
+            hbox18.getChildren().add(flatModificationOfSound);
+
+            if(sound.length() > 1 && sound.charAt(1) == 'b')
+                modificationOfSound.selectToggle(flatModificationOfSound);
+        }
+
+        modificationOfSound.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+            @Override
+            public void changed(ObservableValue<? extends Toggle> observableValue, Toggle toggle, Toggle t1) {
+                SoundModification modification = (SoundModification) observableValue.getValue().getUserData();
+                path.setSoundModification(musicSound, modification);
+            }
+        });
+
+        return hbox18;
     }
 
     @Override
@@ -567,16 +592,27 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
     @Override
     public void onMusicSoundOccurrenceTimeChanged(Path path, IPlayable musicSound)
     {
-        //occurrenceTimeTextField.setText(Double.toString(Path.getSoundTimeOccurrence(musicSound.getTimeX())));
+
     }
 
     @Override
     public void onMusicSoundHeightChange(Path path, IPlayable musicSound) {
+        var toReplace = optionsContent.get(optionsContent.size() - 1);
+        vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().remove(toReplace);
+        optionsContent.remove(toReplace);
 
+        HBox newOne = createModificationSection(path, musicSound);
+        vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().add(newOne);
+        optionsContent.add(newOne);
     }
 
     @Override
     public void onMusicSoundDurationChange(Path path, IPlayable musicSound) {
+
+    }
+
+    @Override
+    public void onMusicSoundModified(Path path, IPlayable musicSound) {
 
     }
 }

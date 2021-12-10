@@ -93,6 +93,11 @@ public class Accord implements IPlayable{
     }
 
     @Override
+    public SoundModification getModification() {
+        return rootNote.getModification();
+    }
+
+    @Override
     public int getNumericalNoteValue() {
         return rootNote.getNumericalNoteValue();
     }

@@ -2,6 +2,7 @@ package Images;
 
 import SongCreatorWindow.Model.Core.Duration;
 import SongCreatorWindow.Model.Core.MusicKeySelection;
+import SongCreatorWindow.Model.Core.SoundModification;
 import javafx.scene.image.Image;
 
 import java.util.HashMap;
@@ -68,6 +69,9 @@ public class ImageManager
     Image _sixtyFourth_NoteImage;
     Image _oneHundredTwentyEighth_NoteImage;
 
+    Image _sharpSymbol;
+    Image _flatSymbol;
+
     Image _soundEffectsImage;
     Image _percussiveImage;
     Image _ethnicImage;
@@ -104,22 +108,12 @@ public class ImageManager
     //region Music keys
     public Image getMusicKey(MusicKeySelection musicKeySelection)
     {
-        Image image = null;
-
-        switch (musicKeySelection)
+        return switch (musicKeySelection)
         {
-            case ViolinKey:
-                image = getViolinKey();
-                break;
-            case BassKey:
-                image = getBassKey();
-                break;
-            case AltoKey:
-                image = getAltoKey();
-                break;
-        }
-
-        return image;
+            case ViolinKey -> getViolinKey();
+            case BassKey -> getBassKey();
+            case AltoKey -> getAltoKey();
+        };
     }
 
     private Image getAltoKey()
@@ -157,6 +151,39 @@ public class ImageManager
     }
     //endregion
 
+    //region Modification Symbols
+    public Image getModificationSymbol(SoundModification modification)
+    {
+        return switch (modification) {
+            case None -> null;
+            case Sharp -> getSharpSymbol();
+            case Flat -> getFlatSymbol();
+        };
+    }
+
+    public Image getSharpSymbol()
+    {
+        if(reloadImage || _sharpSymbol == null)
+        {
+            _sharpSymbol = getImageByResource("/Images/sharp_symbol.png");
+            setReloadFlag(false);
+        }
+
+        return _sharpSymbol;
+    }
+
+    public Image getFlatSymbol()
+    {
+        if(reloadImage || _flatSymbol == null)
+        {
+            _flatSymbol = getImageByResource("/Images/flat_symbol.png");
+            setReloadFlag(false);
+        }
+
+        return _flatSymbol;
+    }
+    //endregion
+
     //region Notes
     public HashMap<Character, Image> getAllNotesWithNames()
     {
@@ -190,36 +217,17 @@ public class ImageManager
 
     public Image getNote(Character noteSelection)
     {
-        Image note = null;
-
-        switch (noteSelection) {
-            case 'w' -> {
-                note = getWholeNote();
-            }
-            case 'h' -> {
-                note = getHalfNote();
-            }
-            case 'q' -> {
-                note = getQuarterNote();
-            }
-            case 'i' -> {
-                note = getEighthNote();
-            }
-            case 's' -> {
-                note = getSixteenthNote();
-            }
-            case 't' -> {
-                note = getThirtySecondNote();
-            }
-            case 'x' -> {
-                note = getSixtyFourthNote();
-            }
-            case 'o' -> {
-                note = getOneHundredTwentyEighthNote();
-            }
-        }
-
-        return note;
+        return switch (noteSelection) {
+            case 'w' -> getWholeNote();
+            case 'h' -> getHalfNote();
+            case 'q' -> getQuarterNote();
+            case 'i' -> getEighthNote();
+            case 's' -> getSixteenthNote();
+            case 't' -> getThirtySecondNote();
+            case 'x' -> getSixtyFourthNote();
+            case 'o' -> getOneHundredTwentyEighthNote();
+            default -> null;
+        };
     }
 
     public Image getWholeNote()
@@ -314,64 +322,26 @@ public class ImageManager
     //region Instruments
     public Image getInstrumentByName(String instrumentName)
     {
-        Image instrument = null;
-
-        switch (instrumentName)
-        {
-            case "Sound_Effects":
-                instrument = getSoundEffects();
-                break;
-            case "Percussive":
-                instrument = getPercussive();
-                break;
-            case "Ethnic":
-                instrument = getEthnic();
-                break;
-            case "Synth_Effects":
-                instrument = getSynthEffects();
-                break;
-            case "Synth_Pad":
-                instrument = getSynthPad();
-                break;
-            case "Synth_Lead":
-                instrument = getSynthLead();
-                break;
-            case "Pipe":
-                instrument = getPipe();
-                break;
-            case "Reed":
-                instrument = getReed();
-                break;
-            case "Brass":
-                instrument = getBrass();
-                break;
-            case "Ensemble":
-                instrument = getEnsemble();
-                break;
-            case "Strings":
-                instrument = getStrings();
-                break;
-            case "Bass":
-                instrument = getBass();
-                break;
-            case "Guitar":
-                instrument = getGuitar();
-                break;
-            case "Organ":
-                instrument = getOrgan();
-                break;
-            case "Chromatic_Percussion":
-                instrument = getChromaticPercussion();
-                break;
-            case "Piano":
-                instrument = getPiano();
-                break;
-            case "None":
-                instrument = getNone();
-                break;
-        }
-
-        return instrument;
+        return switch (instrumentName) {
+            case "Sound_Effects" -> getSoundEffects();
+            case "Percussive" -> getPercussive();
+            case "Ethnic" -> getEthnic();
+            case "Synth_Effects" -> getSynthEffects();
+            case "Synth_Pad" -> getSynthPad();
+            case "Synth_Lead" -> getSynthLead();
+            case "Pipe" -> getPipe();
+            case "Reed" -> getReed();
+            case "Brass" -> getBrass();
+            case "Ensemble" -> getEnsemble();
+            case "Strings" -> getStrings();
+            case "Bass" -> getBass();
+            case "Guitar" -> getGuitar();
+            case "Organ" -> getOrgan();
+            case "Chromatic_Percussion" -> getChromaticPercussion();
+            case "Piano" -> getPiano();
+            case "None" -> getNone();
+            default -> null;
+        };
     }
 
     public Image getSoundEffects()

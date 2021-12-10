@@ -18,4 +18,6 @@ public interface IMusicSoundEditionEvent extends IMusicEvent
     void onMusicSoundHeightChange(Path path, IPlayable musicSound);
 
     void onMusicSoundDurationChange(Path path, IPlayable musicSound);
+
+    void onMusicSoundModified(Path path, IPlayable musicSound);
 }
