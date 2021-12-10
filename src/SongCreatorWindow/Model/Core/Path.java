@@ -112,6 +112,59 @@ public class Path implements Serializable
         sound.setSoundConcatenation(GlobalSettings.TieBetweenNotes);
     }
 
+    public void changeSoundDuration(IPlayable musicSound, char newDuration)
+    {
+        if(_sounds.indexOf(musicSound) == -1)
+            return;
+
+        musicSound.setDuration(newDuration);
+
+        fireOnMusicSoundDurationChange(this, musicSound);
+    }
+
+    public void changeSoundHeight(IPlayable musicSound, int soundMove, int octaveMove)
+    {
+        if(_sounds.indexOf(musicSound) == -1)
+            return;
+
+        musicSound.setSoundHeight(
+                musicSound.getSoundHeight() - soundMove * 10 - octaveMove * 80
+        );
+
+        int noteValue = musicSound.getNumericalNoteValue();
+
+        if(musicSound.isSharp())
+            noteValue--;
+
+        if(musicSound.isFlat())
+            noteValue++;
+
+        int index = Note.getNonFlatSoundNumericalValues().indexOf(noteValue);
+        int newValue = Note.getNonFlatSoundNumericalValues().get(index + soundMove + octaveMove * 7);
+
+        musicSound.setValue(Note.mapNumericalValueOfNoteToSymbols(newValue));
+
+        fireOnMusicSoundHeightChange(this, musicSound);
+    }
+
+    public void changeSoundOccurrence(IPlayable musicSound, double newOccurrenceTime)
+    {
+        if(_sounds.indexOf(musicSound) == -1)
+            return;
+
+        musicSound.setTimeX((int) Path.getSoundTimeX(newOccurrenceTime));
+
+        fireOnMusicSoundOccurrenceTimeChanged(this, musicSound);
+    }
+
+    public void changeSoundInstrument(IPlayable musicSound, String instrumentName)
+    {
+        if(_sounds.indexOf(musicSound) == -1)
+            return;
+
+        musicSound.setInstrument(Instrument.getInstrumentValueByChosenName(instrumentName));
+    }
+
     /**
      * Get music sound that is selected. Return null if none is chosen
      * @return Music Sound or null
@@ -148,6 +201,37 @@ public class Path implements Serializable
     {
         return _sounds.indexOf(selectedMusicSound);
     }
+
+    public boolean isTiedWithPreviousSound(IPlayable musicSound)
+    {
+        int index = _sounds.indexOf(musicSound);
+
+        if(index == 0)
+            return false;
+
+        IPlayable previousSound = getPreviousSound(musicSound);
+
+        if(previousSound == null)
+            return false;
+
+        switch (previousSound.getSoundConcatenation()) {
+            case Begin, Continue -> {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public IPlayable getPreviousSound(IPlayable musicSound)
+    {
+        int index = _sounds.indexOf(musicSound);
+
+        if(index == 0)
+            return null;
+
+        return _sounds.get(index - 1);
+    }
     //endregion
 
     //region Events
@@ -156,7 +240,7 @@ public class Path implements Serializable
         listeners.add(listener);
     }
 
-    public void fireOnMusicSoundSelected(Path path, IPlayable musicSound)
+    private void fireOnMusicSoundSelected(Path path, IPlayable musicSound)
     {
         Iterator iterator = listeners.iterator();
 
@@ -186,6 +270,36 @@ public class Path implements Serializable
         while(iterator.hasNext()) {
             IMusicSoundEditionEvent modelEvent = (IMusicSoundEditionEvent) iterator.next();
             modelEvent.onMusicSoundTieCheck(musicSound, previousTie);
+        }
+    }
+
+    private void fireOnMusicSoundOccurrenceTimeChanged(Path path, IPlayable musicSound)
+    {
+        Iterator iterator = listeners.iterator();
+
+        while(iterator.hasNext()) {
+            IMusicSoundEditionEvent modelEvent = (IMusicSoundEditionEvent) iterator.next();
+            modelEvent.onMusicSoundOccurrenceTimeChanged(path, musicSound);
+        }
+    }
+
+    private void fireOnMusicSoundHeightChange(Path path, IPlayable musicSound)
+    {
+        Iterator iterator = listeners.iterator();
+
+        while(iterator.hasNext()) {
+            IMusicSoundEditionEvent modelEvent = (IMusicSoundEditionEvent) iterator.next();
+            modelEvent.onMusicSoundHeightChange(path, musicSound);
+        }
+    }
+
+    private void fireOnMusicSoundDurationChange(Path path, IPlayable musicSound)
+    {
+        Iterator iterator = listeners.iterator();
+
+        while(iterator.hasNext()) {
+            IMusicSoundEditionEvent modelEvent = (IMusicSoundEditionEvent) iterator.next();
+            modelEvent.onMusicSoundDurationChange(path, musicSound);
         }
     }
     //endregion

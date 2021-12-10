@@ -32,6 +32,11 @@ public class Accord implements IPlayable{
     }
 
     @Override
+    public void setDuration(char newDuration) {
+        rootNote.setDuration(newDuration);
+    }
+
+    @Override
     public int getSoundHeight() { return NoteHeight; }
 
     @Override
@@ -60,6 +65,41 @@ public class Accord implements IPlayable{
     @Override
     public void setSoundConcatenation(TieSelection tie) {
         rootNote.setSoundConcatenation(tie);
+    }
+
+    @Override
+    public void setInstrument(int instrumentValue) {
+        rootNote.setInstrument(instrumentValue);
+    }
+
+    @Override
+    public void setSharpness(boolean isSharp) {
+        rootNote.setSharpness(isSharp);
+    }
+
+    @Override
+    public void setFlatness(boolean isFlat) {
+        rootNote.setFlatness(isFlat);
+    }
+
+    @Override
+    public boolean isSharp() {
+        return rootNote.isSharp();
+    }
+
+    @Override
+    public boolean isFlat() {
+        return rootNote.isFlat();
+    }
+
+    @Override
+    public int getNumericalNoteValue() {
+        return rootNote.getNumericalNoteValue();
+    }
+
+    @Override
+    public void setValue(String value) {
+        rootNote.setValue(value);
     }
 
     /**
@@ -116,6 +156,11 @@ public class Accord implements IPlayable{
 
         musicString.deleteCharAt(musicString.length() - 1); //Remove the last '+' symbol
         return musicString.toString();
+    }
+
+    @Override
+    public int getInstrument() {
+        return rootNote.getInstrument();
     }
 
     public class AccordType

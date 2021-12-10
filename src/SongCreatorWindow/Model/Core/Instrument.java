@@ -9,25 +9,29 @@ import java.util.List;
  * Static helper class for JFugue library that provides constant variables that represents numerical value of instrument
  */
 public class Instrument {
+    static String[] instrumentsNames = null;
     /**
      * Get All Instruments available in JFugue Library as String array
      * @return String array with instruments names
      */
     public static String[] getAllInstruments() {
-        List<String> instrument_names = new LinkedList<>();
+        if(instrumentsNames == null) {
+            List<String> instrument_names = new LinkedList<>();
 
-        for(Class subClass : Instrument.class.getClasses())
-        {
-            for(Field field : subClass.getFields()) {
-                instrument_names.add(
-                        String.format("%s - %s", subClass.getName().split("\\$")[1], field.getName().replace('_', ' '))
-                );
+            for (Class subClass : Instrument.class.getClasses()) {
+                for (Field field : subClass.getFields()) {
+                    instrument_names.add(
+                            String.format("%s - %s", subClass.getName().split("\\$")[1], field.getName().replace('_', ' '))
+                    );
+                }
             }
+
+            String[] all_instrument_names = new String[instrument_names.size()];
+
+            instrumentsNames = instrument_names.toArray(all_instrument_names);
         }
 
-        String[] all_instrument_names = new String[instrument_names.size()];
-
-        return instrument_names.toArray(all_instrument_names);
+        return instrumentsNames;
     }
 
     /**

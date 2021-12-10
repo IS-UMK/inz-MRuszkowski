@@ -56,36 +56,33 @@ public class Duration {
 
     static public String getDurationNameByCharacter(char c)
     {
-        String duration = null;
-
-        switch (c)
+        return switch (c)
         {
-            case 'w' -> {
-                duration = "Whole";
-            }
-            case 'h' -> {
-                duration = "Half";
-            }
-            case 'q' -> {
-                duration = "Quarter";
-            }
-            case 'i' -> {
-                duration = "Eighth";
-            }
-            case 's' -> {
-                duration = "Sixteenth";
-            }
-            case 't' -> {
-                duration = "Thirty_second";
-            }
-            case 'x' -> {
-                duration = "Sixty_fourth";
-            }
-            case 'o' -> {
-                duration = "One_twenty_eighth";
-            }
-        }
+            case 'w' -> "Whole";
+            case 'h' -> "Half";
+            case 'q' -> "Quarter";
+            case 'i' -> "Eighth";
+            case 's' -> "Sixteenth";
+            case 't' -> "Thirty_second";
+            case 'x' -> "Sixty_fourth";
+            case 'o' -> "One_twenty_eighth";
+            default -> throw new IllegalStateException("Unexpected value: " + c);
+        };
+    }
 
-        return duration;
+    static public char getCharacterByDurationName(String c)
+    {
+        return switch (c)
+                {
+                    case "Whole" -> 'w';
+                    case "Half" -> 'h';
+                    case "Quarter" -> 'q';
+                    case "Eighth" -> 'i';
+                    case "Sixteenth" -> 's';
+                    case "Thirty_second" -> 't';
+                    case "Sixty_fourth" -> 'x';
+                    case "One_twenty_eighth" -> 'o';
+                    default -> throw new IllegalStateException("Unexpected value: " + c);
+                };
     }
 }

@@ -17,17 +17,34 @@ public interface IPlayable extends Serializable {
      * @param x
      */
     void setTimeX(int x);
+
     Character getDuration();
+    void setDuration(char newDuration);
+
     int getSoundHeight();
     void setSoundHeight(int y);
+
     String getSoundType();
     String getValue();
+    int getNumericalNoteValue();
+
+    void setValue(String value);
     void setVolume(byte volume);
     byte getVolume();
+
     TieSelection getSoundConcatenation();
     void setSoundConcatenation(TieSelection tie);
+
+    void setInstrument(int instrumentValue);
+    int getInstrument();
+
+    void setSharpness(boolean isSharp);
+    void setFlatness(boolean isFlat);
+    boolean isSharp();
+    boolean isFlat();
     /**
      * @return JFugue string
      */
     String ExtractJFugueSoundString(boolean withInstrument);
+
 }
