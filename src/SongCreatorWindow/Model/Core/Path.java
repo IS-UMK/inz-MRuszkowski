@@ -112,6 +112,56 @@ public class Path implements Serializable
         sound.setSoundConcatenation(GlobalSettings.TieBetweenNotes);
     }
 
+    public void convertToNote(IPlayable musicSound)
+    {
+        if(_sounds.indexOf(musicSound) == -1)
+            return;
+
+        if(musicSound instanceof Accord)
+        {
+            int indexOfSound = _sounds.indexOf(musicSound);
+            _sounds.remove(musicSound);
+
+            var newNote = Note.CreateNote(musicSound.getValue(), musicSound.getDuration(), musicSound.getInstrument());
+            newNote.setFlatness(musicSound.isFlat());
+            newNote.setSharpness(musicSound.isSharp());
+            newNote.setVolume(musicSound.getVolume());
+            newNote.setSoundConcatenation(musicSound.getSoundConcatenation());
+            newNote.setTimeX(musicSound.getTimeX());
+            newNote.setSoundHeight(musicSound.getSoundHeight());
+
+            _sounds.add(indexOfSound, newNote);
+            //addSound(newNote);
+
+            fireOnMusicSoundConvertedToNote(this, musicSound, newNote);
+        }
+    }
+
+    public void convertToAccord(IPlayable musicSound)
+    {
+        if(_sounds.indexOf(musicSound) == -1)
+            return;
+
+        if(musicSound instanceof Note)
+        {
+            int indexOfSound = _sounds.indexOf(musicSound);
+            _sounds.remove(musicSound);
+
+            var newAccord = new Accord((Note)musicSound, GlobalSettings.accordSelectionName);
+            newAccord.setFlatness(musicSound.isFlat());
+            newAccord.setSharpness(musicSound.isSharp());
+            newAccord.setVolume(musicSound.getVolume());
+            newAccord.setSoundConcatenation(musicSound.getSoundConcatenation());
+            newAccord.setTimeX(musicSound.getTimeX());
+            newAccord.setSoundHeight(musicSound.getSoundHeight());
+
+            _sounds.add(indexOfSound, newAccord);
+            //addSound(newAccord);
+
+            fireOnMusicSoundConvertedToAccord(this, musicSound, newAccord);
+        }
+    }
+
     public void ChangeAccordName(IPlayable musicSound, String accordName)
     {
         if(_sounds.indexOf(musicSound) == -1)
@@ -362,6 +412,26 @@ public class Path implements Serializable
         while(iterator.hasNext()) {
             IMusicSoundEditionEvent modelEvent = (IMusicSoundEditionEvent) iterator.next();
             modelEvent.onMusicSoundModified(path, musicSound);
+        }
+    }
+
+    private void fireOnMusicSoundConvertedToAccord(Path path, IPlayable musicSound, Accord newAccord)
+    {
+        Iterator iterator = listeners.iterator();
+
+        while(iterator.hasNext()) {
+            IMusicSoundEditionEvent modelEvent = (IMusicSoundEditionEvent) iterator.next();
+            modelEvent.onMusicSoundConvertedToAccord(path, musicSound, newAccord);
+        }
+    }
+
+    private void fireOnMusicSoundConvertedToNote(Path path, IPlayable musicSound, IPlayable newNote)
+    {
+        Iterator iterator = listeners.iterator();
+
+        while(iterator.hasNext()) {
+            IMusicSoundEditionEvent modelEvent = (IMusicSoundEditionEvent) iterator.next();
+            modelEvent.onMusicSoundConvertedToNote(path, musicSound, newNote);
         }
     }
     //endregion

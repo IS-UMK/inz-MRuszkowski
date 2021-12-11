@@ -97,8 +97,6 @@ public class Accord implements IPlayable{
         return rootNote.getModification();
     }
 
-
-
     /**
      * Root Note where accord begins
      */

@@ -1,5 +1,6 @@
 package SongCreatorWindow.Model.Events;
 
+import SongCreatorWindow.Model.Core.Accord;
 import SongCreatorWindow.Model.Core.IPlayable;
 import SongCreatorWindow.Model.Core.Path;
 import SongCreatorWindow.Model.Core.TieSelection;
@@ -22,4 +23,8 @@ public interface IMusicSoundEditionEvent extends IMusicEvent
     void onMusicSoundModified(Path path, IPlayable musicSound);
 
     void onAccordNameChanged(Path path, IPlayable musicSound);
+
+    void onMusicSoundConvertedToAccord(Path path, IPlayable musicSound, Accord newAccord);
+
+    void onMusicSoundConvertedToNote(Path path, IPlayable musicSound, IPlayable newNote);
 }

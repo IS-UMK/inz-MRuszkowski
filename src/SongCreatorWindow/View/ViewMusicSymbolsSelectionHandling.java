@@ -315,7 +315,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
     public void onMusicSoundSelectedToEdition(Path path, IPlayable musicSound)
     {
         optionsContent = new LinkedList<>();
-
+        //TODO: Podzielić kod na sekcje z daną modyfikacją
         vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().clear();
 
         //Options music sound configuration
@@ -330,32 +330,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
                 new Label("Modification: ")
         };
 
-        groupForSoundTypeOption = new ToggleGroup();
-
-        symbolNoteOption = new RadioButton("Single Note ");
-        symbolNoteOption.setUserData(SoundTypeSelection.Note);
-
-        symbolAccordOption = new RadioButton("Accord ");
-        symbolAccordOption.setUserData(SoundTypeSelection.Accord);
-
-        String[] accordNames = Accord.AccordType.getAccordTypeNames();
-
-        groupForSoundTypeOption.getToggles().addAll(symbolNoteOption, symbolAccordOption);
-        boolean isNote = musicSound.getSoundType().equals("Note") ? true : false;
-        groupForSoundTypeOption.selectToggle(isNote ? symbolNoteOption : symbolAccordOption);
-
-        accordChoiceBoxOption = new ChoiceBox(FXCollections.observableArrayList(accordNames));
-        accordChoiceBoxOption.setDisable(isNote);
-        accordChoiceBoxOption.setValue(accordNames[0]);
-        accordChoiceBoxOption.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
-            @Override
-            public void changed(ObservableValue observableValue, Object newValue, Object oldValue) {
-                String accordName = (String) observableValue.getValue();
-                System.out.println(String.format("Accord %s selected", accordName));
-
-                path.ChangeAccordName(musicSound, accordName);
-            }
-        });
+        HBox hbox11 = createSoundTypeSection(path, musicSound);
 
         musicSymbolDuration = new ChoiceBox(FXCollections.observableArrayList(Duration.getDurations()));
         musicSymbolDuration.setValue(Duration.getDurationNameByCharacter(musicSound.getDuration()));
@@ -480,9 +455,6 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
 
         soundTieLabel = new Label(musicSound.getSoundConcatenation().toString());
 
-        HBox hbox11 = new HBox(optionLabels[0], symbolNoteOption, symbolAccordOption, accordChoiceBoxOption);
-        hbox11.setPadding(padding);
-
         HBox hbox12 = new HBox(optionLabels[1], musicSymbolDuration);
         hbox12.setPadding(padding);
 
@@ -515,6 +487,70 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         optionsContent.add(hbox16);
         optionsContent.add(hbox17);
         optionsContent.add(hbox18);
+    }
+
+    private HBox createSoundTypeSection(Path path, IPlayable musicSound)
+    {
+        groupForSoundTypeOption = new ToggleGroup();
+
+        symbolNoteOption = new RadioButton("Single Note ");
+        symbolNoteOption.setUserData(SoundTypeSelection.Note);
+
+        symbolAccordOption = new RadioButton("Accord ");
+        symbolAccordOption.setUserData(SoundTypeSelection.Accord);
+
+        String[] accordNames = Accord.AccordType.getAccordTypeNames();
+
+        groupForSoundTypeOption.getToggles().addAll(symbolNoteOption, symbolAccordOption);
+        boolean isNote = musicSound.getSoundType().equals("Note") ? true : false;
+        groupForSoundTypeOption.selectToggle(isNote ? symbolNoteOption : symbolAccordOption);
+
+        groupForSoundTypeOption.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+            @Override
+            public void changed(ObservableValue<? extends Toggle> observableValue, Toggle toggle, Toggle t1) {
+                SoundTypeSelection choice = (SoundTypeSelection) t1.getUserData();
+                switch (choice)
+                {
+                    case Note -> {
+                        path.convertToNote(musicSound);
+                        accordChoiceBox.setDisable(true);
+                    }
+                    case Accord -> {
+                        path.convertToAccord(musicSound);
+                        accordChoiceBox.setDisable(false);
+                        System.out.println(String.format("Accord %s selected", GlobalSettings.accordSelectionName));
+                    }
+                }
+                System.out.println(String.format("Sound type changed to %s", choice.toString()));
+            }
+        });
+
+
+
+        accordChoiceBoxOption = new ChoiceBox(FXCollections.observableArrayList(accordNames));
+        accordChoiceBoxOption.setDisable(isNote);
+
+        if(musicSound instanceof Note)
+        {
+            accordChoiceBoxOption.setValue(accordNames[0]);
+            accordChoiceBoxOption.setDisable(true);
+        }
+        else if(musicSound instanceof Accord)
+            accordChoiceBoxOption.setValue(((Accord) musicSound).getAccordName());
+
+        accordChoiceBoxOption.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
+            @Override
+            public void changed(ObservableValue observableValue, Object newValue, Object oldValue) {
+                String accordName = (String) observableValue.getValue();
+                System.out.println(String.format("Accord %s selected", accordName));
+
+                path.ChangeAccordName(musicSound, accordName);
+            }
+        });
+
+        HBox hbox11 = new HBox(optionLabels[0], symbolNoteOption, symbolAccordOption, accordChoiceBoxOption);
+        hbox11.setPadding(padding);
+        return hbox11;
     }
 
     private HBox createModificationSection(Path path, IPlayable musicSound) {
@@ -599,8 +635,9 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
     }
 
     @Override
-    public void onMusicSoundHeightChange(Path path, IPlayable musicSound) {
-        var toReplace = optionsContent.get(optionsContent.size() - 1);
+    public void onMusicSoundHeightChange(Path path, IPlayable musicSound)
+    {
+        HBox toReplace = optionsContent.get(optionsContent.size() - 1);
         vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().remove(toReplace);
         optionsContent.remove(toReplace);
 
@@ -622,5 +659,31 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
     @Override
     public void onAccordNameChanged(Path path, IPlayable musicSound) {
 
+    }
+
+    @Override
+    public void onMusicSoundConvertedToAccord(Path path, IPlayable musicSound, Accord newAccord)
+    {
+        onMusicSoundSelectedToEdition(path, newAccord);
+        /*HBox toReplace = optionsContent.get(0);
+        vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().remove(toReplace);
+        optionsContent.remove(toReplace);
+
+        HBox newOne = createSoundTypeSection(path, newAccord);
+        vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().add(0, newOne);
+        optionsContent.add(0, newOne);*/
+    }
+
+    @Override
+    public void onMusicSoundConvertedToNote(Path path, IPlayable musicSound, IPlayable newNote)
+    {
+        onMusicSoundSelectedToEdition(path, newNote);
+        /*HBox toReplace = optionsContent.get(0);
+        vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().remove(toReplace);
+        optionsContent.remove(toReplace);
+
+        HBox newOne = createSoundTypeSection(path, newNote);
+        vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().add(0, newOne);
+        optionsContent.add(0, newOne);*/
     }
 }

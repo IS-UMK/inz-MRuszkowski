@@ -28,6 +28,8 @@ import static SongCreatorWindow.Model.GlobalSettings.*;
 public class MainController
 {
     @FXML
+    ScrollPane scrollPaneWithPaths;
+    @FXML
     AnchorPane anchorPaneWithPaths;
     @FXML
     AnchorPane anchorPaneWithNotesAndAccordsSelection;
@@ -62,6 +64,9 @@ public class MainController
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
+                scrollPaneWithPaths.setPannable(true);
+                scrollPaneWithPaths.setFocusTraversable(true);
+
                 musicSymbolsViewManager =
                         new ViewMusicSymbolsSelectionHandling(
                                 anchorPaneWithNotesAndAccordsSelection,
