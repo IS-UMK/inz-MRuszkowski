@@ -40,7 +40,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
     HashMap<Canvas, TextField> tempoMap;
     HashMap<Canvas, MenuItem> selectionMenuItemToCanvas;
 
-    HashMap<IPlayable, ImageView> musicSymbols;
+    HashMap<IPlayable, List<ImageView>> musicSymbols;
     HashMap<IPlayable, ImageView> modificationSymbols;
     List<IClickedEvent> listeners;
 
@@ -86,19 +86,15 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         //TODO: Obrazy nut muszą być takiej same w wielkości
         Image musicSymbolImage = ImageManager.getInstance().setDimensions(GlobalSettings.noteWidth, GlobalSettings.noteHeight).getNote(musicSound.getDuration());
 
-        ImageView view = new ImageView(musicSymbolImage);
-        //view.setPickOnBounds(true);
-        view.setFitWidth(musicSymbolImage.getWidth());
-        view.setPickOnBounds(true);
-
+        List<ImageView> views = new LinkedList<>();
         var canvas = canvasMap.get(path);
 
         if(musicSound.getTimeX() >= canvas.getWidth() - GlobalSettings.widthOfAreaWhereCanvasExtends)
             addSpaceToCanvas();
 
-        view.setLayoutX(musicSound.getTimeX());
-        view.setLayoutY(musicSound.getSoundHeight() + GlobalSettings.Height * path.getVoice());
-        view.setFitHeight(musicSymbolImage.getHeight());
+        ImageView view = createImageView(musicSymbolImage, path, musicSound, musicSound.getTimeX(), musicSound.getSoundHeight());
+        views.add(view);
+        anchorPaneWithPaths.getChildren().add(view);
 
         if(musicSound instanceof Note)
         {
@@ -112,9 +108,8 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
             System.out.println(String.format("Accord part inserted at: X - %d, Y - %d", musicSound.getTimeX(), soundHeight));
 
-            var gc = canvas.getGraphicsContext2D();
             int drawAboveBy = 0;
-            //int intervalCount_MultipliedByPadding = 0;
+            ImageView anotherView;
             for(String interval : accordIntervals)
             {
                 try
@@ -127,25 +122,16 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
                 }
                 drawAboveBy--;
 
-                gc.drawImage(musicSymbolImage, musicSound.getTimeX(), GlobalSettings.getLinesPadding() / -2 * drawAboveBy + soundHeight);
-                //intervalCount_MultipliedByPadding += GlobalSettings.getLinesPadding() / 2 * drawAboveBy;
+                anotherView = createImageView(musicSymbolImage, path, musicSound, musicSound.getTimeX(), (int)(GlobalSettings.getLinesPadding() / -2) * drawAboveBy + soundHeight);
+
+                views.add(anotherView);
+                anchorPaneWithPaths.getChildren().add(anotherView);
 
                 System.out.println(String.format("Accord part inserted at: X - %d, Y - %d", musicSound.getTimeX(), soundHeight));
             }
         }
 
-        view.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                if(mouseEvent.getButton() == MouseButton.SECONDARY) {
-                    System.out.println(String.format("Music Symbol Clicked at: %d %d", musicSound.getTimeX(), musicSound.getSoundHeight()));
-                    fireOnMusicSymbolClicked(path, musicSound);
-                }
-            }
-        });
-
-        musicSymbols.put(musicSound, view);
-        anchorPaneWithPaths.getChildren().add(view);
+        musicSymbols.put(musicSound, views);
 
         if(path.isTiedWithPreviousSound(musicSound))
         {
@@ -174,6 +160,29 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
                 //System.out.println("Tie between sounds drawn");
             }
         }
+    }
+
+    private ImageView createImageView(Image musicSymbolImage, Path path, IPlayable musicSound, int insertX, int insertY)
+    {
+        ImageView view = new ImageView(musicSymbolImage);
+        view.setFitWidth(musicSymbolImage.getWidth());
+        view.setPickOnBounds(true);
+
+        view.setLayoutX(insertX);
+        view.setLayoutY(insertY + GlobalSettings.Height * path.getVoice());
+        view.setFitHeight(musicSymbolImage.getHeight());
+
+        view.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                if(mouseEvent.getButton() == MouseButton.SECONDARY) {
+                    System.out.println(String.format("Music Symbol Clicked at: %d %d", insertX, insertY));
+                    fireOnMusicSymbolClicked(path, musicSound);
+                }
+            }
+        });
+
+        return view;
     }
 
     public void addListener(IClickedEvent listener)
@@ -542,17 +551,38 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
     @Override
     public void onMusicSoundOccurrenceTimeChanged(Path path, IPlayable musicSound) {
-        var view = musicSymbols.get(musicSound);
+        var views = musicSymbols.get(musicSound);
 
-        view.setLayoutX(musicSound.getTimeX());
+        for(ImageView view : views) {
+            view.setLayoutX(musicSound.getTimeX());
+        }
+
+        onMusicSoundModified(path, musicSound);
         onMusicSoundSelectedToEdition(path, musicSound);
     }
 
     @Override
     public void onMusicSoundHeightChange(Path path, IPlayable musicSound) {
-        var view = musicSymbols.get(musicSound);
+        var views = musicSymbols.get(musicSound);
 
-        view.setLayoutY(musicSound.getSoundHeight());
+        int movedLocation = 0;
+        if(views.size() > 1)
+            movedLocation = (int)(views.get(1).getLayoutY() - views.get(0).getLayoutY());
+
+        for(int i = 0; i < views.size(); i++)
+        {
+            views.get(i).setLayoutY(musicSound.getSoundHeight() + i * movedLocation);
+        }
+        /*for(ImageView view : views)
+        {
+            if(movedLocation < 0)
+            {
+                view.setLayoutY(musicSound.getSoundHeight());
+                break;
+            }
+
+
+        }*/
 
         onMusicSoundModified(path, musicSound);
         onMusicSoundSelectedToEdition(path, musicSound);
@@ -560,14 +590,15 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
     @Override
     public void onMusicSoundDurationChange(Path path, IPlayable musicSound) {
-        var view = musicSymbols.get(musicSound);
+        var views = musicSymbols.get(musicSound);
 
-        view.setImage(ImageManager.getInstance().getNote(musicSound.getDuration()));
+        for(ImageView view : views)
+            view.setImage(ImageManager.getInstance().getNote(musicSound.getDuration()));
     }
 
     @Override
     public void onMusicSoundModified(Path path, IPlayable musicSound) {
-        int symbolDim = 33;
+        int symbolDim = GlobalSettings.noteHeight / 3;
 
         Image modificationSymbol = switch (musicSound.getModification())
         {
@@ -598,5 +629,11 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
             modificationSymbols.put(musicSound, view);
             anchorPaneWithPaths.getChildren().add(view);
         }
+    }
+
+    @Override
+    public void onAccordNameChanged(Path path, IPlayable musicSound)
+    {
+
     }
 }

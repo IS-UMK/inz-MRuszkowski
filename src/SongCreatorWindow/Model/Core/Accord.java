@@ -97,32 +97,32 @@ public class Accord implements IPlayable{
         return rootNote.getModification();
     }
 
-    @Override
-    public int getNumericalNoteValue() {
-        return rootNote.getNumericalNoteValue();
-    }
 
-    @Override
-    public void setValue(String value) {
-        rootNote.setValue(value);
-    }
 
     /**
      * Root Note where accord begins
      */
     Note rootNote;
-    String JFugueAccordName;
-
     @Override
     public String getValue() {
         return rootNote.getValue();
     }
+    @Override
+    public int getNumericalNoteValue() {
+        return rootNote.getNumericalNoteValue();
+    }
+    @Override
+    public void setValue(String value) {
+        rootNote.setValue(value);
+    }
 
-
+    String JFugueAccordName;
     public String getAccordName()
     {
         return JFugueAccordName;
     }
+    public void setAccordName(String name) { JFugueAccordName = name; }
+
     
     public Accord(Note rootNote, String AccordName)
     {

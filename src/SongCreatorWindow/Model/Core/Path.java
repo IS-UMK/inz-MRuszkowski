@@ -112,6 +112,16 @@ public class Path implements Serializable
         sound.setSoundConcatenation(GlobalSettings.TieBetweenNotes);
     }
 
+    public void ChangeAccordName(IPlayable musicSound, String accordName)
+    {
+        if(_sounds.indexOf(musicSound) == -1)
+            return;
+
+        ((Accord)musicSound).setAccordName(accordName);
+
+        fireOnAccordNameChanged(this, musicSound);
+    }
+
     public void changeSoundDuration(IPlayable musicSound, char newDuration)
     {
         if(_sounds.indexOf(musicSound) == -1)
@@ -270,6 +280,16 @@ public class Path implements Serializable
     public void addListener(IMusicSoundEditionEvent listener)
     {
         listeners.add(listener);
+    }
+
+    private void fireOnAccordNameChanged(Path path, IPlayable musicSound)
+    {
+        Iterator iterator = listeners.iterator();
+
+        while(iterator.hasNext()) {
+            IMusicSoundEditionEvent modelEvent = (IMusicSoundEditionEvent) iterator.next();
+            modelEvent.onAccordNameChanged(path, musicSound);
+        }
     }
 
     private void fireOnMusicSoundSelected(Path path, IPlayable musicSound)

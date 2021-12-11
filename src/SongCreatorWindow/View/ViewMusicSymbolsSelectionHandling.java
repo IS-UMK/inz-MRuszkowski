@@ -339,21 +339,23 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         symbolAccordOption.setUserData(SoundTypeSelection.Accord);
 
         String[] accordNames = Accord.AccordType.getAccordTypeNames();
-        accordChoiceBoxOption = new ChoiceBox(FXCollections.observableArrayList(accordNames));
-        accordChoiceBoxOption.setValue(accordNames[0]);
-        accordChoiceBoxOption.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
-            @Override
-            public void changed(ObservableValue observableValue, Object o, Object t1) {
-                String accordName = (String) observableValue.getValue();
-                System.out.println(String.format("Accord %s selected", accordName));
-                //add code for change
-            }
-        });
 
         groupForSoundTypeOption.getToggles().addAll(symbolNoteOption, symbolAccordOption);
         boolean isNote = musicSound.getSoundType().equals("Note") ? true : false;
         groupForSoundTypeOption.selectToggle(isNote ? symbolNoteOption : symbolAccordOption);
+
+        accordChoiceBoxOption = new ChoiceBox(FXCollections.observableArrayList(accordNames));
         accordChoiceBoxOption.setDisable(isNote);
+        accordChoiceBoxOption.setValue(accordNames[0]);
+        accordChoiceBoxOption.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
+            @Override
+            public void changed(ObservableValue observableValue, Object newValue, Object oldValue) {
+                String accordName = (String) observableValue.getValue();
+                System.out.println(String.format("Accord %s selected", accordName));
+
+                path.ChangeAccordName(musicSound, accordName);
+            }
+        });
 
         musicSymbolDuration = new ChoiceBox(FXCollections.observableArrayList(Duration.getDurations()));
         musicSymbolDuration.setValue(Duration.getDurationNameByCharacter(musicSound.getDuration()));
@@ -373,7 +375,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         String octave = symbols.substring(symbols.length() - 1);
 
         soundChoiceBox = new ChoiceBox(FXCollections.observableArrayList(availableSounds));
-        soundChoiceBox.setValue(sound);
+        soundChoiceBox.setValue(sound.substring(0, 1));
         var soundChoiceBoxListener = new ChangeListener() {
             @Override
             public void changed(ObservableValue observableValue, Object oldValue, Object newValue) {
@@ -614,6 +616,11 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
 
     @Override
     public void onMusicSoundModified(Path path, IPlayable musicSound) {
+
+    }
+
+    @Override
+    public void onAccordNameChanged(Path path, IPlayable musicSound) {
 
     }
 }
