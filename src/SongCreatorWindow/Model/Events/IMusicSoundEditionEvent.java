@@ -27,4 +27,6 @@ public interface IMusicSoundEditionEvent extends IMusicEvent
     void onMusicSoundConvertedToAccord(Path path, IPlayable musicSound, Accord newAccord);
 
     void onMusicSoundConvertedToNote(Path path, IPlayable musicSound, IPlayable newNote);
+
+    void onMusicSoundDeleted(Path path, IPlayable musicSound);
 }

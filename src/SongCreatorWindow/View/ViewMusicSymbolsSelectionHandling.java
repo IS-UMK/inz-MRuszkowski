@@ -7,10 +7,12 @@ import SongCreatorWindow.Model.GlobalSettings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -473,11 +475,11 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         HBox hbox17 = new HBox(optionLabels[6], soundTieLabel);
         hbox17.setPadding(padding);
 
-        vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().addAll(hbox11, hbox12, hbox13, hbox14, hbox15, hbox16, hbox17);
-
         HBox hbox18 = createModificationSection(path, musicSound);
 
-        vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().add(hbox18);
+        HBox hbox19 = createSoundDeleteSection(path, musicSound);
+
+        vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().addAll(hbox11, hbox12, hbox13, hbox14, hbox15, hbox16, hbox17, hbox18, hbox19);
 
         optionsContent.add(hbox11);
         optionsContent.add(hbox12);
@@ -487,6 +489,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         optionsContent.add(hbox16);
         optionsContent.add(hbox17);
         optionsContent.add(hbox18);
+        optionsContent.add(hbox19);
     }
 
     private HBox createSoundTypeSection(Path path, IPlayable musicSound)
@@ -548,9 +551,27 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
             }
         });
 
-        HBox hbox11 = new HBox(optionLabels[0], symbolNoteOption, symbolAccordOption, accordChoiceBoxOption);
-        hbox11.setPadding(padding);
-        return hbox11;
+        HBox hbox = new HBox(optionLabels[0], symbolNoteOption, symbolAccordOption, accordChoiceBoxOption);
+        hbox.setPadding(padding);
+        return hbox;
+    }
+
+    private HBox createSoundDeleteSection(Path path, IPlayable musicSound)
+    {
+        Button deleteButton = new Button("Delete Sound");
+        deleteButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are You sure to delete this sound?");
+
+                if(alert.showAndWait().get() == ButtonType.OK)
+                    path.deleteSound(musicSound);
+            }
+        });
+
+        HBox hbox = new HBox(deleteButton);
+        hbox.setPadding(padding);
+        return hbox;
     }
 
     private HBox createModificationSection(Path path, IPlayable musicSound) {
@@ -561,8 +582,8 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         noneModificationOfSound.setUserData(SoundModification.None);
         modificationOfSound.getToggles().add(noneModificationOfSound);
 
-        HBox hbox18 = new HBox(optionLabels[7], noneModificationOfSound);
-        hbox18.setPadding(padding);
+        HBox hbox = new HBox(optionLabels[7], noneModificationOfSound);
+        hbox.setPadding(padding);
 
         if(sound.length() == 1)
             modificationOfSound.selectToggle(noneModificationOfSound);
@@ -574,7 +595,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
             sharpModificationOfSound.setUserData(SoundModification.Sharp);
 
             modificationOfSound.getToggles().add(sharpModificationOfSound);
-            hbox18.getChildren().add(sharpModificationOfSound);
+            hbox.getChildren().add(sharpModificationOfSound);
 
             if(sound.length() > 1 && sound.charAt(1) == '#')
                 modificationOfSound.selectToggle(sharpModificationOfSound);
@@ -587,7 +608,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
             flatModificationOfSound.setUserData(SoundModification.Flat);
 
             modificationOfSound.getToggles().add(flatModificationOfSound);
-            hbox18.getChildren().add(flatModificationOfSound);
+            hbox.getChildren().add(flatModificationOfSound);
 
             if(sound.length() > 1 && sound.charAt(1) == 'b')
                 modificationOfSound.selectToggle(flatModificationOfSound);
@@ -601,7 +622,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
             }
         });
 
-        return hbox18;
+        return hbox;
     }
 
     @Override
@@ -637,7 +658,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
     @Override
     public void onMusicSoundHeightChange(Path path, IPlayable musicSound)
     {
-        HBox toReplace = optionsContent.get(optionsContent.size() - 1);
+        HBox toReplace = optionsContent.get(optionsContent.size() - 2);
         vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().remove(toReplace);
         optionsContent.remove(toReplace);
 
@@ -665,25 +686,17 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
     public void onMusicSoundConvertedToAccord(Path path, IPlayable musicSound, Accord newAccord)
     {
         onMusicSoundSelectedToEdition(path, newAccord);
-        /*HBox toReplace = optionsContent.get(0);
-        vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().remove(toReplace);
-        optionsContent.remove(toReplace);
-
-        HBox newOne = createSoundTypeSection(path, newAccord);
-        vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().add(0, newOne);
-        optionsContent.add(0, newOne);*/
     }
 
     @Override
     public void onMusicSoundConvertedToNote(Path path, IPlayable musicSound, IPlayable newNote)
     {
         onMusicSoundSelectedToEdition(path, newNote);
-        /*HBox toReplace = optionsContent.get(0);
-        vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().remove(toReplace);
-        optionsContent.remove(toReplace);
+    }
 
-        HBox newOne = createSoundTypeSection(path, newNote);
-        vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().add(0, newOne);
-        optionsContent.add(0, newOne);*/
+    @Override
+    public void onMusicSoundDeleted(Path path, IPlayable musicSound)
+    {
+        onMusicSoundClearSelection();
     }
 }

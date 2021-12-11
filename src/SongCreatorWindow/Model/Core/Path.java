@@ -324,6 +324,15 @@ public class Path implements Serializable
 
         return _sounds.get(index - 1);
     }
+
+    public void deleteSound(IPlayable musicSound)
+    {
+        if(_sounds.indexOf(musicSound) == -1)
+            return;
+
+        _sounds.remove(musicSound);
+        fireOnMusicSoundDeleted(this, musicSound);
+    }
     //endregion
 
     //region Events
@@ -432,6 +441,16 @@ public class Path implements Serializable
         while(iterator.hasNext()) {
             IMusicSoundEditionEvent modelEvent = (IMusicSoundEditionEvent) iterator.next();
             modelEvent.onMusicSoundConvertedToNote(path, musicSound, newNote);
+        }
+    }
+
+    private void fireOnMusicSoundDeleted(Path path, IPlayable musicSound)
+    {
+        Iterator iterator = listeners.iterator();
+
+        while(iterator.hasNext()) {
+            IMusicSoundEditionEvent modelEvent = (IMusicSoundEditionEvent) iterator.next();
+            modelEvent.onMusicSoundDeleted(path, musicSound);
         }
     }
     //endregion

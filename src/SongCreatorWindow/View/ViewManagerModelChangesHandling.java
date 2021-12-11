@@ -676,4 +676,25 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
         removeAdditionalSymbols(views);
     }
+
+    @Override
+    public void onMusicSoundDeleted(Path path, IPlayable musicSound)
+    {
+        //musicSymbols
+        //modificationSymbols
+        ImageView modifier = modificationSymbols.get(musicSound);
+        List<ImageView> views = musicSymbols.get(musicSound);
+
+        if(modifier != null)
+        {
+            modificationSymbols.remove(modifier);
+            anchorPaneWithPaths.getChildren().remove(modifier);
+        }
+
+        musicSymbols.remove(views);
+        for(ImageView view : views)
+            anchorPaneWithPaths.getChildren().remove(view);
+
+        onMusicSoundClearSelection();
+    }
 }
