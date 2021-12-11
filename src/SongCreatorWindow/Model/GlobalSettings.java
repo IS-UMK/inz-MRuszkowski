@@ -1,6 +1,6 @@
 package SongCreatorWindow.Model;
 
-import SongCreatorWindow.Model.Core.MusicKeySelection;
+import SongCreatorWindow.Model.Core.MusicClefSelection;
 import SongCreatorWindow.Model.Core.SoundTypeSelection;
 import SongCreatorWindow.Model.Core.TieSelection;
 import javafx.scene.paint.Color;
@@ -44,7 +44,7 @@ public class GlobalSettings
     /**
      * Music Key Width setting
      */
-    public static double musicKeyWidth = 100.0;
+    public static double musicClefWidth = 100.0;
     public static double getMusicKeyHeight()
     {
         double height = 0;
@@ -83,7 +83,7 @@ public class GlobalSettings
     public static double getLinesPadding() { return Height / 10; }
     public static double getStartXofAreaWhereInsertingNotesIsLegal()
     {
-        return numberOfPropertySquaresInPath * Height + musicKeyWidth;
+        return numberOfPropertySquaresInPath * Height + musicClefWidth;
     }
 
     /**
@@ -96,7 +96,7 @@ public class GlobalSettings
     /**
      * Default music key selection for new path setting
      */
-    public static MusicKeySelection defaultMusicKey = MusicKeySelection.ViolinKey;
+    public static MusicClefSelection defaultMusicKey = MusicClefSelection.ViolinKey;
 
     /**
      * Instrument selection for particular note

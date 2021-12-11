@@ -27,9 +27,9 @@ public class ModelManager implements Serializable
     public void setProjectDestination(String name) { projectDestination = name; }
     public String getProjectDestination() { return projectDestination; }
 
-    MusicKeySelection selectedDefaultKey = GlobalSettings.defaultMusicKey;
-    public void setDefaultMusicKeySelection(MusicKeySelection musicKey) { selectedDefaultKey = musicKey; }
-    public MusicKeySelection getDefaultMusicKeySelection() { return selectedDefaultKey; }
+    MusicClefSelection selectedDefaultKey = GlobalSettings.defaultMusicKey;
+    public void setDefaultMusicKeySelection(MusicClefSelection musicKey) { selectedDefaultKey = musicKey; }
+    public MusicClefSelection getDefaultMusicKeySelection() { return selectedDefaultKey; }
     private int getBasePointSound()
     {
         int base = -1;
@@ -167,7 +167,7 @@ public class ModelManager implements Serializable
             if(pattern.equals(""))
                 continue;
 
-            startX = (int) (numberOfPropertySquaresInPath * Height + musicKeyWidth);
+            startX = (int) (numberOfPropertySquaresInPath * Height + musicClefWidth);
 
             try {
                 modelManager.createPath(String.format("Path %d", i+1));
@@ -279,7 +279,7 @@ public class ModelManager implements Serializable
         for(Path path : modelManager.getPaths())
         {
             try {
-                createPath(path.getName(), path.getInstrument(), path.getTempo(), path.getVolume(), path.getMusicKeySelection());
+                createPath(path.getName(), path.getInstrument(), path.getTempo(), path.getVolume(), path.getMusicClefSelection());
             } catch (CannotAddAnotherPathException e) {
                 System.err.println(e.getMessage());
                 return;
@@ -392,7 +392,7 @@ public class ModelManager implements Serializable
      */
     public void duplicateSelectedPath() throws CannotAddAnotherPathException
     {
-        createPath(selectedPath.getName(), selectedPath.getInstrument(), selectedPath.getTempo(), selectedPath.getVolume(), selectedPath.getMusicKeySelection());
+        createPath(selectedPath.getName(), selectedPath.getInstrument(), selectedPath.getTempo(), selectedPath.getVolume(), selectedPath.getMusicClefSelection());
 
         Path newPath = musicPaths.get(musicPaths.size() - 1);
         int pathIndex = musicPaths.indexOf(newPath);
@@ -407,7 +407,7 @@ public class ModelManager implements Serializable
      * Create new path according to user typed values with selected instrument
      * @param pathName
      */
-    public void createPath(String pathName, String instrument, int tempo, byte volume, MusicKeySelection musicKey) throws CannotAddAnotherPathException
+    public void createPath(String pathName, String instrument, int tempo, byte volume, MusicClefSelection musicKey) throws CannotAddAnotherPathException
     {
         if(musicPaths.size() > 16)
             throw new CannotAddAnotherPathException("Program does not support of handling more than 16 paths at once.");
@@ -427,6 +427,15 @@ public class ModelManager implements Serializable
         fireOnCreatedPathEvent(path);
 
         System.out.println(String.format("User inserted new path of name - %s", pathName));
+    }
+
+    public void changeMusicClefOfSelectedPath(MusicClefSelection musicClef)
+    {
+        selectedPath.setMusicClefSelection(musicClef);
+
+        System.out.println(String.format("Music clef of path \"%s\" changed to %s", selectedPath.getName(), musicClef));
+
+        fireOnPathClefChanged(selectedPath);
     }
 
     /**
@@ -545,6 +554,23 @@ public class ModelManager implements Serializable
             try{
                 IPathEvent pathEvent = (IPathEvent) iterator.next();
                 pathEvent.onPathCreated(path);
+            }
+            catch (Exception e){}
+        }
+    }
+
+    /**
+     * Raise event when path's clef has been changed
+     * @param path
+     */
+    private void fireOnPathClefChanged(Path path)
+    {
+        Iterator iterator = pathListeners.iterator();
+
+        while(iterator.hasNext()) {
+            try{
+                IPathEvent pathEvent = (IPathEvent) iterator.next();
+                pathEvent.onPathClefChanged(path);
             }
             catch (Exception e){}
         }

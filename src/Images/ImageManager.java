@@ -1,7 +1,7 @@
 package Images;
 
 import SongCreatorWindow.Model.Core.Duration;
-import SongCreatorWindow.Model.Core.MusicKeySelection;
+import SongCreatorWindow.Model.Core.MusicClefSelection;
 import SongCreatorWindow.Model.Core.SoundModification;
 import javafx.scene.image.Image;
 
@@ -106,7 +106,7 @@ public class ImageManager
     //region Getters - Flyweight pattern utilized
 
     //region Music keys
-    public Image getMusicKey(MusicKeySelection musicKeySelection)
+    public Image getMusicClef(MusicClefSelection musicKeySelection)
     {
         return switch (musicKeySelection)
         {

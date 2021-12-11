@@ -1,6 +1,6 @@
 package SongCreatorWindow.Model.Core;
 
-public enum MusicKeySelection
+public enum MusicClefSelection
 {
     ViolinKey,
     BassKey,

@@ -25,9 +25,12 @@ public class Path implements Serializable
         _pathName = result;
     }
 
-    MusicKeySelection _selectedKey;
-    public void setMusicKeySelection(MusicKeySelection musicKey) { _selectedKey = musicKey; }
-    public MusicKeySelection getMusicKeySelection() { return _selectedKey; }
+    MusicClefSelection _selectedKey;
+    public void setMusicClefSelection(MusicClefSelection musicKey) {
+        _selectedKey = musicKey;
+        //TODO: zmieniaj wysokość nut w zależności od klucza
+    }
+    public MusicClefSelection getMusicClefSelection() { return _selectedKey; }
 
     String _selectedInstrument;
     public String getInstrument()
@@ -71,7 +74,7 @@ public class Path implements Serializable
 
     int _lenght;
 
-    private Path(String pathName, byte voice, MusicKeySelection musicKey, String selectedInstrument, int tempo, byte volumeLevel)
+    private Path(String pathName, byte voice, MusicClefSelection musicKey, String selectedInstrument, int tempo, byte volumeLevel)
     {
         _pathName = pathName;
         _selectedKey = musicKey;
@@ -87,9 +90,9 @@ public class Path implements Serializable
         _tempo = tempo;
     }
 
-    public static Path CreatePath(String pathName, byte voice, MusicKeySelection musicKey, String selectedInstrument, int tempo, byte volumeLevel) { return new Path(pathName, voice, musicKey, selectedInstrument, tempo, volumeLevel); }
-    public static Path CreatePath(String pathName, byte voice, MusicKeySelection musicKey, String selectedInstrument, int tempo) { return new Path(pathName, voice, musicKey, selectedInstrument, tempo, (byte)50); }
-    public static Path CreatePath(String pathName, byte voice, MusicKeySelection musicKey, String selectedInstrument) { return new Path(pathName, voice, musicKey, selectedInstrument, 120, (byte)50); }
+    public static Path CreatePath(String pathName, byte voice, MusicClefSelection musicKey, String selectedInstrument, int tempo, byte volumeLevel) { return new Path(pathName, voice, musicKey, selectedInstrument, tempo, volumeLevel); }
+    public static Path CreatePath(String pathName, byte voice, MusicClefSelection musicKey, String selectedInstrument, int tempo) { return new Path(pathName, voice, musicKey, selectedInstrument, tempo, (byte)50); }
+    public static Path CreatePath(String pathName, byte voice, MusicClefSelection musicKey, String selectedInstrument) { return new Path(pathName, voice, musicKey, selectedInstrument, 120, (byte)50); }
 
     //region MusicSounds
     public void addSound(IPlayable sound)

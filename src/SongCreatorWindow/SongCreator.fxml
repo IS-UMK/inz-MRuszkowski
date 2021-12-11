@@ -4,6 +4,7 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
@@ -33,6 +34,14 @@
                   <MenuItem mnemonicParsing="false" onAction="#RenameSelected" text="Rename Selected" />
                   <MenuItem mnemonicParsing="false" onAction="#DeleteSelected" text="Delete Selected" />
                   <MenuItem mnemonicParsing="false" onAction="#DeleteAllPaths" text="Delete All Paths" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <Menu fx:id="changeMusicKeyMenuItem" mnemonicParsing="false" text="Change Music Clef">
+                     <items>
+                        <MenuItem mnemonicParsing="false" onAction="#ChangePathClefToViolin" text="Violin" />
+                        <MenuItem mnemonicParsing="false" onAction="#ChangePathClefToBass" text="Bass" />
+                        <MenuItem mnemonicParsing="false" onAction="#ChangePathClefToAlto" text="Alto" />
+                     </items>
+                  </Menu>
                   <MenuItem mnemonicParsing="false" onAction="#RecordPath" text="Record Path" />
                </items>
             </Menu>
@@ -72,7 +81,7 @@
                         <VBox fx:id="vBoxWithNotesAndAccordsProperties" prefHeight="200.0" prefWidth="100.0" />
                      </content>
                 </Tab>
-                  <Tab text="Soud Options">
+                  <Tab text="Sound Options">
                      <content>
                         <VBox fx:id="vBoxPaneWithCurrentlySelectedNoteOrAccordProperties" prefHeight="200.0" prefWidth="100.0" />
                      </content>

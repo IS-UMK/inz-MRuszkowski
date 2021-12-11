@@ -377,7 +377,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
             );
 
         //add (default Violin) music key
-        Image musicKeyImage = ImageManager.getInstance().setDimensions(GlobalSettings.musicKeyWidth, GlobalSettings.getMusicKeyHeight()).getMusicKey(path.getMusicKeySelection());
+        Image musicKeyImage = ImageManager.getInstance().setDimensions(GlobalSettings.musicClefWidth, GlobalSettings.getMusicKeyHeight()).getMusicClef(path.getMusicClefSelection());
         gc.drawImage(musicKeyImage, Height * 3, Height / 13);
 
         //Save created components
@@ -494,6 +494,31 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
         onPathClearSelection();
         onMusicSoundClearSelection();
+    }
+
+    @Override
+    public void onPathClefChanged(Path path)
+    {
+        var canvas = canvasMap.get(path);
+        var gc = canvas.getGraphicsContext2D();
+
+        gc.clearRect(
+                numberOfPropertySquaresInPath * Height + GlobalSettings.strokeLineBorderWidth,
+                GlobalSettings.strokeLineBorderWidth,
+                GlobalSettings.musicClefWidth,
+                GlobalSettings.Height
+        );
+
+        for(int i = 1; i <= 5; i++)
+            gc.strokeLine(
+                    numberOfPropertySquaresInPath * Height + GlobalSettings.getLinesMargins(),
+                    GlobalSettings.getLinesStartHeight() + i * GlobalSettings.getLinesPadding(),
+                    numberOfPropertySquaresInPath * Height + GlobalSettings.musicClefWidth + GlobalSettings.strokeLineBorderWidth,
+                    GlobalSettings.getLinesStartHeight() + i * GlobalSettings.getLinesPadding()
+            );
+
+        Image newClef = ImageManager.getInstance().getMusicClef(path.getMusicClefSelection());
+        gc.drawImage(newClef, Height * 3, Height / 13);
     }
 
     @Override

@@ -44,4 +44,9 @@ public class MusicSymbolsController implements IClickedEvent, IPathEvent
     public void onPathDeleted(Path path) {
 
     }
+
+    @Override
+    public void onPathClefChanged(Path path) {
+
+    }
 }
