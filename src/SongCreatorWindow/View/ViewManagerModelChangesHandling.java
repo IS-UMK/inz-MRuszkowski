@@ -485,6 +485,19 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
             tempoMap_to_move_up.setLayoutY(tempoMap_to_move_up.getLayoutY() - Height);
         }
 
+        List<ImageView> views;
+        ImageView modifier;
+        for(IPlayable sound : path.getSounds())
+        {
+            views = musicSymbols.get(sound);
+            for(var view : views)
+                anchorPaneWithPaths.getChildren().remove(view);
+
+            modifier = modificationSymbols.get(sound);
+            if(modifier != null)
+                anchorPaneWithPaths.getChildren().remove(modifier);
+        }
+
         //remove this canvas from data structures
         canvasMap.remove(path);
         canvasList.remove(canvas);
@@ -518,10 +531,10 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         var gc = canvas.getGraphicsContext2D();
 
         gc.clearRect(
-                numberOfPropertySquaresInPath * Height + GlobalSettings.strokeLineBorderWidth,
-                GlobalSettings.strokeLineBorderWidth,
-                GlobalSettings.musicClefWidth,
-                GlobalSettings.Height
+                numberOfPropertySquaresInPath * Height + GlobalSettings.strokeLineBorderWidth * 2,
+                GlobalSettings.strokeLineBorderWidth * 2,
+                GlobalSettings.musicClefWidth - strokeLineBorderWidth * 2,
+                GlobalSettings.Height - strokeLineBorderWidth * 4
         );
 
         for(int i = 1; i <= 5; i++)
@@ -551,6 +564,8 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
         for(IPlayable sound : path.getSounds())
             onMusicSoundHeightChange(path, sound);
+
+        onMusicSoundClearSelection();
     }
 
     @Override
@@ -670,7 +685,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
             var view = new ImageView(modificationSymbol);
 
             int insertX = musicSound.getTimeX() - symbolDim / 2;
-            int insertY = musicSound.getSoundHeight() + GlobalSettings.noteHeight - (int) (symbolDim * 1.2);
+            int insertY = (int) (musicSound.getSoundHeight() + GlobalSettings.noteHeight - (symbolDim * 1.2) + modelManager.getIndexOfPath(path) * GlobalSettings.Height);
 
             view.setFitWidth(symbolDim);
             view.setFitHeight(symbolDim);

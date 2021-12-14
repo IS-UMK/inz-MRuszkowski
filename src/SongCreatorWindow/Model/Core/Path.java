@@ -39,20 +39,20 @@ public class Path implements Serializable
         switch (_selectedKey) {
             case ViolinClef -> {
                 switch (musicClef) {
-                    case BassClef -> soundShift = -14;
-                    case AltoClef -> soundShift = -7;
+                    case BassClef -> soundShift = -12;
+                    case AltoClef -> soundShift = -6;
                 }
             }
             case BassClef -> {
                 switch (musicClef) {
-                    case ViolinClef -> soundShift = 14;
-                    case AltoClef -> soundShift = 7;
+                    case ViolinClef -> soundShift = 12;
+                    case AltoClef -> soundShift = 6;
                 }
             }
             case AltoClef -> {
                 switch (musicClef) {
-                    case ViolinClef -> soundShift = 7;
-                    case BassClef -> soundShift = -7;
+                    case ViolinClef -> soundShift = 6;
+                    case BassClef -> soundShift = -6;
                 }
             }
         }
