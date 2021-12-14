@@ -268,7 +268,8 @@ public class MainController
 
     public void DuplicateSelectedPath(ActionEvent actionEvent)
     {
-        checkPathSelection();
+        if(!checkPathSelection())
+            return;
 
         try {
             modelManager.duplicateSelectedPath();
@@ -279,7 +280,8 @@ public class MainController
 
     public void RenameSelected(ActionEvent actionEvent)
     {
-        checkPathSelection();
+        if(!checkPathSelection())
+            return;
 
         //ask user for new name
         TextInputDialog window = new TextInputDialog("Changing path name");
@@ -293,14 +295,16 @@ public class MainController
 
     public void UnselectPath(ActionEvent actionEvent)
     {
-        checkPathSelection();
+        if(!checkPathSelection())
+            return;
 
         modelManager.clearSelectionOfPath();
     }
 
     public void DeleteSelected(ActionEvent actionEvent)
     {
-        checkPathSelection();
+        if(!checkPathSelection())
+            return;
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are You sure to delete path?");
 
@@ -330,33 +334,38 @@ public class MainController
 
     public void ChangePathClefToViolin(ActionEvent actionEvent)
     {
-        checkPathSelection();
+        if(!checkPathSelection())
+            return;
 
-        modelManager.changeMusicClefOfSelectedPath(MusicClefSelection.ViolinKey);
+        modelManager.changeMusicClefOfSelectedPath(MusicClefSelection.ViolinClef);
     }
 
     public void ChangePathClefToBass(ActionEvent actionEvent)
     {
-        checkPathSelection();
+        if(!checkPathSelection())
+            return;
 
-        modelManager.changeMusicClefOfSelectedPath(MusicClefSelection.BassKey);
+        modelManager.changeMusicClefOfSelectedPath(MusicClefSelection.BassClef);
     }
 
     public void ChangePathClefToAlto(ActionEvent actionEvent)
     {
-        checkPathSelection();
+        if(!checkPathSelection())
+            return;
 
-        modelManager.changeMusicClefOfSelectedPath(MusicClefSelection.AltoKey);
+        modelManager.changeMusicClefOfSelectedPath(MusicClefSelection.AltoClef);
     }
 
-    private void checkPathSelection()
+    private boolean checkPathSelection()
     {
         if(modelManager.getSelectedPath() == null)
         {
             var alert = new Alert(Alert.AlertType.ERROR, "None path is selected");
             alert.showAndWait();
-            return;
+            return false;
         }
+
+        return true;
     }
 
     public void selectMusicSymbol(MouseEvent mouseEvent)

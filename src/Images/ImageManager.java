@@ -110,9 +110,9 @@ public class ImageManager
     {
         return switch (musicKeySelection)
         {
-            case ViolinKey -> getViolinKey();
-            case BassKey -> getBassKey();
-            case AltoKey -> getAltoKey();
+            case ViolinClef -> getViolinKey();
+            case BassClef -> getBassKey();
+            case AltoClef -> getAltoKey();
         };
     }
 

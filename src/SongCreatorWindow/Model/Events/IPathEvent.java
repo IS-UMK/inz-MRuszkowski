@@ -8,5 +8,5 @@ public interface IPathEvent extends IMusicEvent
     void onPathNameRenamed(Path path);
     void onPathClearSelection();
     void onPathDeleted(Path path);
-    void onPathClefChanged(Path path);
+    void onPathClefChanged(Path path, int soundShift);
 }

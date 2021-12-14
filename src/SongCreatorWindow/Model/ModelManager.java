@@ -27,32 +27,36 @@ public class ModelManager implements Serializable
     public void setProjectDestination(String name) { projectDestination = name; }
     public String getProjectDestination() { return projectDestination; }
 
-    MusicClefSelection selectedDefaultKey = GlobalSettings.defaultMusicKey;
+    MusicClefSelection selectedDefaultKey = GlobalSettings.defaultMusicClef;
     public void setDefaultMusicKeySelection(MusicClefSelection musicKey) { selectedDefaultKey = musicKey; }
     public MusicClefSelection getDefaultMusicKeySelection() { return selectedDefaultKey; }
-    private int getBasePointSound()
+    private int getBasePointSound(MusicClefSelection musicClefSelection)
     {
         int base = -1;
 
-        switch (selectedDefaultKey)
+        switch (musicClefSelection)
         {
-            case ViolinKey:
+            case ViolinClef:
                 base = 67;//NoteToNumericValue.Get_Octave_5_sound_G(); // 67 - G5
                 break;
-            case BassKey:
+            case BassClef:
                 base = 53;//NoteToNumericValue.Get_Octave_4_sound_F(); // 53 - F4
                 break;
-            case AltoKey:
+            case AltoClef:
                 base = 60;//NoteToNumericValue.Get_Octave_5_sound_C(); // 60 - C5
                 break;
         }
 
         return base;
     }
-    private String getCalculatedSoundValue(int insertY)
+    private String getCalculatedSoundValue(int insertY, MusicClefSelection musicClefSelection)
     {
-        int base = getBasePointSound();
-        int move_sound_by = (insertY - 40) / 10;
+        int base = getBasePointSound(musicClefSelection);
+        int move_sound_by = switch(musicClefSelection){
+            case ViolinClef -> (insertY - 40) / 10;
+            case BassClef -> insertY / 10;
+            case AltoClef -> (insertY - 20) / 10;
+        };
 
         List<Integer> numericalNoNFlatSounds = Note.getNonFlatSoundNumericalValues();
 
@@ -251,7 +255,7 @@ public class ModelManager implements Serializable
                         modelManager.addMusicSymbol(
                                 i,
                                 (int)(startX),
-                                (modelManager.getBasePointSound() - noteValue) * 10 + 40
+                                (modelManager.getBasePointSound(defaultMusicClef) - noteValue) * 10 + 40
                         );
                     }
 
@@ -299,6 +303,14 @@ public class ModelManager implements Serializable
 
     public void addMusicSymbol(int pathIndex, int insertX, int insertY, char duration)
     {
+        Path path;
+        try {
+            path = musicPaths.get(pathIndex);
+        }
+        catch(RuntimeException e)
+        {
+            path = musicPaths.get(pathIndex - 1);
+        }
 
         IPlayable sound = null;
 
@@ -306,8 +318,8 @@ public class ModelManager implements Serializable
 
         Note note;
         if(instrument > 0)
-            note = Note.CreateNote(getCalculatedSoundValue(insertY), duration, GlobalSettings.InstrumentForParticularNoteChoice);
-        else note = Note.CreateNote(getCalculatedSoundValue(insertY), duration);
+            note = Note.CreateNote(getCalculatedSoundValue(insertY, path.getMusicClefSelection()), duration, GlobalSettings.InstrumentForParticularNoteChoice);
+        else note = Note.CreateNote(getCalculatedSoundValue(insertY, path.getMusicClefSelection()), duration);
         note.setTimeX(insertX);
         note.setSoundHeight(insertY);
 
@@ -319,15 +331,6 @@ public class ModelManager implements Serializable
                 Accord accord = new Accord(note, GlobalSettings.accordSelectionName);
                 sound = accord;
             }
-        }
-
-        Path path;
-        try {
-            path = musicPaths.get(pathIndex);
-        }
-        catch(RuntimeException e)
-        {
-            path = musicPaths.get(pathIndex - 1);
         }
         path.addSound(sound);
 
@@ -431,11 +434,11 @@ public class ModelManager implements Serializable
 
     public void changeMusicClefOfSelectedPath(MusicClefSelection musicClef)
     {
-        selectedPath.setMusicClefSelection(musicClef);
+        int soundShift = selectedPath.setMusicClefSelection(musicClef);
 
         System.out.println(String.format("Music clef of path \"%s\" changed to %s", selectedPath.getName(), musicClef));
 
-        fireOnPathClefChanged(selectedPath);
+        fireOnPathClefChanged(selectedPath, soundShift);
     }
 
     /**
@@ -562,15 +565,16 @@ public class ModelManager implements Serializable
     /**
      * Raise event when path's clef has been changed
      * @param path
+     * @param soundShift
      */
-    private void fireOnPathClefChanged(Path path)
+    private void fireOnPathClefChanged(Path path, int soundShift)
     {
         Iterator iterator = pathListeners.iterator();
 
         while(iterator.hasNext()) {
             try{
                 IPathEvent pathEvent = (IPathEvent) iterator.next();
-                pathEvent.onPathClefChanged(path);
+                pathEvent.onPathClefChanged(path, soundShift);
             }
             catch (Exception e){}
         }

@@ -377,7 +377,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
             );
 
         //add (default Violin) music key
-        Image musicKeyImage = ImageManager.getInstance().setDimensions(GlobalSettings.musicClefWidth, GlobalSettings.getMusicKeyHeight()).getMusicClef(path.getMusicClefSelection());
+        Image musicKeyImage = ImageManager.getInstance().setDimensions(GlobalSettings.musicClefWidth, GlobalSettings.getMusicClefHeight()).getMusicClef(path.getMusicClefSelection());
         gc.drawImage(musicKeyImage, Height * 3, Height / 13);
 
         //Save created components
@@ -497,7 +497,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
     }
 
     @Override
-    public void onPathClefChanged(Path path)
+    public void onPathClefChanged(Path path, int soundShift)
     {
         var canvas = canvasMap.get(path);
         var gc = canvas.getGraphicsContext2D();
@@ -517,8 +517,25 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
                     GlobalSettings.getLinesStartHeight() + i * GlobalSettings.getLinesPadding()
             );
 
-        Image newClef = ImageManager.getInstance().getMusicClef(path.getMusicClefSelection());
-        gc.drawImage(newClef, Height * 3, Height / 13);
+        Image newClef;
+
+        switch (path.getMusicClefSelection()) {
+            case ViolinClef -> {
+                newClef = ImageManager.getInstance().setDimensions(GlobalSettings.musicClefWidth, GlobalSettings.getMusicClefHeight(path.getMusicClefSelection())).getMusicClef(MusicClefSelection.ViolinClef);
+                gc.drawImage(newClef, Height * 3, Height / 13);
+            }
+            case BassClef -> {
+                newClef = ImageManager.getInstance().setDimensions(GlobalSettings.musicClefWidth * .6, GlobalSettings.getMusicClefHeight(path.getMusicClefSelection()) * .6).getMusicClef(MusicClefSelection.BassClef);
+                gc.drawImage(newClef, Height * 3 + getLinesPadding() * 1.2, Height / 3.3);
+            }
+            case AltoClef -> {
+                newClef = ImageManager.getInstance().setDimensions(GlobalSettings.musicClefWidth * .81, GlobalSettings.getMusicClefHeight(path.getMusicClefSelection()) * .81).getMusicClef(MusicClefSelection.AltoClef);
+                gc.drawImage(newClef, Height * 3 + getLinesPadding() * .5, Height / 3.5);
+            }
+        }
+
+        for(IPlayable sound : path.getSounds())
+            onMusicSoundHeightChange(path, sound);
     }
 
     @Override

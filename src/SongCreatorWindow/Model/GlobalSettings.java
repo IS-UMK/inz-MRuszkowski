@@ -45,24 +45,18 @@ public class GlobalSettings
      * Music Key Width setting
      */
     public static double musicClefWidth = 100.0;
-    public static double getMusicKeyHeight()
+    public static  double getMusicClefHeight(MusicClefSelection selection)
     {
-        double height = 0;
-
-        switch (defaultMusicKey)
-        {
-            case ViolinKey:
-                height = 170.62;
-                break;
-            case BassKey:
-                height = 111.11; // 53 - F4
-                break;
-            case AltoKey:
-                height = 107.95; // 60 - C5
-                break;
-        }
-
-        return height;
+        return switch (selection)
+                {
+                    case ViolinClef -> 170.62;
+                    case BassClef -> 111.11; // 53 - F4
+                    case AltoClef -> 107.95; // 60 - C5
+                };
+    }
+    public static double getMusicClefHeight()
+    {
+        return getMusicClefHeight(defaultMusicClef);
     }
 
     /**
@@ -96,7 +90,7 @@ public class GlobalSettings
     /**
      * Default music key selection for new path setting
      */
-    public static MusicClefSelection defaultMusicKey = MusicClefSelection.ViolinKey;
+    public static MusicClefSelection defaultMusicClef = MusicClefSelection.ViolinClef;
 
     /**
      * Instrument selection for particular note

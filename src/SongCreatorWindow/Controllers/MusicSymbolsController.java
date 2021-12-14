@@ -46,7 +46,7 @@ public class MusicSymbolsController implements IClickedEvent, IPathEvent
     }
 
     @Override
-    public void onPathClefChanged(Path path) {
+    public void onPathClefChanged(Path path, int soundShift) {
 
     }
 }

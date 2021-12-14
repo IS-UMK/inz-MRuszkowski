@@ -26,9 +26,43 @@ public class Path implements Serializable
     }
 
     MusicClefSelection _selectedKey;
-    public void setMusicClefSelection(MusicClefSelection musicKey) {
-        _selectedKey = musicKey;
-        //TODO: zmieniaj wysokość nut w zależności od klucza
+
+    /**
+     * Sets the music clef
+     * @param musicClef music clef
+     * @return sound shift
+     */
+    public int setMusicClefSelection(MusicClefSelection musicClef)
+    {
+        int soundShift = 0;
+
+        switch (_selectedKey) {
+            case ViolinClef -> {
+                switch (musicClef) {
+                    case BassClef -> soundShift = -14;
+                    case AltoClef -> soundShift = -7;
+                }
+            }
+            case BassClef -> {
+                switch (musicClef) {
+                    case ViolinClef -> soundShift = 14;
+                    case AltoClef -> soundShift = 7;
+                }
+            }
+            case AltoClef -> {
+                switch (musicClef) {
+                    case ViolinClef -> soundShift = 7;
+                    case BassClef -> soundShift = -7;
+                }
+            }
+        }
+
+        for(var musicSound : _sounds)
+            musicSound.setSoundHeight((int) (musicSound.getSoundHeight() + GlobalSettings.getLinesPadding() / 2 * soundShift));
+
+        _selectedKey = musicClef;
+
+        return soundShift;
     }
     public MusicClefSelection getMusicClefSelection() { return _selectedKey; }
 
