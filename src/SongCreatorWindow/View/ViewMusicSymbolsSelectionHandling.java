@@ -638,7 +638,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         TieSelection tie = GlobalSettings.TieBetweenNotes;//musicSound.getSoundConcatenation();
 
         switch (previousTie) {
-            case None, End -> {
+            case End -> {
                 if(tie == TieSelection.Continue || tie == TieSelection.End)
                     groupForTie.selectToggle(noneTie);
             }

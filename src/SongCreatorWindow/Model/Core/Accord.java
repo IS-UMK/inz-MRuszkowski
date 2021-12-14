@@ -68,6 +68,26 @@ public class Accord implements IPlayable{
     }
 
     @Override
+    public IPlayable getPreviousTiedSound() {
+        return rootNote.getPreviousTiedSound();
+    }
+
+    @Override
+    public void setPreviousTiedSound(IPlayable previousTiedSound) {
+        rootNote.setPreviousTiedSound(previousTiedSound);
+    }
+
+    @Override
+    public IPlayable getNextTiedSound() {
+        return rootNote.getNextTiedSound();
+    }
+
+    @Override
+    public void setNextTiedSound(IPlayable nextTiedSound) {
+        rootNote.setNextTiedSound(nextTiedSound);
+    }
+
+    @Override
     public void setInstrument(int instrumentValue) {
         rootNote.setInstrument(instrumentValue);
     }

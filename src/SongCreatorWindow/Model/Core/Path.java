@@ -104,7 +104,7 @@ public class Path implements Serializable
     public List<IPlayable> getSounds() { return new ArrayList<IPlayable>(_sounds); }
 
     IPlayable selectedMusicSound = null;
-    List<IMusicSoundEditionEvent> listeners;
+    transient List<IMusicSoundEditionEvent> listeners;
 
     int _lenght;
 
@@ -145,8 +145,8 @@ public class Path implements Serializable
         if(!added)
             _sounds.add(sound);
 
-        fireOnMusicSoundTieCheck(sound);
         sound.setSoundConcatenation(GlobalSettings.TieBetweenNotes);
+        fireOnMusicSoundTieCheck(sound);
     }
 
     public void convertToNote(IPlayable musicSound)
@@ -333,6 +333,13 @@ public class Path implements Serializable
 
     public boolean isTiedWithPreviousSound(IPlayable musicSound)
     {
+        if(musicSound.getPreviousTiedSound() != null)
+            return true;
+
+        return false;
+    }
+    /*public boolean isTiedWithPreviousSound(IPlayable musicSound)
+    {
         int index = _sounds.indexOf(musicSound);
 
         if(index == 0)
@@ -360,7 +367,7 @@ public class Path implements Serializable
             return null;
 
         return _sounds.get(index - 1);
-    }
+    }*/
 
     public void deleteSound(IPlayable musicSound)
     {
@@ -411,7 +418,26 @@ public class Path implements Serializable
     private void fireOnMusicSoundTieCheck(IPlayable musicSound)
     {
         int index = _sounds.indexOf(musicSound);
-        TieSelection previousTie = index != 0 && _sounds.size() > 1 ? _sounds.get(index - 1).getSoundConcatenation() : TieSelection.None;
+
+        TieSelection previousTie = TieSelection.None;
+
+        IPlayable previousSound = null;
+        for(int i = index - 1; i >= 0; i--)
+        {
+            previousSound = _sounds.get(i);
+            if(previousSound.getSoundConcatenation() == TieSelection.Begin || previousSound.getSoundConcatenation() == TieSelection.Continue)
+            {
+                if(previousSound.getNextTiedSound() == null)
+                {
+                    previousTie = previousSound.getSoundConcatenation();
+                    musicSound.setPreviousTiedSound(previousSound);
+                    previousSound.setNextTiedSound(musicSound);
+                }
+                break;
+            }
+        }
+
+        //TieSelection previousTie = index != 0 && _sounds.size() > 1 ? _sounds.get(index - 1).getSoundConcatenation() : TieSelection.None;
 
         Iterator iterator = listeners.iterator();
 

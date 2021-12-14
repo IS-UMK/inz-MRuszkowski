@@ -93,6 +93,42 @@ public class Note implements IPlayable{
     @Override
     public void setSoundConcatenation(TieSelection tie) { noteConcatenation = tie; }
 
+    IPlayable previousTiedSound;
+    IPlayable nextTiedSound;
+
+    @Override
+    public IPlayable getPreviousTiedSound() {
+        if(noteConcatenation == TieSelection.Continue || noteConcatenation == TieSelection.End)
+            return previousTiedSound;
+
+        return null;
+    }
+    @Override
+    public void setPreviousTiedSound(IPlayable previousTiedSound) {
+        if(noteConcatenation == TieSelection.None || noteConcatenation == TieSelection.Begin) {
+            this.previousTiedSound = null;
+            return;
+        }
+
+        this.previousTiedSound = previousTiedSound;
+    }
+    @Override
+    public IPlayable getNextTiedSound() {
+        if(noteConcatenation == TieSelection.Continue || noteConcatenation == TieSelection.Begin)
+            return nextTiedSound;
+
+        return null;
+    }
+    @Override
+    public void setNextTiedSound(IPlayable nextTiedSound) {
+        if(noteConcatenation == TieSelection.None || noteConcatenation == TieSelection.End) {
+            this.nextTiedSound = null;
+            return;
+        }
+
+        this.nextTiedSound = nextTiedSound;
+    }
+
     @Override
     public void setInstrument(int instrumentValue) {
         this.instrument = instrumentValue;

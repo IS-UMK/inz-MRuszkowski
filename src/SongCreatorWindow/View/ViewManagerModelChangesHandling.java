@@ -109,30 +109,24 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         //Music Ties
         if(path.isTiedWithPreviousSound(musicSound))
         {
-            IPlayable previousSound = path.getPreviousSound(musicSound);
+            IPlayable previousSound = musicSound.getPreviousTiedSound();
 
-            if(previousSound != null)
-            {
-                int arcWidth = musicSound.getTimeX() - previousSound.getTimeX();
-                int arcHeight = Math.abs(musicSound.getSoundHeight()- previousSound.getSoundHeight());
+            int lineWidth = musicSound.getTimeX() - previousSound.getTimeX() - GlobalSettings.noteHeight;
+            int lineHeight = lineWidth / 6 + Math.abs(musicSound.getSoundHeight() - previousSound.getSoundHeight());
 
-                /*gc.strokeArc(previousSound.getTimeX() + GlobalSettings.noteWidth / 2,
-                        previousSound.getSoundHeight(),
-                        arcWidth,
-                        arcHeight,
-                        -45,
-                        90,
-                        ArcType.OPEN);*/
-                //gc.
-                /*gc.strokeArc(musicSound.getTimeX(),
-                        musicSound.getSoundHeight(),
-                        -(musicSound.getTimeX() - previousSound.getTimeX()),
-                        -(musicSound.getTimeX() - previousSound.getSoundHeight()),
-                        50,
-                        0,
-                        ArcType.ROUND);*/
-                //System.out.println("Tie between sounds drawn");
-            }
+            Image tieLineImage = ImageManager.getInstance().setReloadFlag(true).setDimensions(lineWidth, lineHeight).getTieSymbolImage();
+
+            ImageView lineView = new ImageView(tieLineImage);
+
+            System.out.println(String.format("Tie line drawn at %d %d with dim %d %d", previousSound.getTimeX(), previousSound.getSoundHeight(), lineWidth, lineHeight));
+            lineView.setFitWidth(lineWidth);
+            lineView.setFitHeight(lineHeight);
+            lineView.setLayoutX(previousSound.getTimeX() + GlobalSettings.noteWidth);
+            lineView.setLayoutY(previousSound.getSoundHeight());
+
+            lineView.setRotate(lineView.getRotate() + Math.acos(lineWidth / (Math.sqrt(lineWidth*lineWidth + lineHeight*lineHeight))));
+
+            anchorPaneWithPaths.getChildren().add(lineView);
         }
     }
 
