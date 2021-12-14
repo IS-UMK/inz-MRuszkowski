@@ -240,6 +240,21 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         }
 
         canvasCurrentWidth = oldWidth + GlobalSettings.canvasExtension;
+
+        if(modelManager.getSelectedPath() != null)
+        {
+            GraphicsContext gc = interactionCanvas.getGraphicsContext2D();
+            gc.clearRect(0, 0, interactionCanvas.getWidth(), interactionCanvas.getHeight());
+
+            int index = modelManager.getIndexOfSelectedPath();
+            interactionCanvas.setWidth(canvasCurrentWidth);
+            interactionCanvas.setLayoutY(Height * index);
+
+            gc.setStroke(GlobalSettings.selectionColor);
+            gc.setLineWidth(strokeLineWidthForSelection);
+            gc.strokeRect(strokeLineWidthForSelection / 2, strokeLineWidthForSelection / 2,
+                    canvasCurrentWidth - strokeLineWidthForSelection, Height - strokeLineWidthForSelection);
+        }
     }
 
     @Override
