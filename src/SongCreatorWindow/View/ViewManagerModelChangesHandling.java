@@ -143,7 +143,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         view.setPickOnBounds(true);
 
         view.setLayoutX(insertX);
-        view.setLayoutY(insertY + GlobalSettings.Height * path.getVoice());
+        view.setLayoutY(insertY + modelManager.getIndexOfPath(path) * GlobalSettings.Height);
         view.setFitHeight(musicSymbolImage.getHeight());
 
         view.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -602,7 +602,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
         for(int i = 0; i < views.size(); i++)
         {
-            views.get(i).setLayoutY(musicSound.getSoundHeight() + i * movedLocation);
+            views.get(i).setLayoutY(musicSound.getSoundHeight() + i * movedLocation + GlobalSettings.Height * modelManager.getIndexOfPath(path));
         }
 
         onMusicSoundModified(path, musicSound);
