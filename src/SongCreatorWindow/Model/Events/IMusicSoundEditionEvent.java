@@ -12,7 +12,7 @@ public interface IMusicSoundEditionEvent extends IMusicEvent
 
     void onMusicSoundClearSelection();
 
-    void onMusicSoundTieCheck(IPlayable musicSound, TieSelection previousTie);
+    void onMusicSoundTieCheck(Path path, IPlayable musicSound, TieSelection previousTie);
 
     void onMusicSoundOccurrenceTimeChanged(Path path, IPlayable musicSound);
 

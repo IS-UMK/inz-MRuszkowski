@@ -105,29 +105,6 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         }
 
         musicSymbols.put(musicSound, views);
-
-        //Music Ties
-        if(path.isTiedWithPreviousSound(musicSound))
-        {
-            IPlayable previousSound = musicSound.getPreviousTiedSound();
-
-            int lineWidth = musicSound.getTimeX() - previousSound.getTimeX() - GlobalSettings.noteHeight;
-            int lineHeight = lineWidth / 6 + Math.abs(musicSound.getSoundHeight() - previousSound.getSoundHeight());
-
-            Image tieLineImage = ImageManager.getInstance().setReloadFlag(true).setDimensions(lineWidth, lineHeight).getTieSymbolImage();
-
-            ImageView lineView = new ImageView(tieLineImage);
-
-            System.out.println(String.format("Tie line drawn at %d %d with dim %d %d", previousSound.getTimeX(), previousSound.getSoundHeight(), lineWidth, lineHeight));
-            lineView.setFitWidth(lineWidth);
-            lineView.setFitHeight(lineHeight);
-            lineView.setLayoutX(previousSound.getTimeX() + GlobalSettings.noteWidth);
-            lineView.setLayoutY(previousSound.getSoundHeight());
-
-            lineView.setRotate(lineView.getRotate() + Math.acos(lineWidth / (Math.sqrt(lineWidth*lineWidth + lineHeight*lineHeight))));
-
-            anchorPaneWithPaths.getChildren().add(lineView);
-        }
     }
 
     private ImageView createImageView(Image musicSymbolImage, Path path, IPlayable musicSound, int insertX, int insertY)
@@ -617,8 +594,29 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
     }
 
     @Override
-    public void onMusicSoundTieCheck(IPlayable musicSound, TieSelection previousTie) {
+    public void onMusicSoundTieCheck(Path path, IPlayable musicSound, TieSelection previousTie) {
+        //Music Ties
+        /*if(path.isTiedWithPreviousSound(musicSound))
+        {
+            IPlayable previousSound = musicSound.getPreviousTiedSound();
 
+            int lineWidth = musicSound.getTimeX() - previousSound.getTimeX() - GlobalSettings.noteHeight;
+            int lineHeight = lineWidth / 6 + Math.abs(musicSound.getSoundHeight() - previousSound.getSoundHeight());
+
+            Image tieLineImage = ImageManager.getInstance().setReloadFlag(true).setDimensions(lineWidth, lineHeight).getTieSymbolImage();
+
+            ImageView lineView = new ImageView(tieLineImage);
+
+            System.out.println(String.format("Tie line drawn at %d %d with dim %d %d", previousSound.getTimeX(), previousSound.getSoundHeight(), lineWidth, lineHeight));
+            lineView.setFitWidth(lineWidth);
+            lineView.setFitHeight(lineHeight);
+            lineView.setLayoutX(previousSound.getTimeX() + GlobalSettings.noteWidth);
+            lineView.setLayoutY(previousSound.getSoundHeight());
+
+            lineView.setRotate(lineView.getRotate() + Math.acos(lineWidth / (Math.sqrt(lineWidth*lineWidth + lineHeight*lineHeight))));
+
+            anchorPaneWithPaths.getChildren().add(lineView);
+        }*/
     }
 
     @Override

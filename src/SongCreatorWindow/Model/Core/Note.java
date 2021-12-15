@@ -90,8 +90,26 @@ public class Note implements IPlayable{
     TieSelection noteConcatenation;
     @Override
     public TieSelection getSoundConcatenation() { return noteConcatenation; }
+
     @Override
-    public void setSoundConcatenation(TieSelection tie) { noteConcatenation = tie; }
+    public void setSoundConcatenation(TieSelection tie) {
+        noteConcatenation = tie;
+    }
+
+    @Override
+    public void setSoundConcatenation(boolean b) {
+        if(b)
+        {
+            noteConcatenation = TieSelection.Begin;
+        }
+        else
+        {
+            noteConcatenation = TieSelection.None;
+        }
+
+        previousTiedSound = null;
+        nextTiedSound = null;
+    }
 
     IPlayable previousTiedSound;
     IPlayable nextTiedSound;
@@ -105,12 +123,25 @@ public class Note implements IPlayable{
     }
     @Override
     public void setPreviousTiedSound(IPlayable previousTiedSound) {
-        if(noteConcatenation == TieSelection.None || noteConcatenation == TieSelection.Begin) {
+        if(noteConcatenation == TieSelection.None) {
             this.previousTiedSound = null;
             return;
         }
 
         this.previousTiedSound = previousTiedSound;
+
+        if(previousTiedSound != null)
+        {
+            if(nextTiedSound == null)
+                noteConcatenation = TieSelection.End;
+            else noteConcatenation = TieSelection.Continue;
+        }
+        else
+        {
+            if(nextTiedSound != null)
+                noteConcatenation = TieSelection.Begin;
+            else noteConcatenation = TieSelection.None;
+        }
     }
     @Override
     public IPlayable getNextTiedSound() {
@@ -121,12 +152,25 @@ public class Note implements IPlayable{
     }
     @Override
     public void setNextTiedSound(IPlayable nextTiedSound) {
-        if(noteConcatenation == TieSelection.None || noteConcatenation == TieSelection.End) {
+        if(noteConcatenation == TieSelection.None) {
             this.nextTiedSound = null;
             return;
         }
 
         this.nextTiedSound = nextTiedSound;
+
+        if(nextTiedSound != null)
+        {
+            if(previousTiedSound == null)
+                noteConcatenation = TieSelection.Begin;
+            else noteConcatenation = TieSelection.Continue;
+        }
+        else
+        {
+            if(previousTiedSound != null)
+                noteConcatenation = TieSelection.End;
+            else noteConcatenation = TieSelection.None;
+        }
     }
 
     @Override

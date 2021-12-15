@@ -50,9 +50,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
 
     ToggleGroup groupForTie;
     RadioButton noneTie;
-    RadioButton beginOfTie;
-    RadioButton continueOfTie;
-    RadioButton endOfTie;
+    RadioButton includeOfTie;
 
     ChoiceBox instrumentChoiceBoxForNextSound;
     //endregion
@@ -158,14 +156,8 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         noneTie = new RadioButton("None ");
         noneTie.setUserData(TieSelection.None);
 
-        beginOfTie = new RadioButton("Begin ");
-        beginOfTie.setUserData(TieSelection.Begin);
-
-        continueOfTie = new RadioButton("Continue ");
-        continueOfTie.setUserData(TieSelection.Continue);
-
-        endOfTie = new RadioButton("End ");
-        endOfTie.setUserData(TieSelection.End);
+        includeOfTie = new RadioButton("Include");
+        includeOfTie.setUserData(TieSelection.Include);
 
         groupForTie.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
             @Override
@@ -176,21 +168,15 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
                     case None -> {
                         GlobalSettings.TieBetweenNotes = TieSelection.None;
                     }
-                    case Begin -> {
-                        GlobalSettings.TieBetweenNotes = TieSelection.Begin;
-                    }
-                    case Continue -> {
-                        GlobalSettings.TieBetweenNotes = TieSelection.Continue;
-                    }
-                    case End -> {
-                        GlobalSettings.TieBetweenNotes = TieSelection.End;
+                    case Include -> {
+                        GlobalSettings.TieBetweenNotes = TieSelection.Include;
                     }
                 }
                 System.out.println(String.format("Tie selection set to %s", choice.toString()));
             }
         });
 
-        groupForTie.getToggles().addAll(noneTie, beginOfTie, continueOfTie, endOfTie);
+        groupForTie.getToggles().addAll(noneTie, includeOfTie);
         groupForTie.selectToggle(noneTie);
 
         //Properties selection configuration - user selects instrument for particular sound
@@ -211,7 +197,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         HBox hbox1 = new HBox(accordLabels[0], symbolNote, symbolAccord, accordChoiceBox);
         hbox1.setPadding(padding);
 
-        HBox hbox2 = new HBox(accordLabels[1], noneTie, beginOfTie, continueOfTie, endOfTie);
+        HBox hbox2 = new HBox(accordLabels[1], noneTie, includeOfTie);
         hbox2.setPadding(padding);
 
         HBox hbox3 = new HBox(accordLabels[2]);
@@ -357,6 +343,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
             @Override
             public void changed(ObservableValue observableValue, Object oldValue, Object newValue) {
                 if(oldValue.equals("") || newValue.equals("")){
+                    //TODO: Usunąć ten blok if'a
                     System.err.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
                     System.err.println("Old " + oldValue + " new " + newValue);
                     return;
@@ -633,9 +620,10 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
     }
 
     @Override
-    public void onMusicSoundTieCheck(IPlayable musicSound, TieSelection previousTie)
+    public void onMusicSoundTieCheck(Path path, IPlayable musicSound, TieSelection previousTie)
     {
-        TieSelection tie = GlobalSettings.TieBetweenNotes;//musicSound.getSoundConcatenation();
+        //TODO: usuń
+        /*TieSelection tie = GlobalSettings.TieBetweenNotes;//musicSound.getSoundConcatenation();
 
         switch (previousTie) {
             case End -> {
@@ -646,7 +634,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
                 if(tie == TieSelection.None || tie == TieSelection.Begin)
                     groupForTie.selectToggle(endOfTie);
             }
-        }
+        }*/
     }
 
     @Override

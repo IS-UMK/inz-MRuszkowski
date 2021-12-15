@@ -34,6 +34,7 @@ public interface IPlayable extends Serializable {
 
     TieSelection getSoundConcatenation();
     void setSoundConcatenation(TieSelection tie);
+    public void setSoundConcatenation(boolean b);
     IPlayable getPreviousTiedSound();
     void setPreviousTiedSound(IPlayable previousTiedSound);
     IPlayable getNextTiedSound();

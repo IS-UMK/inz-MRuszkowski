@@ -145,8 +145,11 @@ public class Path implements Serializable
         if(!added)
             _sounds.add(sound);
 
-        sound.setSoundConcatenation(GlobalSettings.TieBetweenNotes);
-        fireOnMusicSoundTieCheck(sound);
+        if(GlobalSettings.TieBetweenNotes == TieSelection.Include)
+        {
+            sound.setSoundConcatenation(true);
+            fireOnMusicSoundTieCheck(sound);
+        }
     }
 
     public void convertToNote(IPlayable musicSound)
@@ -163,7 +166,11 @@ public class Path implements Serializable
             newNote.setFlatness(musicSound.isFlat());
             newNote.setSharpness(musicSound.isSharp());
             newNote.setVolume(musicSound.getVolume());
+
             newNote.setSoundConcatenation(musicSound.getSoundConcatenation());
+            newNote.setPreviousTiedSound(musicSound.getPreviousTiedSound());
+            newNote.setNextTiedSound(musicSound.getNextTiedSound());
+
             newNote.setTimeX(musicSound.getTimeX());
             newNote.setSoundHeight(musicSound.getSoundHeight());
 
@@ -188,7 +195,11 @@ public class Path implements Serializable
             newAccord.setFlatness(musicSound.isFlat());
             newAccord.setSharpness(musicSound.isSharp());
             newAccord.setVolume(musicSound.getVolume());
+
             newAccord.setSoundConcatenation(musicSound.getSoundConcatenation());
+            newAccord.setPreviousTiedSound(musicSound.getPreviousTiedSound());
+            newAccord.setNextTiedSound(musicSound.getNextTiedSound());
+
             newAccord.setTimeX(musicSound.getTimeX());
             newAccord.setSoundHeight(musicSound.getSoundHeight());
 
@@ -417,6 +428,7 @@ public class Path implements Serializable
 
     private void fireOnMusicSoundTieCheck(IPlayable musicSound)
     {
+        //TODO: Czy to na pewno event? Jest pusty de facto, nikt nie odbiera
         int index = _sounds.indexOf(musicSound);
 
         TieSelection previousTie = TieSelection.None;
@@ -425,15 +437,14 @@ public class Path implements Serializable
         for(int i = index - 1; i >= 0; i--)
         {
             previousSound = _sounds.get(i);
-            if(previousSound.getSoundConcatenation() == TieSelection.Begin || previousSound.getSoundConcatenation() == TieSelection.Continue)
+            if(previousSound.getSoundConcatenation() != TieSelection.None && previousSound.getSoundConcatenation() != TieSelection.Continue)
             {
-                if(previousSound.getNextTiedSound() == null)
-                {
-                    previousTie = previousSound.getSoundConcatenation();
-                    musicSound.setPreviousTiedSound(previousSound);
-                    previousSound.setNextTiedSound(musicSound);
-                }
-                break;
+                if(previousSound.getSoundConcatenation() == TieSelection.Begin && previousSound.getNextTiedSound() != null)
+                    continue;
+
+                previousTie = previousSound.getSoundConcatenation();
+                musicSound.setPreviousTiedSound(previousSound);
+                previousSound.setNextTiedSound(musicSound);
             }
         }
 
@@ -443,7 +454,7 @@ public class Path implements Serializable
 
         while(iterator.hasNext()) {
             IMusicSoundEditionEvent modelEvent = (IMusicSoundEditionEvent) iterator.next();
-            modelEvent.onMusicSoundTieCheck(musicSound, previousTie);
+            modelEvent.onMusicSoundTieCheck(this, musicSound, previousTie);
         }
     }
 
@@ -509,6 +520,22 @@ public class Path implements Serializable
 
     private void fireOnMusicSoundDeleted(Path path, IPlayable musicSound)
     {
+        if(musicSound.getSoundConcatenation() != TieSelection.None)
+        {
+            switch (musicSound.getSoundConcatenation()) {
+                case Begin -> {
+                    musicSound.getNextTiedSound().setPreviousTiedSound(null);
+                }
+                case Continue -> {
+                    musicSound.getPreviousTiedSound().setNextTiedSound(null);
+                    musicSound.getNextTiedSound().setPreviousTiedSound(null);
+                }
+                case End -> {
+                    musicSound.getPreviousTiedSound().setNextTiedSound(null);
+                }
+            }
+        }
+
         Iterator iterator = listeners.iterator();
 
         while(iterator.hasNext()) {

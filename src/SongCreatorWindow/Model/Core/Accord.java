@@ -68,6 +68,11 @@ public class Accord implements IPlayable{
     }
 
     @Override
+    public void setSoundConcatenation(boolean b) {
+        rootNote.setSoundConcatenation(b);
+    }
+
+    @Override
     public IPlayable getPreviousTiedSound() {
         return rootNote.getPreviousTiedSound();
     }

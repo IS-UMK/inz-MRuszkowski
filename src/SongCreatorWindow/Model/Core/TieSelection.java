@@ -5,5 +5,5 @@ public enum TieSelection
     None,
     Begin,
     Continue,
-    End
+    Include, End
 }
