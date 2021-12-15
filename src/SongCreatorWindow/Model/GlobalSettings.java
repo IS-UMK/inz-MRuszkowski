@@ -65,7 +65,7 @@ public class GlobalSettings
     public final static int numberOfPropertySquaresInPath = 3;
     public final static int widthOfAreaWhereCanvasExtends = 300;
     public final static int fixedXPositionOfNotes = -40;
-    public static int canvasExtension = 300;
+    public static int canvasExtension = 600;
     public static double getLinesStartHeight() { return Height / 5; }
     /**
      * Left and right margin of five lines

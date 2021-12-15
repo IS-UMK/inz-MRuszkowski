@@ -141,6 +141,7 @@ public class ModelManager implements Serializable
     /**
      * Method that interprets MIDI file as a .mrinz music project. Method will NEVER return the same model due to errors while reading MIDI files.
      * Model will be only similar and the original is not possible to restore. Time when notes and accords occurs are often confused and sometimes even their order.
+     * Music Clef selection is unknown so user has to choose clef manually.
      * @param pathToProject
      * @return ModelManager that represents similar music written in MIDI file
      * @throws IOException
@@ -160,14 +161,16 @@ public class ModelManager implements Serializable
 
         byte i = 0;
 
-        int startX;
-        double parsedValue = 0;
-        double rests = 0;
+        int startX, octave, noteValue, index, baseIndex, insertY;
+        double parsedValue;
 
         char saveChoice = GlobalSettings.chosenNote;
+        List<Integer> nonFlatSounds = Note.getNonFlatSoundNumericalValues();
 
         for(String pattern : patterns)
         {
+            parsedValue = 0;
+
             if(pattern.equals(""))
                 continue;
 
@@ -189,8 +192,6 @@ public class ModelManager implements Serializable
             {
                 if(sound.equals(""))
                     continue;
-
-                parsedValue = 0;
                 String[] notes = sound.split(" ");
 
                 for(String note: notes)
@@ -224,38 +225,39 @@ public class ModelManager implements Serializable
                                 }
                             }
                             else {
-                                symbols = note.split("/")[1];
-                                parsedValue += Double.parseDouble(symbols);
+                                parsedValue += Double.parseDouble(note.split("/")[1]);
                             }
                         }
                         else {
-                            symbols =  note.split("@")[1];
-                            parsedValue += Double.parseDouble(symbols);
-                        }
-
-                        for(int k = startX; k < startX + 600; k++){
-                            var tmp = (k - GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() - GlobalSettings.fixedXPositionOfNotes) / (GlobalSettings.Height * 2);
-                            System.out.println(String.format("TimeX %d: %f", k, tmp));
+                            parsedValue += Double.parseDouble(note.split("@")[1]);
                         }
 
                         if(symbols.charAt(0) == '@')
-                            startX = (int)((parsedValue * 2 * GlobalSettings.Height) + GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() + GlobalSettings.fixedXPositionOfNotes);
-                        else startX += (int)(parsedValue * 2 * GlobalSettings.Height);
+                            startX = (int)Path.getSoundTimeX(parsedValue);//;(int)((parsedValue * 2 * GlobalSettings.Height) + GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() + GlobalSettings.fixedXPositionOfNotes);
+                        else {
+                            startX += Path.getSoundTimeX(parsedValue) - GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal();//;(int)(parsedValue * 2 * GlobalSettings.Height);
+                        }
                     }
                     else
                     {
+                        parsedValue = 0;
+
                         String musicSoundLetter = symbols;
                         symbols = note.split(symbols)[1];
-                        int octave = Character.getNumericValue(symbols.charAt(0));
+                        octave = Character.getNumericValue(symbols.charAt(0));
 
                         GlobalSettings.chosenNote = symbols.charAt(1);
 
-                        int noteValue = Note.mapNoteSymbolToNumericalValue(musicSoundLetter, octave);
+                        noteValue = Note.mapNoteSymbolToNumericalValue(musicSoundLetter, octave);
+
+                        index = nonFlatSounds.indexOf(noteValue);
+                        baseIndex = nonFlatSounds.indexOf(modelManager.getBasePointSound(modelManager.getPathByIndex(i).getMusicClefSelection()));
+                        insertY = (int)(GlobalSettings.getLinesStartHeight()) - (index - baseIndex) * 10;
 
                         modelManager.addMusicSymbol(
                                 i,
-                                (int)(startX),
-                                (modelManager.getBasePointSound(defaultMusicClef) - noteValue) * 10 + 40
+                                startX,
+                                insertY
                         );
                     }
 
@@ -280,6 +282,8 @@ public class ModelManager implements Serializable
         this.setProjectName(modelManager.getProjectName());
         this.setProjectDestination(modelManager.getProjectDestination());
 
+        var userPrefTie = GlobalSettings.TieBetweenNotes;
+
         for(Path path : modelManager.getPaths())
         {
             try {
@@ -289,9 +293,16 @@ public class ModelManager implements Serializable
                 return;
             }
 
-            for(IPlayable sound : path.getSounds())
+            for(IPlayable sound : path.getSounds()) {
+                if(sound.getSoundConcatenation() != TieSelection.None)
+                    GlobalSettings.TieBetweenNotes = TieSelection.Include;
+                else GlobalSettings.TieBetweenNotes = TieSelection.None;
+
                 addMusicSymbol(path.getVoice(), sound.getTimeX(), sound.getSoundHeight(), sound.getDuration());
+            }
         }
+
+        GlobalSettings.TieBetweenNotes = userPrefTie;
     }
     //endregion
 
@@ -378,6 +389,16 @@ public class ModelManager implements Serializable
 
     public int getIndexOfPath(Path path) {
         return musicPaths.indexOf(path);
+    }
+    public Path getPathByIndex(int index)
+    {
+        try{
+            return musicPaths.get(index);
+        }
+        catch (RuntimeException e)
+        {
+            return null;
+        }
     }
 
     /**
