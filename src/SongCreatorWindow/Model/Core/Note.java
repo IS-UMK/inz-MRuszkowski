@@ -173,6 +173,22 @@ public class Note implements IPlayable{
         }
     }
 
+    public boolean isTiedWithPreviousSound()
+    {
+        if(getPreviousTiedSound() != null)
+            return true;
+
+        return false;
+    }
+
+    public boolean isTiedWithAnotherSound()
+    {
+        if(getNextTiedSound() != null)
+            return true;
+
+        return false;
+    }
+
     @Override
     public void setInstrument(int instrumentValue) {
         this.instrument = instrumentValue;

@@ -20,6 +20,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.CubicCurveTo;
+import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
 
 import java.util.*;
@@ -42,6 +43,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
     HashMap<IPlayable, List<ImageView>> musicSymbols;
     HashMap<IPlayable, ImageView> modificationSymbols;
+    HashMap<IPlayable, javafx.scene.shape.Path> bindingSymbols;
     List<IClickedEvent> listeners;
 
     //GUI components
@@ -67,6 +69,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
         musicSymbols = new HashMap<>();
         modificationSymbols = new HashMap<>();
+        bindingSymbols = new HashMap<>();
         listeners = new LinkedList<>();
 
         this.anchorPaneWithPaths = anchorPaneWithPaths;
@@ -599,124 +602,84 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
     }
 
     @Override
-    public void onMusicSoundTieCheck(Path path, IPlayable musicSound, TieSelection previousTie) {
-        //Music Ties
-        /*if(path.isTiedWithPreviousSound(musicSound))
+    public void onMusicSoundTieCheck(Path path, IPlayable musicSound)
+    {
+        if(musicSound.isTiedWithPreviousSound())
         {
-            IPlayable previousSound = musicSound.getPreviousTiedSound();
-
-            int lineWidth = musicSound.getTimeX() - previousSound.getTimeX() - GlobalSettings.noteHeight;
-            int lineHeight = lineWidth / 6 + Math.abs(musicSound.getSoundHeight() - previousSound.getSoundHeight());
-
-            Image tieLineImage = ImageManager.getInstance().setReloadFlag(true).setDimensions(lineWidth, lineHeight).getTieSymbolImage();
-
-            ImageView lineView = new ImageView(tieLineImage);
-
-            System.out.println(String.format("Tie line drawn at %d %d with dim %d %d", previousSound.getTimeX(), previousSound.getSoundHeight(), lineWidth, lineHeight));
-            lineView.setFitWidth(lineWidth);
-            lineView.setFitHeight(lineHeight);
-            lineView.setLayoutX(previousSound.getTimeX() + GlobalSettings.noteWidth);
-            lineView.setLayoutY(previousSound.getSoundHeight());
-
-            lineView.setRotate(lineView.getRotate() + Math.acos(lineWidth / (Math.sqrt(lineWidth*lineWidth + lineHeight*lineHeight))));
-
-            anchorPaneWithPaths.getChildren().add(lineView);
-        }*/
-        if(path.isTiedWithPreviousSound(musicSound))
-        {
-            IPlayable previousSound = musicSound.getPreviousTiedSound();
-
-            var tiePath = new javafx.scene.shape.Path();
-            tiePath.setStrokeWidth(strokeLineBorderWidth * 5);
-
-            //Moving to the starting point
-            var moveTo = new javafx.scene.shape.MoveTo();
-
-            double firstX = previousSound.getTimeX() + noteWidth *.9;
-            double firstY = previousSound.getSoundHeight() + noteHeight * .8;
-            double secondX = musicSound.getTimeX() + noteHeight * .1;
-            double secondY = musicSound.getSoundHeight() + noteHeight * .8;
-
-            moveTo.setX(firstX);
-            moveTo.setY(firstY);
-
-            double a = (secondY - firstY) / (secondX / firstX);
-            double b = firstY;
-
-            double R = Math.sqrt(Math.pow(firstX - secondX, 2) + Math.pow(firstY - secondY, 2));
-
-            double y = secondY - firstY;//;Math.abs(secondY - firstY);
-
-            double angle1 = Math.asin(y/R);
-            double angle2 = Math.asin(-y/R);
-
-            double r = R/3;
-            double rotation = 45;
-            if(secondY - firstY > 0)
-                rotation += 180;
-
-            double newX1 = r * Math.cos(angle1 + rotation);
-            double newY1 = r * Math.sin(angle1 + rotation);
-
-            double newX2 = r * Math.cos(angle2 - rotation);
-            double newY2 = r * Math.sin(angle2 - rotation);
-            //Instantiating the class CubicCurve
-            CubicCurveTo cubicCurveTo = new CubicCurveTo();
-
-            //Setting properties of the class CubicCurve
-            cubicCurveTo.setControlX1(firstX + newX1);
-            cubicCurveTo.setControlY1(firstY - newY1);
-            cubicCurveTo.setControlX2(secondX - newX2);
-            cubicCurveTo.setControlY2(secondY + newY2);
-            cubicCurveTo.setX(secondX);
-            cubicCurveTo.setY(secondY);
-
-            //Adding the path elements to Observable list of the Path class
-            tiePath.getElements().add(moveTo);
-            tiePath.getElements().add(cubicCurveTo);
-
-            anchorPaneWithPaths.getChildren().add(tiePath);
-            /*Arc arc = new Arc();
-
-            int arcHeight = Math.abs(musicSound.getSoundHeight() - previousSound.getSoundHeight()) + GlobalSettings.noteHeight;
-            int arcWidth = musicSound.getTimeX() - previousSound.getTimeX() -  GlobalSettings.noteWidth / 2;
-            //int arcHeight = arcWidth / 6 + Math.abs(musicSound.getSoundHeight() - previousSound.getSoundHeight());
-
-            double radiusX = arcWidth / 2 + previousSound.getTimeX() + GlobalSettings.noteWidth / 2;
-            double radiusY = -(previousSound.getSoundHeight() - musicSound.getSoundHeight()) + arcHeight / 2;// + GlobalSettings.noteHeight;
-
-            double startAngle = 45, arcLength = 135;
-
-            arc.setCenterX(radiusX);
-            arc.setCenterY(radiusY + modelManager.getIndexOfPath(path) * GlobalSettings.Height);
-            arc.setRadiusX(arcWidth / 2);
-            arc.setRadiusY(arcHeight / 2);
-            arc.setStartAngle(startAngle);
-            arc.setLength(arcLength);
-
-            arc.setStroke(Color.BLACK);
-            arc.setStrokeWidth(strokeLineBorderWidth * 5);
-            arc.setFill(Color.TRANSPARENT);
-
-            arc.setType(ArcType.OPEN);
-
-            //Image tieLineImage = ImageManager.getInstance().setReloadFlag(true).setDimensions(lineWidth, lineHeight).getTieSymbolImage();
-
-            //ImageView lineView = new ImageView(tieLineImage);
-
-            System.out.println(String.format("Tie line drawn at %d %d with dim %d %d", previousSound.getTimeX(), previousSound.getSoundHeight(), arcWidth, arcHeight));
-
-            anchorPaneWithPaths.getChildren().add(arc);*/
-
-            /*lineView.setFitWidth(lineWidth);
-            lineView.setFitHeight(lineHeight);
-            lineView.setLayoutX(previousSound.getTimeX() + GlobalSettings.noteWidth);
-            lineView.setLayoutY(previousSound.getSoundHeight());
-
-            lineView.setRotate(lineView.getRotate() + Math.acos(lineWidth / (Math.sqrt(lineWidth*lineWidth + lineHeight*lineHeight))));
-
-            anchorPaneWithPaths.getChildren().add(lineView);*/
+            redrawSoundBinding(path, musicSound);
         }
+
+        if(musicSound.isTiedWithAnotherSound())
+        {
+            redrawSoundBinding(path, musicSound.getNextTiedSound());
+        }
+    }
+
+    private void redrawSoundBinding(Path path, IPlayable musicSound) {
+        javafx.scene.shape.Path tiePath = bindingSymbols.get(musicSound);
+
+        if (tiePath != null)
+        {
+            anchorPaneWithPaths.getChildren().remove(tiePath);
+            bindingSymbols.remove(musicSound);
+        }
+
+        tiePath = createBindingSymbolImageView(path, musicSound);
+        bindingSymbols.put(musicSound, tiePath);
+        anchorPaneWithPaths.getChildren().add(tiePath);
+    }
+
+    private javafx.scene.shape.Path createBindingSymbolImageView(Path path, IPlayable musicSound) {
+        IPlayable previousSound = musicSound.getPreviousTiedSound();
+
+        var tiePath = new javafx.scene.shape.Path();
+        tiePath.setStrokeWidth(strokeLineBorderWidth * 5);
+        tiePath.setStrokeLineCap(StrokeLineCap.ROUND);
+
+        //Moving to the starting point
+        var moveTo = new javafx.scene.shape.MoveTo();
+
+        double firstX = previousSound.getTimeX() + noteWidth *.8;
+        double firstY = previousSound.getSoundHeight() + noteHeight * .8 + modelManager.getIndexOfPath(path) * GlobalSettings.Height;
+        double secondX = musicSound.getTimeX() + noteHeight * .2;
+        double secondY = musicSound.getSoundHeight() + noteHeight * .8 + modelManager.getIndexOfPath(path) * GlobalSettings.Height;
+
+        moveTo.setX(firstX);
+        moveTo.setY(firstY);
+
+        double R = Math.sqrt(Math.pow(firstX - secondX, 2) + Math.pow(firstY - secondY, 2));
+
+        double y = secondY - firstY;
+
+        double angle1 = Math.asin(y/R);
+        double angle2 = Math.asin(-y/R);
+
+        double r = R/3;
+        double rotation = 45;
+        if(secondY - firstY > 0)
+            rotation += 180;
+
+        double newX1 = r * Math.cos(angle1 + rotation);
+        double newY1 = r * Math.sin(angle1 + rotation);
+
+        double newX2 = r * Math.cos(angle2 - rotation);
+        double newY2 = r * Math.sin(angle2 - rotation);
+        //Instantiating the class CubicCurve
+        CubicCurveTo cubicCurveTo = new CubicCurveTo();
+
+        //Setting properties of the class CubicCurve
+        cubicCurveTo.setControlX1(firstX + newX1);
+        cubicCurveTo.setControlY1(firstY - newY1);
+        cubicCurveTo.setControlX2(secondX - newX2);
+        cubicCurveTo.setControlY2(secondY + newY2);
+        cubicCurveTo.setX(secondX);
+        cubicCurveTo.setY(secondY);
+
+        //Adding the path elements to Observable list of the Path class
+        tiePath.getElements().add(moveTo);
+        tiePath.getElements().add(cubicCurveTo);
+
+        return tiePath;
     }
 
     @Override
@@ -860,5 +823,19 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
             anchorPaneWithPaths.getChildren().remove(view);
 
         onMusicSoundClearSelection();
+
+        var tiePath = bindingSymbols.get(musicSound);
+        if(tiePath != null)
+        {
+            bindingSymbols.remove(tiePath);
+            anchorPaneWithPaths.getChildren().remove(tiePath);
+        }
+
+        if(musicSound.isTiedWithAnotherSound())
+        {
+            tiePath = bindingSymbols.get(musicSound.getNextTiedSound());
+            bindingSymbols.remove(tiePath);
+            anchorPaneWithPaths.getChildren().remove(tiePath);
+        }
     }
 }

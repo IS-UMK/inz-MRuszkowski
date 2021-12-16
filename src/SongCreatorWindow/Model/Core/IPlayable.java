@@ -53,4 +53,6 @@ public interface IPlayable extends Serializable {
      */
     String ExtractJFugueSoundString(boolean withInstrument);
 
+    boolean isTiedWithPreviousSound();
+    boolean isTiedWithAnotherSound();
 }

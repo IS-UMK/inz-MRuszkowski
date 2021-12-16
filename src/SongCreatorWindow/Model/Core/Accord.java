@@ -187,6 +187,16 @@ public class Accord implements IPlayable{
     }
 
     @Override
+    public boolean isTiedWithPreviousSound() {
+        return rootNote.isTiedWithPreviousSound();
+    }
+
+    @Override
+    public boolean isTiedWithAnotherSound() {
+        return rootNote.isTiedWithAnotherSound();
+    }
+
+    @Override
     public int getInstrument() {
         return rootNote.getInstrument();
     }

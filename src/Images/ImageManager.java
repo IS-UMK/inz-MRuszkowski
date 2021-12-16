@@ -56,8 +56,6 @@ public class ImageManager
     //end region
 
     //region Images references
-    Image _curvedLineSymbol;
-
     Image _altoKeyImage;
     Image _violinKeyImage;
     Image _bassKeyImage;
@@ -154,17 +152,6 @@ public class ImageManager
     //endregion
 
     //region Modification Symbols
-    public Image getTieSymbolImage()
-    {
-        if(reloadImage || _curvedLineSymbol == null)
-        {
-            _curvedLineSymbol = getImageByResource("/Images/curved_line.png");
-            setReloadFlag(false);
-        }
-
-        return _curvedLineSymbol;
-    }
-
     public Image getModificationSymbol(SoundModification modification)
     {
         return switch (modification) {

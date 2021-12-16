@@ -620,21 +620,9 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
     }
 
     @Override
-    public void onMusicSoundTieCheck(Path path, IPlayable musicSound, TieSelection previousTie)
+    public void onMusicSoundTieCheck(Path path, IPlayable musicSound)
     {
-        //TODO: usuń
-        /*TieSelection tie = GlobalSettings.TieBetweenNotes;//musicSound.getSoundConcatenation();
 
-        switch (previousTie) {
-            case End -> {
-                if(tie == TieSelection.Continue || tie == TieSelection.End)
-                    groupForTie.selectToggle(noneTie);
-            }
-            case Begin, Continue -> {
-                if(tie == TieSelection.None || tie == TieSelection.Begin)
-                    groupForTie.selectToggle(endOfTie);
-            }
-        }*/
     }
 
     @Override

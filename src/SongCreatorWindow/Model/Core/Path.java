@@ -146,10 +146,34 @@ public class Path implements Serializable
             _sounds.add(sound);
 
         if(GlobalSettings.TieBetweenNotes == TieSelection.Include)
+            bindSounds(sound);
+    }
+
+    private void bindSounds(IPlayable sound)
+    {
+        sound.setSoundConcatenation(true);
+
+
+        int index = _sounds.indexOf(sound);
+
+        TieSelection previousTie = TieSelection.None;
+
+        IPlayable previousSound = null;
+        for(int i = index - 1; i >= 0; i--)
         {
-            sound.setSoundConcatenation(true);
-            fireOnMusicSoundTieCheck(sound);
+            previousSound = _sounds.get(i);
+            if(previousSound.getSoundConcatenation() != TieSelection.None && previousSound.getSoundConcatenation() != TieSelection.Continue)
+            {
+                if(previousSound.getSoundConcatenation() == TieSelection.Begin && previousSound.getNextTiedSound() != null)
+                    continue;
+
+                previousTie = previousSound.getSoundConcatenation();
+                sound.setPreviousTiedSound(previousSound);
+                previousSound.setNextTiedSound(sound);
+            }
         }
+
+        fireOnMusicSoundTieCheck(this, sound);
     }
 
     public void convertToNote(IPlayable musicSound)
@@ -258,6 +282,7 @@ public class Path implements Serializable
             musicSound.setFlatness(false);
 
         fireOnMusicSoundHeightChange(this, musicSound);
+        fireOnMusicSoundTieCheck(this, musicSound);
     }
 
     public void changeSoundOccurrence(IPlayable musicSound, double newOccurrenceTime)
@@ -268,6 +293,7 @@ public class Path implements Serializable
         musicSound.setTimeX((int) Path.getSoundTimeX(newOccurrenceTime));
 
         fireOnMusicSoundOccurrenceTimeChanged(this, musicSound);
+        fireOnMusicSoundTieCheck(this, musicSound);
     }
 
     public void changeSoundInstrument(IPlayable musicSound, String instrumentName)
@@ -340,14 +366,6 @@ public class Path implements Serializable
     public int getIndexOfSelectedMusicSound()
     {
         return _sounds.indexOf(selectedMusicSound);
-    }
-
-    public boolean isTiedWithPreviousSound(IPlayable musicSound)
-    {
-        if(musicSound.getPreviousTiedSound() != null)
-            return true;
-
-        return false;
     }
     /*public boolean isTiedWithPreviousSound(IPlayable musicSound)
     {
@@ -426,35 +444,13 @@ public class Path implements Serializable
         }
     }
 
-    private void fireOnMusicSoundTieCheck(IPlayable musicSound)
+    private void fireOnMusicSoundTieCheck(Path path, IPlayable musicSound)
     {
-        //TODO: Czy to na pewno event? Jest pusty de facto, nikt nie odbiera
-        int index = _sounds.indexOf(musicSound);
-
-        TieSelection previousTie = TieSelection.None;
-
-        IPlayable previousSound = null;
-        for(int i = index - 1; i >= 0; i--)
-        {
-            previousSound = _sounds.get(i);
-            if(previousSound.getSoundConcatenation() != TieSelection.None && previousSound.getSoundConcatenation() != TieSelection.Continue)
-            {
-                if(previousSound.getSoundConcatenation() == TieSelection.Begin && previousSound.getNextTiedSound() != null)
-                    continue;
-
-                previousTie = previousSound.getSoundConcatenation();
-                musicSound.setPreviousTiedSound(previousSound);
-                previousSound.setNextTiedSound(musicSound);
-            }
-        }
-
-        //TieSelection previousTie = index != 0 && _sounds.size() > 1 ? _sounds.get(index - 1).getSoundConcatenation() : TieSelection.None;
-
         Iterator iterator = listeners.iterator();
 
         while(iterator.hasNext()) {
             IMusicSoundEditionEvent modelEvent = (IMusicSoundEditionEvent) iterator.next();
-            modelEvent.onMusicSoundTieCheck(this, musicSound, previousTie);
+            modelEvent.onMusicSoundTieCheck(path, musicSound);
         }
     }
 
