@@ -42,7 +42,8 @@ public class MainController
     //Data structures for program logic (Model)
     @FXML
     Menu selectPathMenuItem;
-
+    @FXML
+    Menu selectSoundMenuItem;
 
     //For playing music
     @FXML
@@ -77,7 +78,7 @@ public class MainController
 
                 modelManager = new ModelManager();
 
-                viewManager = new ViewManagerModelChangesHandling(modelManager, anchorPaneWithPaths, selectPathMenuItem, playMenuItem);
+                viewManager = new ViewManagerModelChangesHandling(modelManager, anchorPaneWithPaths, selectPathMenuItem, selectSoundMenuItem, playMenuItem);
                 modelManager.addListener(viewManager);
 
                 musicSymbolsController = new MusicSymbolsController(viewManager, musicSymbolsViewManager);

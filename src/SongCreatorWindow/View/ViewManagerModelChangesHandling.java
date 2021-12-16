@@ -40,6 +40,8 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
     HashMap<Canvas, ChoiceBox> choiceBoxMap;
     HashMap<Canvas, TextField> tempoMap;
     HashMap<Canvas, MenuItem> selectionMenuItemToCanvas;
+    HashMap<Path, Menu> selectionMenuForSounds;
+    HashMap<IPlayable, MenuItem> selectionMenuItemOfSound;
 
     HashMap<IPlayable, List<ImageView>> musicSymbols;
     HashMap<IPlayable, ImageView> modificationSymbols;
@@ -49,6 +51,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
     //GUI components
     AnchorPane anchorPaneWithPaths;
     Menu selectPathMenuItem;
+    Menu selectSoundMenuItem;
     MenuItem playMenuItem;
 
     Canvas interactionCanvas;
@@ -56,7 +59,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
     Canvas soundEditionCanvas;
 
-    public ViewManagerModelChangesHandling(ModelManager modelManager, AnchorPane anchorPaneWithPaths, Menu selectPathMenuItem, MenuItem playMenuItem)
+    public ViewManagerModelChangesHandling(ModelManager modelManager, AnchorPane anchorPaneWithPaths, Menu selectPathMenuItem, Menu selectSoundMenuItem, MenuItem playMenuItem)
     {
         this.modelManager = modelManager;
 
@@ -66,6 +69,8 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         choiceBoxMap = new HashMap<>();
         tempoMap = new HashMap<>();
         selectionMenuItemToCanvas = new HashMap<>();
+        selectionMenuForSounds = new HashMap<>();
+        selectionMenuItemOfSound = new HashMap<>();
 
         musicSymbols = new HashMap<>();
         modificationSymbols = new HashMap<>();
@@ -74,6 +79,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
         this.anchorPaneWithPaths = anchorPaneWithPaths;
         this.selectPathMenuItem = selectPathMenuItem;
+        this.selectSoundMenuItem = selectSoundMenuItem;
         this.playMenuItem = playMenuItem;
     }
 
@@ -95,7 +101,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         if(musicSound.getTimeX() >= canvas.getWidth() - GlobalSettings.widthOfAreaWhereCanvasExtends)
             addSpaceToCanvas();
 
-        ImageView view = createImageView(musicSymbolImage, path, musicSound, musicSound.getTimeX(), musicSound.getSoundHeight());
+        ImageView view = createImageViewOfSound(musicSymbolImage, path, musicSound, musicSound.getTimeX(), musicSound.getSoundHeight());
         view.setPickOnBounds(false);
         views.add(view);
         anchorPaneWithPaths.getChildren().add(view);
@@ -110,9 +116,24 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         }
 
         musicSymbols.put(musicSound, views);
+
+
+        //Add different edition selection
+        Menu menu = selectionMenuForSounds.get(path);
+
+        MenuItem soundItemMenu = new MenuItem(String.format("%s %s %.3f", musicSound.getSoundType(), musicSound.getValue(), Path.getSoundTimeOccurrence(musicSound.getTimeX())));
+        soundItemMenu.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                fireOnMusicSymbolClicked(path, musicSound);
+            }
+        });
+
+        selectionMenuItemOfSound.put(musicSound, soundItemMenu);
+        menu.getItems().add(soundItemMenu);
     }
 
-    private ImageView createImageView(Image musicSymbolImage, Path path, IPlayable musicSound, int insertX, int insertY)
+    private ImageView createImageViewOfSound(Image musicSymbolImage, Path path, IPlayable musicSound, int insertX, int insertY)
     {
         ImageView view = new ImageView(musicSymbolImage);
         view.setFitWidth(musicSymbolImage.getWidth());
@@ -157,7 +178,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
             }
             drawAboveBy--;
 
-            anotherView = createImageView(musicSymbolImage, path, musicSound, musicSound.getTimeX(), (int)(GlobalSettings.getLinesPadding() / -2) * drawAboveBy + soundHeight);
+            anotherView = createImageViewOfSound(musicSymbolImage, path, musicSound, musicSound.getTimeX(), (int)(GlobalSettings.getLinesPadding() / -2) * drawAboveBy + soundHeight);
 
             views.add(anotherView);
             anchorPaneWithPaths.getChildren().add(anotherView);
@@ -410,6 +431,12 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
         selectPathMenuItem.getItems().add(pathToSelect);
         selectionMenuItemToCanvas.put(canvas, pathToSelect);
+
+
+        var pathMenuToSelectSound = new Menu(path.getName());
+
+        selectionMenuForSounds.put(path, pathMenuToSelectSound);
+        selectSoundMenuItem.getItems().add(pathMenuToSelectSound);
     }
 
     @Override
@@ -490,10 +517,14 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         tempoMap.remove(tempoField);
         anchorPaneWithPaths.getChildren().remove(tempoField);
 
-        //remove selection option
+        //remove selection options
         MenuItem pathSelectionMenuItem = selectionMenuItemToCanvas.get(canvas);
         selectPathMenuItem.getItems().remove(pathSelectionMenuItem);
         selectionMenuItemToCanvas.remove(pathSelectionMenuItem);
+
+        Menu soundsOfPath = selectionMenuForSounds.get(path);
+        selectSoundMenuItem.getItems().remove(soundsOfPath);
+        selectionMenuForSounds.remove(soundsOfPath);
 
         onPathClearSelection();
         onMusicSoundClearSelection();
@@ -807,8 +838,6 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
     @Override
     public void onMusicSoundDeleted(Path path, IPlayable musicSound)
     {
-        //musicSymbols
-        //modificationSymbols
         ImageView modifier = modificationSymbols.get(musicSound);
         List<ImageView> views = musicSymbols.get(musicSound);
 
@@ -821,6 +850,10 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         musicSymbols.remove(views);
         for(ImageView view : views)
             anchorPaneWithPaths.getChildren().remove(view);
+
+        Menu menu = selectionMenuForSounds.get(path);
+        MenuItem menuItem = selectionMenuItemOfSound.get(musicSound);
+        menu.getItems().remove(menuItem);
 
         onMusicSoundClearSelection();
 
