@@ -19,6 +19,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.text.Font;
 
 import java.util.*;
@@ -92,6 +93,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
             addSpaceToCanvas();
 
         ImageView view = createImageView(musicSymbolImage, path, musicSound, musicSound.getTimeX(), musicSound.getSoundHeight());
+        view.setPickOnBounds(false);
         views.add(view);
         anchorPaneWithPaths.getChildren().add(view);
 
@@ -620,6 +622,101 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
             anchorPaneWithPaths.getChildren().add(lineView);
         }*/
+        if(path.isTiedWithPreviousSound(musicSound))
+        {
+            IPlayable previousSound = musicSound.getPreviousTiedSound();
+
+            var tiePath = new javafx.scene.shape.Path();
+            tiePath.setStrokeWidth(strokeLineBorderWidth * 5);
+
+            //Moving to the starting point
+            var moveTo = new javafx.scene.shape.MoveTo();
+
+            double firstX = previousSound.getTimeX() + noteWidth *.9;
+            double firstY = previousSound.getSoundHeight() + noteHeight * .8;
+            double secondX = musicSound.getTimeX() + noteHeight * .1;
+            double secondY = musicSound.getSoundHeight() + noteHeight * .8;
+
+            moveTo.setX(firstX);
+            moveTo.setY(firstY);
+
+            double a = (secondY - firstY) / (secondX / firstX);
+            double b = firstY;
+
+            double R = Math.sqrt(Math.pow(firstX - secondX, 2) + Math.pow(firstY - secondY, 2));
+
+            double y = secondY - firstY;//;Math.abs(secondY - firstY);
+
+            double angle1 = Math.asin(y/R);
+            double angle2 = Math.asin(-y/R);
+
+            double r = R/3;
+            double rotation = 45;
+            if(secondY - firstY > 0)
+                rotation += 180;
+
+            double newX1 = r * Math.cos(angle1 + rotation);
+            double newY1 = r * Math.sin(angle1 + rotation);
+
+            double newX2 = r * Math.cos(angle2 - rotation);
+            double newY2 = r * Math.sin(angle2 - rotation);
+            //Instantiating the class CubicCurve
+            CubicCurveTo cubicCurveTo = new CubicCurveTo();
+
+            //Setting properties of the class CubicCurve
+            cubicCurveTo.setControlX1(firstX + newX1);
+            cubicCurveTo.setControlY1(firstY - newY1);
+            cubicCurveTo.setControlX2(secondX - newX2);
+            cubicCurveTo.setControlY2(secondY + newY2);
+            cubicCurveTo.setX(secondX);
+            cubicCurveTo.setY(secondY);
+
+            //Adding the path elements to Observable list of the Path class
+            tiePath.getElements().add(moveTo);
+            tiePath.getElements().add(cubicCurveTo);
+
+            anchorPaneWithPaths.getChildren().add(tiePath);
+            /*Arc arc = new Arc();
+
+            int arcHeight = Math.abs(musicSound.getSoundHeight() - previousSound.getSoundHeight()) + GlobalSettings.noteHeight;
+            int arcWidth = musicSound.getTimeX() - previousSound.getTimeX() -  GlobalSettings.noteWidth / 2;
+            //int arcHeight = arcWidth / 6 + Math.abs(musicSound.getSoundHeight() - previousSound.getSoundHeight());
+
+            double radiusX = arcWidth / 2 + previousSound.getTimeX() + GlobalSettings.noteWidth / 2;
+            double radiusY = -(previousSound.getSoundHeight() - musicSound.getSoundHeight()) + arcHeight / 2;// + GlobalSettings.noteHeight;
+
+            double startAngle = 45, arcLength = 135;
+
+            arc.setCenterX(radiusX);
+            arc.setCenterY(radiusY + modelManager.getIndexOfPath(path) * GlobalSettings.Height);
+            arc.setRadiusX(arcWidth / 2);
+            arc.setRadiusY(arcHeight / 2);
+            arc.setStartAngle(startAngle);
+            arc.setLength(arcLength);
+
+            arc.setStroke(Color.BLACK);
+            arc.setStrokeWidth(strokeLineBorderWidth * 5);
+            arc.setFill(Color.TRANSPARENT);
+
+            arc.setType(ArcType.OPEN);
+
+            //Image tieLineImage = ImageManager.getInstance().setReloadFlag(true).setDimensions(lineWidth, lineHeight).getTieSymbolImage();
+
+            //ImageView lineView = new ImageView(tieLineImage);
+
+            System.out.println(String.format("Tie line drawn at %d %d with dim %d %d", previousSound.getTimeX(), previousSound.getSoundHeight(), arcWidth, arcHeight));
+
+            anchorPaneWithPaths.getChildren().add(arc);*/
+
+            /*lineView.setFitWidth(lineWidth);
+            lineView.setFitHeight(lineHeight);
+            lineView.setLayoutX(previousSound.getTimeX() + GlobalSettings.noteWidth);
+            lineView.setLayoutY(previousSound.getSoundHeight());
+
+            lineView.setRotate(lineView.getRotate() + Math.acos(lineWidth / (Math.sqrt(lineWidth*lineWidth + lineHeight*lineHeight))));
+
+            anchorPaneWithPaths.getChildren().add(lineView);*/
+        }
     }
 
     @Override
