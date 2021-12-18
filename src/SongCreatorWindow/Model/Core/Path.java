@@ -26,7 +26,6 @@ public class Path implements Serializable
     }
 
     MusicClefSelection _selectedKey;
-
     /**
      * Sets the music clef
      * @param musicClef music clef
@@ -106,8 +105,6 @@ public class Path implements Serializable
     IPlayable selectedMusicSound = null;
     transient List<IMusicSoundEditionEvent> listeners;
 
-    int _lenght;
-
     private Path(String pathName, byte voice, MusicClefSelection musicKey, String selectedInstrument, int tempo, byte volumeLevel)
     {
         _pathName = pathName;
@@ -131,22 +128,22 @@ public class Path implements Serializable
     //region MusicSounds
     public void addSound(IPlayable sound)
     {
-        boolean added = false;
+        appendToMusicListInOrder(sound);
 
+        if(GlobalSettings.TieBetweenNotes == TieSelection.Include)
+            bindSounds(sound);
+    }
+
+    private void appendToMusicListInOrder(IPlayable sound) {
         for(IPlayable s : _sounds)
             if(s.getTimeX() > sound.getTimeX())
             {
                 int index = _sounds.indexOf(s);
                 _sounds.add(index, sound);
-                added = true;
-                break;
+                return;
             }
 
-        if(!added)
-            _sounds.add(sound);
-
-        if(GlobalSettings.TieBetweenNotes == TieSelection.Include)
-            bindSounds(sound);
+        _sounds.add(sound);
     }
 
     private void bindSounds(IPlayable sound)
@@ -294,6 +291,9 @@ public class Path implements Serializable
 
         musicSound.setTimeX((int) Path.getSoundTimeX(newOccurrenceTime));
 
+        _sounds.remove(musicSound);
+        appendToMusicListInOrder(musicSound);
+
         fireOnMusicSoundOccurrenceTimeChanged(this, musicSound);
         fireOnMusicSoundTieCheck(this, musicSound);
     }
@@ -368,6 +368,11 @@ public class Path implements Serializable
     public int getIndexOfSelectedMusicSound()
     {
         return _sounds.indexOf(selectedMusicSound);
+    }
+
+    public IPlayable getLatestSound()
+    {
+        return _sounds.get(_sounds.size() - 1);
     }
 
     public void deleteSound(IPlayable musicSound)

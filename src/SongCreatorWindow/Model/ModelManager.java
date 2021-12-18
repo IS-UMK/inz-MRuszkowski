@@ -444,8 +444,24 @@ public class ModelManager implements Serializable
         Path newPath = musicPaths.get(musicPaths.size() - 1);
         int pathIndex = musicPaths.indexOf(newPath);
 
+        IPlayable duplicatedSound;
         for(IPlayable sound : selectedPath.getSounds())
+        {
+            GlobalSettings.selectedTypeOfSoundToInsertInPath = sound.getSoundType() == "Note" ? SoundTypeSelection.Note : SoundTypeSelection.Accord;
+
+            if(sound.isTiedWithPreviousSound() || sound.isTiedWithAnotherSound())
+                GlobalSettings.TieBetweenNotes = TieSelection.Include;
+            else GlobalSettings.TieBetweenNotes = TieSelection.None;
+
             addMusicSymbol(pathIndex, sound.getTimeX(), sound.getSoundHeight(), sound.getDuration());
+
+            duplicatedSound = newPath.getLatestSound();
+
+            if(sound.isSharp())
+                newPath.setSoundModification(duplicatedSound, SoundModification.Sharp);
+            else if(sound.isFlat())
+                newPath.setSoundModification(duplicatedSound, SoundModification.Flat);
+        }
 
         System.out.println(String.format("Path %s duplicated successfully", selectedPath.getName()));
     }
