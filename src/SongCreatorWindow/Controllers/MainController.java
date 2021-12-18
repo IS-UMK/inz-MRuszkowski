@@ -383,11 +383,6 @@ public class MainController
     {
         musicSymbolsViewManager.drawSelectionOfNote(mouseEvent.getX(), mouseEvent.getY());
     }
-
-    public void resizeMusicSymbolsInMenu(ZoomEvent zoomEvent)
-    {
-        musicSymbolsViewManager.refreshPanel();
-    }
     //endregion
 
     //region Song

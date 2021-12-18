@@ -275,61 +275,15 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         Font font = new Font(Font.getFamilies().toArray()[1].toString(), 24);
         var savedFont = gc.getFont();
 
-        //Display Path Name
-        gc.strokeRect(0,0, Height, Height);
-        gc.setFont(font);
-        //Text should be placed basing on the middle of square, minus half of the final text size on canvas (font size)
-        gc.fillText(path.getName(), Height /2 - path.getName().length()/2.0*24*3/4, Height /2, Height);
+        displayNameOfNewPath(path, gc, font);
 
-        //Display selected instrument info
-        gc.strokeRect(Height, 0, Height, Height);
-        String selected_instrument_note = "Selected Instrument:";
-        gc.fillText(
-                selected_instrument_note,
-                1.4*Height + Height/2 - selected_instrument_note.length()/2.0*24*3/4,
-                Height - selected_instrument_note.length()/2.0*24*3/4,
-                Height
-        );
+        displaySelectedInstrumentInfoOfNewPath(path, gc);
 
-        Image instrumentImage = ImageManager.getInstance().setDimensions(Height * .7, Height * .7).getInstrumentByName(path.getInstrument());
-        gc.drawImage(instrumentImage, Height * 1.15, Height / 10);
-
-        //Instrument Selection
-        var instruments = Instrument.getAllInstruments();
-
-        //Observable list where I can choose Instrument - create list with given instrument list
-        ChoiceBox instrumentChoiceBox = new ChoiceBox(FXCollections.observableArrayList(instruments));
-        instrumentChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
-            @Override
-            public void changed(ObservableValue observableValue, Object o, Object t1) {
-                String instrumentName = (String) observableValue.getValue();
-                path.setInstrument(instrumentName);
-
-                gc.clearRect(
-                        Height * 1.15,
-                        Height / 10,
-                        Height * .7,
-                        Height * .7
-                );
-
-                String instrument = instrumentName.split(" ")[0];
-                Image instrumentImage = ImageManager.getInstance().setDimensions(Height * .7, Height * .7).getInstrumentByName(instrument);
-                gc.drawImage(instrumentImage, Height * 1.15, Height / 10);
-
-                System.out.println(String.format("Instrument set to %s for path %s", instrumentName, path.getName()));
-            }
-        });
-
-        //set layout of list created above
-        instrumentChoiceBox.setLayoutX(1.1 * Height);
-        instrumentChoiceBox.setLayoutY(Height * canvasList.size() + Height - Height/5);
-        instrumentChoiceBox.setMinWidth(Height * .8);
-        instrumentChoiceBox.setMaxWidth(Height * .8);
-        instrumentChoiceBox.setValue(path.getInstrument());
+        ChoiceBox instrumentChoiceBox = displayInstrumentChoiceBoxOfNewPath(path, gc);
 
         //display speaker, tempo selection and create volume slider
         gc.strokeRect(2 * Height, 0, Height, Height);
-        //TODO: Coś nie chce ładować grafiki wektorowej
+
         Image speakerImage = ImageManager.getInstance().setDimensions(100, 100).getSpeaker();
         gc.drawImage(speakerImage, Height * 2.25, Height / 5);
 
@@ -341,53 +295,11 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
                 Height / 7.5,
                 Height
         );
+        TextField tempoTextField = displayTempoOfNewPath(path);
 
-        var tempoTextField = new TextField();
-        tempoTextField.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(
-                    ObservableValue<? extends String> observable,
-                    String oldValue, String newValue) {
-                if (!newValue.matches("[^\\d]"))
-                {
-                    if(newValue.isEmpty())
-                        return;
+        Slider volumeSlider = displayVolumeSliderOfNewPath(path);
 
-                    path.setTempo(Integer.parseInt(newValue));
-                    System.out.println(String.format("Tempo of path %s has been changed to %d", path.getName() , path.getTempo()));
-                }
-            }
-        });
-        tempoTextField.setMaxWidth(Height / 5);
-        tempoTextField.setLayoutX(Height * 2.5);
-        tempoTextField.setLayoutY(Height * canvasList.size() + Height / 20);
-        tempoTextField.setText(String.valueOf(path.getTempo()));
-
-        //Volume selection
-        Slider volumeSlider = new Slider(0, 100 ,0.5);
-        volumeSlider.setMaxWidth(Height * .9);
-        volumeSlider.setShowTickMarks(true);
-        volumeSlider.setShowTickLabels(true);
-        volumeSlider.setLayoutX(Height * 2.15);
-        volumeSlider.setLayoutY(Height * canvasList.size() + Height * .75);
-        volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
-                path.setVolume((byte)(t1.byteValue() * 1.27));
-                System.out.println(String.format("Volume of path %s has been changed to %d", path.getName() , path.getVolume()));
-            }
-        });
-        volumeSlider.setValue(path.getVolume());
-
-        //five lines for inserting notes
-        gc.setLineWidth(GlobalSettings.strokeLineBorderWidth);
-        for(int i = 1; i <= 5; i++)
-            gc.strokeLine(
-                    numberOfPropertySquaresInPath * Height + GlobalSettings.getLinesMargins(),
-                    GlobalSettings.getLinesStartHeight() + i * GlobalSettings.getLinesPadding(),
-                    canvas.getWidth() - GlobalSettings.getLinesMargins(),
-                    GlobalSettings.getLinesStartHeight() + i * GlobalSettings.getLinesPadding()
-            );
+        drawFiveLinesOfNewPath(canvas, gc);
 
         //add (default Violin) music key
         drawPathClef(path, gc);
@@ -402,6 +314,11 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         //add created canvas and volume slider
         anchorPaneWithPaths.getChildren().addAll(canvas, instrumentChoiceBox, tempoTextField, volumeSlider);
 
+        initializeMenuItems(path, canvas);
+    }
+
+    //region New Path Creation
+    private void initializeMenuItems(Path path, Canvas canvas) {
         var pathToSelect = new MenuItem(path.getName());
         pathToSelect.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -455,6 +372,126 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
         selectSoundMenuItem.getItems().add(pathMenuToSelectSound);
     }
+
+    private void drawFiveLinesOfNewPath(Canvas canvas, GraphicsContext gc) {
+        //five lines for inserting notes
+        gc.setLineWidth(GlobalSettings.strokeLineBorderWidth);
+        for(int i = 1; i <= 5; i++)
+            gc.strokeLine(
+                    numberOfPropertySquaresInPath * Height + GlobalSettings.getLinesMargins(),
+                    GlobalSettings.getLinesStartHeight() + i * GlobalSettings.getLinesPadding(),
+                    canvas.getWidth() - GlobalSettings.getLinesMargins(),
+                    GlobalSettings.getLinesStartHeight() + i * GlobalSettings.getLinesPadding()
+            );
+    }
+
+    private Slider displayVolumeSliderOfNewPath(Path path)
+    {
+        //Volume selection
+        Slider volumeSlider = new Slider(0, 100 ,0.5);
+        volumeSlider.setMaxWidth(Height * .9);
+        volumeSlider.setShowTickMarks(true);
+        volumeSlider.setShowTickLabels(true);
+        volumeSlider.setLayoutX(Height * 2.15);
+        volumeSlider.setLayoutY(Height * canvasList.size() + Height * .75);
+        volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                path.setVolume((byte)(t1.byteValue() * 1.27));
+                System.out.println(String.format("Volume of path %s has been changed to %d", path.getName() , path.getVolume()));
+            }
+        });
+        volumeSlider.setValue(path.getVolume());
+        return volumeSlider;
+    }
+
+    private TextField displayTempoOfNewPath(Path path)
+    {
+        var tempoTextField = new TextField();
+        tempoTextField.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(
+                    ObservableValue<? extends String> observable,
+                    String oldValue, String newValue) {
+                if (!newValue.matches("[^\\d]"))
+                {
+                    if(newValue.isEmpty())
+                        return;
+
+                    path.setTempo(Integer.parseInt(newValue));
+                    System.out.println(String.format("Tempo of path %s has been changed to %d", path.getName() , path.getTempo()));
+                }
+            }
+        });
+        tempoTextField.setMaxWidth(Height / 5);
+        tempoTextField.setLayoutX(Height * 2.5);
+        tempoTextField.setLayoutY(Height * canvasList.size() + Height / 20);
+        tempoTextField.setText(String.valueOf(path.getTempo()));
+        return tempoTextField;
+    }
+
+    private ChoiceBox displayInstrumentChoiceBoxOfNewPath(Path path, GraphicsContext gc)
+    {
+        //Instrument Selection
+        var instruments = Instrument.getAllInstruments();
+
+        //Observable list where I can choose Instrument - create list with given instrument list
+        ChoiceBox instrumentChoiceBox = new ChoiceBox(FXCollections.observableArrayList(instruments));
+        instrumentChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
+            @Override
+            public void changed(ObservableValue observableValue, Object o, Object t1) {
+                String instrumentName = (String) observableValue.getValue();
+                path.setInstrument(instrumentName);
+
+                gc.clearRect(
+                        Height * 1.15,
+                        Height / 10,
+                        Height * .7,
+                        Height * .7
+                );
+
+                String instrument = instrumentName.split(" ")[0];
+                Image instrumentImage = ImageManager.getInstance().setDimensions(Height * .7, Height * .7).getInstrumentByName(instrument);
+                gc.drawImage(instrumentImage, Height * 1.15, Height / 10);
+
+                System.out.println(String.format("Instrument set to %s for path %s", instrumentName, path.getName()));
+            }
+        });
+
+        //set layout of list created above
+        instrumentChoiceBox.setLayoutX(1.1 * Height);
+        instrumentChoiceBox.setLayoutY(Height * canvasList.size() + Height - Height/5);
+        instrumentChoiceBox.setMinWidth(Height * .8);
+        instrumentChoiceBox.setMaxWidth(Height * .8);
+        instrumentChoiceBox.setValue(path.getInstrument());
+        return instrumentChoiceBox;
+    }
+
+    private void displaySelectedInstrumentInfoOfNewPath(Path path, GraphicsContext gc)
+    {
+        //Display selected instrument info
+        gc.strokeRect(Height, 0, Height, Height);
+        String selected_instrument_note = "Selected Instrument:";
+        gc.fillText(
+                selected_instrument_note,
+                1.4*Height + Height/2 - selected_instrument_note.length()/2.0*24*3/4,
+                Height - selected_instrument_note.length()/2.0*24*3/4,
+                Height
+        );
+
+        Image instrumentImage = ImageManager.getInstance().setDimensions(Height * .7, Height * .7).getInstrumentByName(path.getInstrument());
+        gc.drawImage(instrumentImage, Height * 1.15, Height / 10);
+    }
+
+    private void displayNameOfNewPath(Path path, GraphicsContext gc, Font font)
+    {
+        //Display Path Name
+        gc.strokeRect(0,0, Height, Height);
+        gc.setFont(font);
+        //Text should be placed basing on the middle of square, minus half of the final text size on canvas (font size)
+        gc.fillText(path.getName(), Height /2 - path.getName().length()/2.0*24*3/4, Height /2, Height);
+    }
+    //endregion
 
     @Override
     public void onPathNameRenamed(Path path) {

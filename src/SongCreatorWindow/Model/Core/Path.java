@@ -290,12 +290,7 @@ public class Path implements Serializable
         if(_sounds.indexOf(musicSound) == -1)
             return;
 
-        Iterator iterator = listeners.iterator();
-
-        while(iterator.hasNext()) {
-            IMusicSoundEditionEvent modelEvent = (IMusicSoundEditionEvent) iterator.next();
-            modelEvent.onMusicSoundOccurrenceTimeChangedPreprocess(this, musicSound);
-        }
+        fireOnMusicSoundOccurrenceTimeChangedPreprocess(this, musicSound);
 
         musicSound.setTimeX((int) Path.getSoundTimeX(newOccurrenceTime));
 
@@ -428,6 +423,16 @@ public class Path implements Serializable
         while(iterator.hasNext()) {
             IMusicSoundEditionEvent modelEvent = (IMusicSoundEditionEvent) iterator.next();
             modelEvent.onMusicSoundTieCheck(path, musicSound);
+        }
+    }
+
+    private void fireOnMusicSoundOccurrenceTimeChangedPreprocess(Path path, IPlayable musicSound)
+    {
+        Iterator iterator = listeners.iterator();
+
+        while(iterator.hasNext()) {
+            IMusicSoundEditionEvent modelEvent = (IMusicSoundEditionEvent) iterator.next();
+            modelEvent.onMusicSoundOccurrenceTimeChangedPreprocess(this, musicSound);
         }
     }
 

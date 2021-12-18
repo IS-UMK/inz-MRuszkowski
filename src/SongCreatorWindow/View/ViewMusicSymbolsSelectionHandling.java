@@ -105,6 +105,35 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
                 new Label("Instrument: ")
         };
 
+        //Options music sound configuration
+        optionLabels = new Label[]{
+                new Label("Type: "),
+                new Label("Duration: "),
+                new Label("Sound: "),
+                new Label("Octave: "),
+                new Label("Occurrence time: "),
+                new Label("Instrument: "),
+                new Label("Tie type: "),
+                new Label("Modification: ")
+        };
+
+        HBox hbox1 = createSoundTypePropertySelection();
+        HBox hbox2 = createSoundTiePropertySection();
+
+        HBox hbox3 = new HBox(accordLabels[2]);
+        hbox3.setPadding(padding);
+
+        HBox hbox4 = createSoundInstrumentPropertySection();
+
+        vBoxWithNotesAndAccordsProperties.getChildren().addAll(hbox1, hbox2, hbox3, hbox4);
+
+        redrawMusicSymbols();
+        drawSelectionOfNote(0, 0);
+    }
+
+    //region Properties of sound that will be inserted
+    private HBox createSoundTypePropertySelection()
+    {
         //Properties selection configuration - user selects between note and accord
         groupForSoundType = new ToggleGroup();
 
@@ -150,6 +179,33 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         groupForSoundType.getToggles().addAll(symbolNote, symbolAccord);
         groupForSoundType.selectToggle(symbolNote);
 
+        HBox hbox = new HBox(accordLabels[0], symbolNote, symbolAccord, accordChoiceBox);
+        hbox.setPadding(padding);
+        return hbox;
+    }
+
+    private HBox createSoundInstrumentPropertySection()
+    {
+        //Properties selection configuration - user selects instrument for particular sound
+        var instruments = Instrument.getAllInstruments();
+        instrumentChoiceBoxForNextSound = new ChoiceBox(FXCollections.observableArrayList(instruments));
+        instrumentChoiceBoxForNextSound.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
+            @Override
+            public void changed(ObservableValue observableValue, Object o, Object t1) {
+                String instrumentName = (String) observableValue.getValue();
+                GlobalSettings.InstrumentForParticularNoteChoice = Instrument.getInstrumentValueByChosenName(instrumentName);
+                System.out.println(String.format("Instrument for next notes is set to %s", instrumentName));
+            }
+        });
+        instrumentChoiceBoxForNextSound.setValue(instruments[InstrumentChoice]);
+
+        HBox hbox = new HBox(accordLabels[3], instrumentChoiceBoxForNextSound);
+        hbox.setPadding(padding);
+        return hbox;
+    }
+
+    private HBox createSoundTiePropertySection()
+    {
         //Properties selection configuration - user selects tie type
         groupForTie = new ToggleGroup();
 
@@ -179,47 +235,11 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         groupForTie.getToggles().addAll(noneTie, includeOfTie);
         groupForTie.selectToggle(noneTie);
 
-        //Properties selection configuration - user selects instrument for particular sound
-        var instruments = Instrument.getAllInstruments();
-        instrumentChoiceBoxForNextSound = new ChoiceBox(FXCollections.observableArrayList(instruments));
-        instrumentChoiceBoxForNextSound.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
-            @Override
-            public void changed(ObservableValue observableValue, Object o, Object t1) {
-                String instrumentName = (String) observableValue.getValue();
-                GlobalSettings.InstrumentForParticularNoteChoice = Instrument.getInstrumentValueByChosenName(instrumentName);
-                System.out.println(String.format("Instrument for next notes is set to %s", instrumentName));
-            }
-        });
-        instrumentChoiceBoxForNextSound.setValue(instruments[InstrumentChoice]);
-
-        //Add all components
-
-        HBox hbox1 = new HBox(accordLabels[0], symbolNote, symbolAccord, accordChoiceBox);
-        hbox1.setPadding(padding);
-
-        HBox hbox2 = new HBox(accordLabels[1], noneTie, includeOfTie);
-        hbox2.setPadding(padding);
-
-        HBox hbox3 = new HBox(accordLabels[2]);
-        hbox3.setPadding(padding);
-
-        HBox hbox4 = new HBox(accordLabels[3], instrumentChoiceBoxForNextSound);
-        hbox4.setPadding(padding);
-
-        vBoxWithNotesAndAccordsProperties.getChildren().addAll(hbox1, hbox2, hbox3, hbox4);
-
-        refreshPanel();
-        drawSelectionOfNote(0, 0);
+        HBox hbox = new HBox(accordLabels[1], noneTie, includeOfTie);
+        hbox.setPadding(padding);
+        return hbox;
     }
-
-    /**
-     * Method that refreshes the entire panel including: sound duration choose panel, properties of new sounds and options of already existing sound
-     */
-    public void refreshPanel()
-    {
-        redrawMusicSymbols();
-        redrawOptionsOfCurrentlySelectedSound();
-    }
+    //endregion
 
     /**
      * Method draws music symbols so user can make up his mind which to choose
@@ -294,11 +314,6 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         interactionCanvas.setHeight(0);
     }
 
-    private void redrawOptionsOfCurrentlySelectedSound()
-    {
-
-    }
-
     @Override
     public void onMusicSoundSelectedToEdition(Path path, IPlayable musicSound)
     {
@@ -306,49 +321,13 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         //TODO: Podzielić kod na sekcje z daną modyfikacją
         vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().clear();
 
-        //Options music sound configuration
-        optionLabels = new Label[]{
-                new Label("Type: "),
-                new Label("Duration: "),
-                new Label("Sound: "),
-                new Label("Octave: "),
-                new Label("Occurrence time: "),
-                new Label("Instrument: "),
-                new Label("Tie type: "),
-                new Label("Modification: ")
-        };
-
         HBox hbox11 = createSoundTypeSection(path, musicSound);
+        HBox hbox12 = createSoundDurationSection(path, musicSound);
 
-        musicSymbolDuration = new ChoiceBox(FXCollections.observableArrayList(Duration.getDurations()));
-        musicSymbolDuration.setValue(Duration.getDurationNameByCharacter(musicSound.getDuration()));
-        musicSymbolDuration.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
-            @Override
-            public void changed(ObservableValue observableValue, Object oldValue, Object newVale) {
-                String duration = (String) observableValue.getValue();
-                System.out.println(String.format("Duration '%s' selected", duration));
-
-                path.changeSoundDuration(musicSound, Duration.getCharacterByDurationName(duration));
-            }
-        });
-
-        //Symbols
-        String symbols = musicSound.getValue();
-        String sound = symbols.split("[0-9]")[0];
-        String octave = symbols.substring(symbols.length() - 1);
-
-        soundChoiceBox = new ChoiceBox(FXCollections.observableArrayList(availableSounds));
-        soundChoiceBox.setValue(sound.substring(0, 1));
         var soundChoiceBoxListener = new ChangeListener() {
             @Override
-            public void changed(ObservableValue observableValue, Object oldValue, Object newValue) {
-                if(oldValue.equals("") || newValue.equals("")){
-                    //TODO: Usunąć ten blok if'a
-                    System.err.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-                    System.err.println("Old " + oldValue + " new " + newValue);
-                    return;
-                }
-
+            public void changed(ObservableValue observableValue, Object oldValue, Object newValue)
+            {
                 String sound = (String) observableValue.getValue();
                 int oldIndex = availableSounds.indexOf(((String)oldValue).substring(0, 1));
                 int newIndex = availableSounds.indexOf(((String)newValue).substring(0, 1));
@@ -358,112 +337,21 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
                 System.out.println(String.format("Sound %s selected", sound));
             }
         };
-        soundChoiceBox.getSelectionModel().selectedItemProperty().addListener(soundChoiceBoxListener);
 
-        octaveChoiceBox = new ChoiceBox(FXCollections.observableArrayList(octaves));
-        octaveChoiceBox.setValue(Integer.parseInt(octave));
-        octaveChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Integer>() {
-            @Override
-            public void changed(ObservableValue observableValue, Integer oldValue, Integer newValue) {
-                if(oldValue == newValue)
-                    return;
-
-                if(oldValue == 10)
-                {
-                    soundChoiceBox.getSelectionModel().selectedItemProperty().removeListener(soundChoiceBoxListener);
-                    Object sound = soundChoiceBox.getValue();
-                    soundChoiceBox.setItems(FXCollections.observableArrayList(availableSounds));
-                    soundChoiceBox.setValue(sound);
-                    soundChoiceBox.getSelectionModel().selectedItemProperty().addListener(soundChoiceBoxListener);
-                }
-                if(newValue == 10)
-                {
-                    Object sound = soundChoiceBox.getValue();
-                    if(sound.toString().equals("A") || sound.toString().equals("B"))
-                    {
-                        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Chosen sound does not exist in this octave");
-                        alert.showAndWait();
-                        octaveChoiceBox.setValue(oldValue);
-                        return;
-                    }
-
-                    soundChoiceBox.getSelectionModel().selectedItemProperty().removeListener(soundChoiceBoxListener);
-
-                    soundChoiceBox.setItems(FXCollections.observableArrayList(availableSounds.subList(0, availableSounds.size() - 2)));
-                    soundChoiceBox.setValue(sound);
-                    soundChoiceBox.getSelectionModel().selectedItemProperty().addListener(soundChoiceBoxListener);
-                }
-
-                int move = newValue - oldValue;
-                path.changeSoundHeight(musicSound, 0,  move);
-
-                System.out.println(String.format("Octave %d selected", move));
-            }
-        });
+        HBox hbox13 = createSoundSelectionSection(path, musicSound, soundChoiceBoxListener);
+        HBox hbox14 = createSoundOctaveSection(path, musicSound, soundChoiceBoxListener);
 
         //Occurrence Time
-        String time = Double.toString(Path.getSoundTimeOccurrence(musicSound.getTimeX()));
-        occurrenceTimeTextField = new TextField(time);
-        occurrenceTimeTextField.setText(time);
-        occurrenceTimeTextField.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
-                String occurrenceTime = (String) observableValue.getValue();
-
-                if (!newValue.matches("(?<=^| )\\d+(\\.\\d+)?(?=$| )|(?<=^| )\\.\\d+(?=$| )")) {
-                    occurrenceTimeTextField.setText(oldValue);
-                    return;
-                }
-
-                occurrenceTimeTextField.setText(newValue);
-                path.changeSoundOccurrence(musicSound, Double.parseDouble(newValue));
-                System.out.println(String.format("Occurrence time set to %s", occurrenceTime));
-            }
-        });
+        HBox hbox15 = createSoundOccurrenceSection(path, musicSound);
 
         //Instrument
-        var instruments = Instrument.getAllInstruments();
-        instrumentChoiceBoxForCurrentlySelectedSoundToEdition = new ChoiceBox(FXCollections.observableArrayList(instruments));
-        instrumentChoiceBoxForCurrentlySelectedSoundToEdition.setValue(instruments[musicSound.getInstrument()]);
-        instrumentChoiceBoxForCurrentlySelectedSoundToEdition.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
-            @Override
-            public void changed(ObservableValue observableValue, Object o, Object t1) {
-                String instrumentName = (String) observableValue.getValue();
-                GlobalSettings.InstrumentChoice = Instrument.getInstrumentValueByChosenName(instrumentName);
-                System.out.println(String.format("Instrument for chosen sound is set to %s", instrumentName));
-                path.changeSoundInstrument(musicSound, instrumentName);
-            }
-        });
-
-        //Tie of Sound
-        List<String> tiesTypes = new LinkedList<>();
-        for(var field : TieSelection.class.getDeclaredFields())
-            tiesTypes.add(field.getName());
-
-        tiesTypes.remove(tiesTypes.size() - 1); // remove artifact - $VALUES
+        HBox hbox16 = createInstrumentChoiceSection(path, musicSound);
 
         soundTieLabel = new Label(musicSound.getSoundConcatenation().toString());
-
-        HBox hbox12 = new HBox(optionLabels[1], musicSymbolDuration);
-        hbox12.setPadding(padding);
-
-        HBox hbox13 = new HBox(optionLabels[2], soundChoiceBox);
-        hbox13.setPadding(padding);
-
-        HBox hbox14 = new HBox(optionLabels[3], octaveChoiceBox);
-        hbox14.setPadding(padding);
-
-        HBox hbox15 = new HBox(optionLabels[4], occurrenceTimeTextField);
-        hbox15.setPadding(padding);
-
-        HBox hbox16 = new HBox(optionLabels[5], instrumentChoiceBoxForCurrentlySelectedSoundToEdition);
-        hbox16.setPadding(padding);
-
         HBox hbox17 = new HBox(optionLabels[6], soundTieLabel);
         hbox17.setPadding(padding);
 
         HBox hbox18 = createModificationSection(path, musicSound);
-
         HBox hbox19 = createSoundDeleteSection(path, musicSound);
 
         vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().addAll(hbox11, hbox12, hbox13, hbox14, hbox15, hbox16, hbox17, hbox18, hbox19);
@@ -477,6 +365,26 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         optionsContent.add(hbox17);
         optionsContent.add(hbox18);
         optionsContent.add(hbox19);
+    }
+
+    //region Sections - Modifications of Music Sounds
+    private HBox createSoundDurationSection(Path path, IPlayable musicSound)
+    {
+        musicSymbolDuration = new ChoiceBox(FXCollections.observableArrayList(Duration.getDurations()));
+        musicSymbolDuration.setValue(Duration.getDurationNameByCharacter(musicSound.getDuration()));
+        musicSymbolDuration.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
+            @Override
+            public void changed(ObservableValue observableValue, Object oldValue, Object newVale) {
+                String duration = (String) observableValue.getValue();
+                System.out.println(String.format("Duration '%s' selected", duration));
+
+                path.changeSoundDuration(musicSound, Duration.getCharacterByDurationName(duration));
+            }
+        });
+
+        HBox hbox = new HBox(optionLabels[1], musicSymbolDuration);
+        hbox.setPadding(padding);
+        return hbox;
     }
 
     private HBox createSoundTypeSection(Path path, IPlayable musicSound)
@@ -539,6 +447,125 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         });
 
         HBox hbox = new HBox(optionLabels[0], symbolNoteOption, symbolAccordOption, accordChoiceBoxOption);
+        hbox.setPadding(padding);
+        return hbox;
+    }
+
+    private HBox createSoundSelectionSection(Path path, IPlayable musicSound, ChangeListener soundChoiceBoxListener)
+    {
+        String symbols = musicSound.getValue();
+        String sound = symbols.split("[0-9]")[0];
+
+        soundChoiceBox = new ChoiceBox(FXCollections.observableArrayList(availableSounds));
+        soundChoiceBox.setValue(sound.substring(0, 1));
+
+        soundChoiceBox.getSelectionModel().selectedItemProperty().addListener(soundChoiceBoxListener);
+
+        HBox hbox = new HBox(optionLabels[2], soundChoiceBox);
+        hbox.setPadding(padding);
+        return hbox;
+    }
+
+    private HBox createSoundOctaveSection(Path path, IPlayable musicSound, ChangeListener soundChoiceBoxListener)
+    {
+        String symbols = musicSound.getValue();
+        String octave = symbols.substring(symbols.length() - 1);
+
+        octaveChoiceBox = new ChoiceBox(FXCollections.observableArrayList(octaves));
+        octaveChoiceBox.setValue(Integer.parseInt(octave));
+        octaveChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Integer>() {
+            @Override
+            public void changed(ObservableValue observableValue, Integer oldValue, Integer newValue) {
+                if(oldValue == newValue)
+                    return;
+
+                if(oldValue == 10)
+                {
+                    soundChoiceBox.getSelectionModel().selectedItemProperty().removeListener(soundChoiceBoxListener);
+                    Object sound = soundChoiceBox.getValue();
+                    soundChoiceBox.setItems(FXCollections.observableArrayList(availableSounds));
+                    soundChoiceBox.setValue(sound);
+                    soundChoiceBox.getSelectionModel().selectedItemProperty().addListener(soundChoiceBoxListener);
+                }
+                if(newValue == 10)
+                {
+                    Object sound = soundChoiceBox.getValue();
+                    if(sound.toString().equals("A") || sound.toString().equals("B"))
+                    {
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Chosen sound does not exist in this octave");
+                        alert.showAndWait();
+                        octaveChoiceBox.setValue(oldValue);
+                        return;
+                    }
+
+                    soundChoiceBox.getSelectionModel().selectedItemProperty().removeListener(soundChoiceBoxListener);
+
+                    soundChoiceBox.setItems(FXCollections.observableArrayList(availableSounds.subList(0, availableSounds.size() - 2)));
+                    soundChoiceBox.setValue(sound);
+                    soundChoiceBox.getSelectionModel().selectedItemProperty().addListener(soundChoiceBoxListener);
+                }
+
+                int move = newValue - oldValue;
+                path.changeSoundHeight(musicSound, 0,  move);
+
+                System.out.println(String.format("Octave %d selected", move));
+            }
+        });
+
+        HBox hbox = new HBox(optionLabels[3], octaveChoiceBox);
+        hbox.setPadding(padding);
+        return hbox;
+    }
+
+    private HBox createSoundOccurrenceSection(Path path, IPlayable musicSound)
+    {
+        String time = Double.toString(Path.getSoundTimeOccurrence(musicSound.getTimeX()));
+        occurrenceTimeTextField = new TextField(time);
+        occurrenceTimeTextField.setText(time);
+        occurrenceTimeTextField.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
+                String occurrenceTime = (String) observableValue.getValue();
+
+                if (!newValue.matches("(?<=^| )\\d+(\\.\\d+)?(?=$| )|(?<=^| )\\.\\d+(?=$| )")) {
+                    occurrenceTimeTextField.setText(oldValue);
+                    return;
+                }
+
+                occurrenceTimeTextField.setText(newValue);
+                path.changeSoundOccurrence(musicSound, Double.parseDouble(newValue));
+                System.out.println(String.format("Occurrence time set to %s", occurrenceTime));
+            }
+        });
+
+        HBox hbox = new HBox(optionLabels[4], occurrenceTimeTextField);
+        hbox.setPadding(padding);
+        return hbox;
+    }
+
+    private HBox createInstrumentChoiceSection(Path path, IPlayable musicSound)
+    {
+        var instruments = Instrument.getAllInstruments();
+        instrumentChoiceBoxForCurrentlySelectedSoundToEdition = new ChoiceBox(FXCollections.observableArrayList(instruments));
+        instrumentChoiceBoxForCurrentlySelectedSoundToEdition.setValue(instruments[musicSound.getInstrument()]);
+        instrumentChoiceBoxForCurrentlySelectedSoundToEdition.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
+            @Override
+            public void changed(ObservableValue observableValue, Object o, Object t1) {
+                String instrumentName = (String) observableValue.getValue();
+                GlobalSettings.InstrumentChoice = Instrument.getInstrumentValueByChosenName(instrumentName);
+                System.out.println(String.format("Instrument for chosen sound is set to %s", instrumentName));
+                path.changeSoundInstrument(musicSound, instrumentName);
+            }
+        });
+
+        //Tie of Sound
+        List<String> tiesTypes = new LinkedList<>();
+        for(var field : TieSelection.class.getDeclaredFields())
+            tiesTypes.add(field.getName());
+
+        tiesTypes.remove(tiesTypes.size() - 1); // remove artifact - $VALUES
+
+        HBox hbox = new HBox(optionLabels[5], instrumentChoiceBoxForCurrentlySelectedSoundToEdition);
         hbox.setPadding(padding);
         return hbox;
     }
@@ -611,6 +638,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
 
         return hbox;
     }
+    //endregion
 
     @Override
     public void onMusicSoundClearSelection()
