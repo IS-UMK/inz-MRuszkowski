@@ -3,17 +3,13 @@ package SongCreatorWindow.Model;
 import SongCreatorWindow.Model.Core.*;
 import SongCreatorWindow.Model.Events.IModelEvent;
 import SongCreatorWindow.Model.Events.IMusicEvent;
-import SongCreatorWindow.Model.Events.ISoundEvent;
 import SongCreatorWindow.Model.Events.IPathEvent;
+import SongCreatorWindow.Model.Events.ISoundEvent;
 import SongCreatorWindow.Model.Exceptions.CannotAddAnotherPathException;
-import org.jfugue.devices.MusicTransmitterToSequence;
-import org.jfugue.devtools.MidiDevicePrompt;
 import org.jfugue.midi.MidiFileManager;
 import org.jfugue.pattern.Pattern;
 
 import javax.sound.midi.InvalidMidiDataException;
-import javax.sound.midi.MidiDevice;
-import javax.sound.midi.MidiUnavailableException;
 import java.io.*;
 import java.util.*;
 
@@ -21,6 +17,7 @@ import static SongCreatorWindow.Model.GlobalSettings.*;
 
 public class ModelManager implements Serializable
 {
+    @Serial
     private static final long serialVersionUID = 8538391531267863794L;
 
     String projectName = null;
@@ -36,22 +33,11 @@ public class ModelManager implements Serializable
     public MusicClefSelection getDefaultMusicKeySelection() { return selectedDefaultKey; }
     private int getBasePointSound(MusicClefSelection musicClefSelection)
     {
-        int base = -1;
-
-        switch (musicClefSelection)
-        {
-            case ViolinClef:
-                base = 67;//NoteToNumericValue.Get_Octave_5_sound_G(); // 67 - G5
-                break;
-            case BassClef:
-                base = 53;//NoteToNumericValue.Get_Octave_4_sound_F(); // 53 - F4
-                break;
-            case AltoClef:
-                base = 60;//NoteToNumericValue.Get_Octave_5_sound_C(); // 60 - C5
-                break;
-        }
-
-        return base;
+        return switch (musicClefSelection) {
+            case ViolinClef -> 67;//NoteToNumericValue.Get_Octave_5_sound_G(); // 67 - G5
+            case BassClef -> 53;//NoteToNumericValue.Get_Octave_4_sound_F(); // 53 - F4
+            case AltoClef -> 60; //NoteToNumericValue.Get_Octave_5_sound_C(); // 60 - C5
+        };
     }
     private String getCalculatedSoundValue(int insertY, MusicClefSelection musicClefSelection)
     {
@@ -70,7 +56,7 @@ public class ModelManager implements Serializable
     }
 
     //Paths
-    List<Path> musicPaths = new LinkedList<Path>();
+    List<Path> musicPaths = new LinkedList<>();
     public int getTheLatestTimeX()
     {
         int timeX = 0;
@@ -88,7 +74,7 @@ public class ModelManager implements Serializable
      * Get music path from model copied
      * @return Copy of paths
      */
-    public List<Path> getPaths() { return new ArrayList<Path>(musicPaths); }
+    public List<Path> getPaths() { return new ArrayList<>(musicPaths); }
 
     //events
     transient public List<IPathEvent> pathListeners = new LinkedList<>();
@@ -146,10 +132,10 @@ public class ModelManager implements Serializable
      * Method that interprets MIDI file as a .mrinz music project. Method will NEVER return the same model due to errors while reading MIDI files.
      * Model will be only similar and the original is not possible to restore. Time when notes and accords occurs are often confused and sometimes even their order.
      * Music Clef selection is unknown so user has to choose clef manually.
-     * @param pathToProject
+     * @param pathToProject Destination of MIDI file
      * @return ModelManager that represents similar music written in MIDI file
-     * @throws IOException
-     * @throws InvalidMidiDataException
+     * @throws IOException When file is missing
+     * @throws InvalidMidiDataException Midi exception
      */
     public static ModelManager importProjectFromMIDI(String pathToProject) throws IOException, InvalidMidiDataException
     {
@@ -214,17 +200,16 @@ public class ModelManager implements Serializable
                                 int j;
                                 for(j = 0; j < symbols.length(); j++)
                                 {
-                                    switch (symbols.charAt(j))
-                                    {
-                                        case 'w': parsedValue += 1; break;
-                                        case 'h': parsedValue += 0.5; break;
-                                        case 'q': parsedValue += 0.25; break;
-                                        case 'i': parsedValue += 0.125; break;
-                                        case 's': parsedValue += 0.0625; break;
-                                        case 't': parsedValue += 0.03125; break;
-                                        case 'x': parsedValue += 0.015625; break;
-                                        case 'o': parsedValue += 0.0078125; break;
-                                        case '.': parsedValue *= 1.5; break;
+                                    switch (symbols.charAt(j)) {
+                                        case 'w' -> parsedValue += 1;
+                                        case 'h' -> parsedValue += 0.5;
+                                        case 'q' -> parsedValue += 0.25;
+                                        case 'i' -> parsedValue += 0.125;
+                                        case 's' -> parsedValue += 0.0625;
+                                        case 't' -> parsedValue += 0.03125;
+                                        case 'x' -> parsedValue += 0.015625;
+                                        case 'o' -> parsedValue += 0.0078125;
+                                        case '.' -> parsedValue *= 1.5;
                                     }
                                 }
                             }
@@ -339,13 +324,8 @@ public class ModelManager implements Serializable
         note.setSoundHeight(insertY);
 
         switch (GlobalSettings.selectedTypeOfSoundToInsertInPath) {
-            case Note -> {
-                sound = note;
-            }
-            case Accord -> {
-                Accord accord = new Accord(note, GlobalSettings.accordSelectionName);
-                sound = accord;
-            }
+            case Note -> sound = note;
+            case Accord -> sound = new Accord(note, GlobalSettings.accordSelectionName);
         }
         path.addSound(sound);
 
@@ -426,7 +406,7 @@ public class ModelManager implements Serializable
 
     /**
      * Create new path according to user typed values with selected piano as instrument, tempo 120 and volume level 50 and selected Key
-     * @param pathName
+     * @param pathName Name of path
      */
     public void createPath(String pathName) throws CannotAddAnotherPathException
     {
@@ -434,41 +414,8 @@ public class ModelManager implements Serializable
     }
 
     /**
-     * Duplicates selected path
-     * @throws CannotAddAnotherPathException
-     */
-    public void duplicateSelectedPath() throws CannotAddAnotherPathException
-    {
-        createPath(selectedPath.getName(), selectedPath.getInstrument(), selectedPath.getTempo(), selectedPath.getVolume(), selectedPath.getMusicClefSelection());
-
-        Path newPath = musicPaths.get(musicPaths.size() - 1);
-        int pathIndex = musicPaths.indexOf(newPath);
-
-        IPlayable duplicatedSound;
-        for(IPlayable sound : selectedPath.getSounds())
-        {
-            GlobalSettings.selectedTypeOfSoundToInsertInPath = sound.getSoundType() == "Note" ? SoundTypeSelection.Note : SoundTypeSelection.Accord;
-
-            if(sound.isTiedWithPreviousSound() || sound.isTiedWithAnotherSound())
-                GlobalSettings.TieBetweenNotes = TieSelection.Include;
-            else GlobalSettings.TieBetweenNotes = TieSelection.None;
-
-            addMusicSymbol(pathIndex, sound.getTimeX(), sound.getSoundHeight(), sound.getDuration());
-
-            duplicatedSound = newPath.getLatestSound();
-
-            if(sound.isSharp())
-                newPath.setSoundModification(duplicatedSound, SoundModification.Sharp);
-            else if(sound.isFlat())
-                newPath.setSoundModification(duplicatedSound, SoundModification.Flat);
-        }
-
-        System.out.println(String.format("Path %s duplicated successfully", selectedPath.getName()));
-    }
-
-    /**
      * Create new path according to user typed values with selected instrument
-     * @param pathName
+     * @param pathName Name of path
      */
     public void createPath(String pathName, String instrument, int tempo, byte volume, MusicClefSelection musicKey) throws CannotAddAnotherPathException
     {
@@ -492,6 +439,39 @@ public class ModelManager implements Serializable
         System.out.println(String.format("User inserted new path of name - %s", pathName));
     }
 
+    /**
+     * Duplicates selected path
+     * @throws CannotAddAnotherPathException Thrown when user surpass acceptable amount of paths
+     */
+    public void duplicateSelectedPath() throws CannotAddAnotherPathException
+    {
+        createPath(selectedPath.getName(), selectedPath.getInstrument(), selectedPath.getTempo(), selectedPath.getVolume(), selectedPath.getMusicClefSelection());
+
+        Path newPath = musicPaths.get(musicPaths.size() - 1);
+        int pathIndex = musicPaths.indexOf(newPath);
+
+        IPlayable duplicatedSound;
+        for(IPlayable sound : selectedPath.getSounds())
+        {
+            GlobalSettings.selectedTypeOfSoundToInsertInPath = sound.getSoundType().equals("Note") ? SoundTypeSelection.Note : SoundTypeSelection.Accord;
+
+            if(sound.isTiedWithPreviousSound() || sound.isTiedWithAnotherSound())
+                GlobalSettings.TieBetweenNotes = TieSelection.Include;
+            else GlobalSettings.TieBetweenNotes = TieSelection.None;
+
+            addMusicSymbol(pathIndex, sound.getTimeX(), sound.getSoundHeight(), sound.getDuration());
+
+            duplicatedSound = newPath.getLatestSound();
+
+            if(sound.isSharp())
+                newPath.setSoundModification(duplicatedSound, SoundModification.Sharp);
+            else if(sound.isFlat())
+                newPath.setSoundModification(duplicatedSound, SoundModification.Flat);
+        }
+
+        System.out.println(String.format("Path %s duplicated successfully", selectedPath.getName()));
+    }
+
     public void changeMusicClefOfSelectedPath(MusicClefSelection musicClef)
     {
         int soundShift = selectedPath.setMusicClefSelection(musicClef);
@@ -503,7 +483,7 @@ public class ModelManager implements Serializable
 
     /**
      * Sets the new name of selected path in model
-     * @param newName
+     * @param newName New name that will be assing to existing path
      */
     public void renameSelectedPathName(String newName)
     {
@@ -576,11 +556,11 @@ public class ModelManager implements Serializable
 
     public void fireOnModelLoaded(int latestTimeX)
     {
-        Iterator iterator = modelListeners.iterator();
+        Iterator<IModelEvent> iterator = modelListeners.iterator();
 
         while(iterator.hasNext()) {
             try{
-                IModelEvent modelEvent = (IModelEvent) iterator.next();
+                IModelEvent modelEvent = iterator.next();
                 modelEvent.onModelLoaded(latestTimeX);
             }
             catch (Exception e){}
@@ -589,8 +569,8 @@ public class ModelManager implements Serializable
 
     /**
      * Raise event when note is added to particular path
-     * @param path
-     * @param note
+     * @param path path where note has been added
+     * @param note added note
      */
     private void fireOnNoteAdded(Path path, IPlayable note)
     {
@@ -607,7 +587,7 @@ public class ModelManager implements Serializable
 
     /**
      * Raise event when new path is created
-     * @param path
+     * @param path created path
      */
     private void fireOnCreatedPathEvent(Path path)
     {
@@ -624,8 +604,8 @@ public class ModelManager implements Serializable
 
     /**
      * Raise event when path's clef has been changed
-     * @param path
-     * @param soundShift
+     * @param path path where clef has changed
+     * @param soundShift Threshold shift
      */
     private void fireOnPathClefChanged(Path path, int soundShift)
     {
@@ -642,7 +622,7 @@ public class ModelManager implements Serializable
 
     /**
      * Raise event when the selected path has changed name
-     * @param path
+     * @param path renamed path
      */
     private void fireOnPathNameRenamed(Path path)
     {
@@ -669,13 +649,13 @@ public class ModelManager implements Serializable
                 IPathEvent pathEvent = (IPathEvent) iterator.next();
                 pathEvent.onPathClearSelection();
             }
-            catch (Exception e){}
+            catch (Exception ignored){}
         }
     }
 
     /**
      * Raise event when selected path has been deleted
-     * @param path
+     * @param path deleted path
      */
     private void fireOnPathDeleted(Path path)
     {
