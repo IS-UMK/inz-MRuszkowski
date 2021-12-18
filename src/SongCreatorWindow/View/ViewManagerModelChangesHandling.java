@@ -23,6 +23,10 @@ import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
 
+import com.itextpdf.kernel.pdf.PdfWriter;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.*;
 
 import static SongCreatorWindow.Model.GlobalSettings.*;
@@ -41,7 +45,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
     HashMap<Canvas, TextField> tempoMap;
     HashMap<Canvas, MenuItem> selectionMenuItemToCanvas;
     HashMap<Path, Menu> selectionMenuForSounds;
-    HashMap<IPlayable, MenuItem> selectionMenuItemOfSound;
+    HashMap<Menu, TreeMap<IPlayable, MenuItem>> selectionMenuItemOfSound;
 
     HashMap<IPlayable, List<ImageView>> musicSymbols;
     HashMap<IPlayable, ImageView> modificationSymbols;
@@ -69,6 +73,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         choiceBoxMap = new HashMap<>();
         tempoMap = new HashMap<>();
         selectionMenuItemToCanvas = new HashMap<>();
+
         selectionMenuForSounds = new HashMap<>();
         selectionMenuItemOfSound = new HashMap<>();
 
@@ -92,7 +97,6 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
     @Override
     public void onMusicSymbolAdded(Path path, IPlayable musicSound)
     {
-        //TODO: Obrazy nut muszą być takiej same w wielkości
         Image musicSymbolImage = ImageManager.getInstance().setDimensions(GlobalSettings.noteWidth, GlobalSettings.noteHeight).getNote(musicSound.getDuration());
 
         List<ImageView> views = new LinkedList<>();
@@ -129,8 +133,9 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
             }
         });
 
-        selectionMenuItemOfSound.put(musicSound, soundItemMenu);
-        menu.getItems().add(soundItemMenu);
+        var menuItems = selectionMenuItemOfSound.get(menu);
+        menuItems.put(musicSound, soundItemMenu);
+        menu.getItems().add(menuItems.headMap(musicSound).size(), soundItemMenu);
     }
 
     private ImageView createImageViewOfSound(Image musicSymbolImage, Path path, IPlayable musicSound, int insertX, int insertY)
@@ -436,6 +441,22 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         var pathMenuToSelectSound = new Menu(path.getName());
 
         selectionMenuForSounds.put(path, pathMenuToSelectSound);
+        selectionMenuItemOfSound.put(
+            pathMenuToSelectSound,
+                new TreeMap<>(new Comparator<IPlayable>() {
+                    @Override
+                    public int compare(IPlayable o1, IPlayable o2) {
+                        if(o1.getTimeX() > o2.getTimeX())
+                            return 1;
+                        else if(o1.getTimeX() < o2.getTimeX())
+                            return -1;
+
+                        return 0;
+                    }
+                }
+            )
+        );
+
         selectSoundMenuItem.getItems().add(pathMenuToSelectSound);
     }
 
@@ -523,6 +544,15 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         selectionMenuItemToCanvas.remove(pathSelectionMenuItem);
 
         Menu soundsOfPath = selectionMenuForSounds.get(path);
+
+        TreeMap<IPlayable, MenuItem> items = selectionMenuItemOfSound.get(soundsOfPath);
+
+        for(var item : items.keySet().toArray())
+        {
+            soundsOfPath.getItems().remove(item);
+            items.remove(item);
+        }
+
         selectSoundMenuItem.getItems().remove(soundsOfPath);
         selectionMenuForSounds.remove(soundsOfPath);
 
@@ -723,6 +753,8 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
         onMusicSoundModified(path, musicSound);
         onMusicSoundSelectedToEdition(path, musicSound);
+
+        UpdateSoundMenuItem(path, musicSound);
     }
 
     @Override
@@ -740,6 +772,38 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
         onMusicSoundModified(path, musicSound);
         onMusicSoundSelectedToEdition(path, musicSound);
+
+        UpdateSoundMenuItem(path, musicSound);
+    }
+
+    private void UpdateSoundMenuItem(Path path, IPlayable musicSound) {
+        Menu menu = selectionMenuForSounds.get(path);
+        TreeMap<IPlayable, MenuItem> soundItems = selectionMenuItemOfSound.get(menu);
+
+        MenuItem soundItemMenu = soundItems.get(musicSound);
+
+        if(soundItemMenu == null)
+        {
+            soundItemMenu = soundItems.get(musicSound);
+        }
+
+        /*menu.getItems().remove(soundItemMenu);
+        soundItems.remove(musicSound);*/
+
+        soundItemMenu.setText(String.format("%s %s %.3f", musicSound.getSoundType(), musicSound.getValue(), Path.getSoundTimeOccurrence(musicSound.getTimeX())));
+
+        /*soundItems.put(musicSound, soundItemMenu);
+        menu.getItems().add(soundItems.headMap(musicSound).size(), soundItemMenu);*/
+    }
+
+    private void DeleteSoundMenuItem(Path path, IPlayable musicSound)
+    {
+        Menu menu = selectionMenuForSounds.get(path);
+        TreeMap<IPlayable, MenuItem> soundItems = selectionMenuItemOfSound.get(menu);
+
+        var soundItemMenu = soundItems.get(musicSound);
+        menu.getItems().remove(soundItemMenu);
+        soundItems.remove(musicSound);
     }
 
     @Override
@@ -851,9 +915,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         for(ImageView view : views)
             anchorPaneWithPaths.getChildren().remove(view);
 
-        Menu menu = selectionMenuForSounds.get(path);
-        MenuItem menuItem = selectionMenuItemOfSound.get(musicSound);
-        menu.getItems().remove(menuItem);
+        DeleteSoundMenuItem(path, musicSound);
 
         onMusicSoundClearSelection();
 
@@ -870,5 +932,16 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
             bindingSymbols.remove(tiePath);
             anchorPaneWithPaths.getChildren().remove(tiePath);
         }
+    }
+
+    public void printSongToPDFFile(String path) throws FileNotFoundException {
+
+        FileOutputStream stream = new FileOutputStream(path);
+        PdfWriter
+        PDF pdf = new pdf(stream);
+        Page page = new Page(pdf, Letter.LANDSCAPE);
+        pdf.close();
+        stream.flush();
+        stream.close();
     }
 }

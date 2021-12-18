@@ -45,13 +45,7 @@
                   <MenuItem mnemonicParsing="false" onAction="#RecordPath" text="Record Path" />
                </items>
             </Menu>
-            <Menu mnemonicParsing="false" text="Notes">
-               <items>
-                  <MenuItem mnemonicParsing="false" onAction="#InsertNote" text="Insert Note" />
-                  <MenuItem mnemonicParsing="false" onAction="#EditNote" text="Edit Note" />
-                  <MenuItem mnemonicParsing="false" onAction="#DeleteNote" text="Delete Note" />
-               </items>
-            </Menu>
+            <Menu fx:id="selectSoundMenuItem" mnemonicParsing="false" text="Select Sound" />
             <Menu mnemonicParsing="false" text="Song">
                <items>
                   <MenuItem fx:id="playMenuItem" mnemonicParsing="false" onAction="#PlayAllPathsWithoutMutedOnes" text="Play" />

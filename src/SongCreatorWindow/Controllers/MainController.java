@@ -22,6 +22,8 @@ import org.jfugue.player.Player;
 
 import javax.sound.midi.InvalidMidiDataException;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import static SongCreatorWindow.Model.GlobalSettings.*;
@@ -378,21 +380,6 @@ public class MainController
     {
         musicSymbolsViewManager.refreshPanel();
     }
-
-    public void InsertNote(ActionEvent actionEvent)
-    {
-
-    }
-
-    public void EditNote(ActionEvent actionEvent)
-    {
-
-    }
-
-    public void DeleteNote(ActionEvent actionEvent)
-    {
-
-    }
     //endregion
 
     //region Song
@@ -406,7 +393,25 @@ public class MainController
 
     public void PrintSongToPDFFile(ActionEvent actionEvent)
     {
+        FileChooser fileChooser = new FileChooser();
 
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF File", "*.pdf"));
+        fileChooser.setTitle("Save song to pdf file");
+
+        File file = fileChooser.showSaveDialog(MainWindow.StageToDeleteLater);
+
+        if(file == null)
+            return;
+
+        String path = file.getAbsolutePath();
+
+        try
+        {
+            viewManager.printSongToPDFFile(path);
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
     //endregion
 
