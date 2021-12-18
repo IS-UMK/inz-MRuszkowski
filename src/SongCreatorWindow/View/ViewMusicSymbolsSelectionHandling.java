@@ -318,7 +318,6 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
     public void onMusicSoundSelectedToEdition(Path path, IPlayable musicSound)
     {
         optionsContent = new LinkedList<>();
-        //TODO: Podzielić kod na sekcje z daną modyfikacją
         vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().clear();
 
         HBox hbox11 = createSoundTypeSection(path, musicSound);

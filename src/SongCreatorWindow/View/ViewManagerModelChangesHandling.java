@@ -258,7 +258,6 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
     @Override
     public void onPathCreated(Path path)
     {
-        //TODO: Rozdzielić cały kod na poszczególne prywatne metody
         //create canvas and set its size
         Canvas canvas = new Canvas(canvasCurrentWidth, Height);
         canvas.setLayoutY(Height * canvasList.size());
