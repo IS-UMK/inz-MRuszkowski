@@ -290,6 +290,13 @@ public class Path implements Serializable
         if(_sounds.indexOf(musicSound) == -1)
             return;
 
+        Iterator iterator = listeners.iterator();
+
+        while(iterator.hasNext()) {
+            IMusicSoundEditionEvent modelEvent = (IMusicSoundEditionEvent) iterator.next();
+            modelEvent.onMusicSoundOccurrenceTimeChangedPreprocess(this, musicSound);
+        }
+
         musicSound.setTimeX((int) Path.getSoundTimeX(newOccurrenceTime));
 
         fireOnMusicSoundOccurrenceTimeChanged(this, musicSound);
@@ -367,36 +374,6 @@ public class Path implements Serializable
     {
         return _sounds.indexOf(selectedMusicSound);
     }
-    /*public boolean isTiedWithPreviousSound(IPlayable musicSound)
-    {
-        int index = _sounds.indexOf(musicSound);
-
-        if(index == 0)
-            return false;
-
-        IPlayable previousSound = getPreviousSound(musicSound);
-
-        if(previousSound == null)
-            return false;
-
-        switch (previousSound.getSoundConcatenation()) {
-            case Begin, Continue -> {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public IPlayable getPreviousSound(IPlayable musicSound)
-    {
-        int index = _sounds.indexOf(musicSound);
-
-        if(index == 0)
-            return null;
-
-        return _sounds.get(index - 1);
-    }*/
 
     public void deleteSound(IPlayable musicSound)
     {

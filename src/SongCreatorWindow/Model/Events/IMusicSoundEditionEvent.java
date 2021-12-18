@@ -29,4 +29,13 @@ public interface IMusicSoundEditionEvent extends IMusicEvent
     void onMusicSoundConvertedToNote(Path path, IPlayable musicSound, IPlayable newNote);
 
     void onMusicSoundDeleted(Path path, IPlayable musicSound);
+
+    /**
+     * Method is created due to error that occurs when parameter of music sound named "timeX" changes.
+     * Tree map that gives access to MenuItem of the relevant music sound, after change of this parameter,
+     * returns null in case when item is obligated to move up or down on list.
+     * @param path Path that given music Sound belongs to
+     * @param musicSound Particular music Sound of the given path
+     */
+    void onMusicSoundOccurrenceTimeChangedPreprocess(Path path, IPlayable musicSound);
 }

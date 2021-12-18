@@ -23,14 +23,10 @@ import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
 
-import com.itextpdf.kernel.pdf.PdfWriter;
-
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.util.*;
 
 import static SongCreatorWindow.Model.GlobalSettings.*;
-import static SongCreatorWindow.Model.GlobalSettings.strokeLineWidthForSelection;
 
 public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent, IModelEvent, IMusicSoundEditionEvent
 {
@@ -498,6 +494,12 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
             var canvas_to_move_up = canvasList.get(i);
             canvas_to_move_up.setLayoutY(canvas_to_move_up.getLayoutY() - Height);
 
+            Path currentPath = modelManager.getPathByIndex(i);
+            for(IPlayable sound : currentPath.getSounds())
+            {
+
+            }
+
             var volumeSlider_to_move_up = volumeSliderMap.get(canvas_to_move_up);
             volumeSlider_to_move_up.setLayoutY(volumeSlider_to_move_up.getLayoutY() - Height);
 
@@ -754,7 +756,13 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         onMusicSoundModified(path, musicSound);
         onMusicSoundSelectedToEdition(path, musicSound);
 
-        UpdateSoundMenuItem(path, musicSound);
+        AddSoundMenuItem(path, musicSound);
+    }
+
+    @Override
+    public void onMusicSoundOccurrenceTimeChangedPreprocess(Path path, IPlayable musicSound)
+    {
+        DeleteSoundMenuItem(path, musicSound);
     }
 
     @Override
@@ -773,27 +781,26 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         onMusicSoundModified(path, musicSound);
         onMusicSoundSelectedToEdition(path, musicSound);
 
-        UpdateSoundMenuItem(path, musicSound);
+        DeleteSoundMenuItem(path, musicSound);
+        AddSoundMenuItem(path, musicSound);
     }
 
-    private void UpdateSoundMenuItem(Path path, IPlayable musicSound) {
+    private void AddSoundMenuItem(Path path, IPlayable musicSound) {
         Menu menu = selectionMenuForSounds.get(path);
         TreeMap<IPlayable, MenuItem> soundItems = selectionMenuItemOfSound.get(menu);
 
-        MenuItem soundItemMenu = soundItems.get(musicSound);
-
-        if(soundItemMenu == null)
-        {
-            soundItemMenu = soundItems.get(musicSound);
-        }
-
-        /*menu.getItems().remove(soundItemMenu);
-        soundItems.remove(musicSound);*/
+        MenuItem soundItemMenu = new MenuItem();
+        soundItemMenu.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                fireOnMusicSymbolClicked(path, musicSound);
+            }
+        });
 
         soundItemMenu.setText(String.format("%s %s %.3f", musicSound.getSoundType(), musicSound.getValue(), Path.getSoundTimeOccurrence(musicSound.getTimeX())));
 
-        /*soundItems.put(musicSound, soundItemMenu);
-        menu.getItems().add(soundItems.headMap(musicSound).size(), soundItemMenu);*/
+        soundItems.put(musicSound, soundItemMenu);
+        menu.getItems().add(soundItems.headMap(musicSound).size(), soundItemMenu);
     }
 
     private void DeleteSoundMenuItem(Path path, IPlayable musicSound)
@@ -801,7 +808,8 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         Menu menu = selectionMenuForSounds.get(path);
         TreeMap<IPlayable, MenuItem> soundItems = selectionMenuItemOfSound.get(menu);
 
-        var soundItemMenu = soundItems.get(musicSound);
+        MenuItem soundItemMenu = soundItems.get(musicSound);
+
         menu.getItems().remove(soundItemMenu);
         soundItems.remove(musicSound);
     }
@@ -886,6 +894,9 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         musicSymbols.put(newAccord, views);
 
         addAdditionalSymbols(views, path, newAccord);
+
+        DeleteSoundMenuItem(path, musicSound);
+        AddSoundMenuItem(path, newAccord);
     }
 
     @Override
@@ -897,6 +908,9 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         musicSymbols.put(newNote, views);
 
         removeAdditionalSymbols(views);
+
+        DeleteSoundMenuItem(path, musicSound);
+        AddSoundMenuItem(path, newNote);
     }
 
     @Override
@@ -934,14 +948,8 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         }
     }
 
-    public void printSongToPDFFile(String path) throws FileNotFoundException {
+    public void printSongToPDFFile(String path) throws FileNotFoundException
+    {
 
-        FileOutputStream stream = new FileOutputStream(path);
-        PdfWriter
-        PDF pdf = new pdf(stream);
-        Page page = new Page(pdf, Letter.LANDSCAPE);
-        pdf.close();
-        stream.flush();
-        stream.close();
     }
 }

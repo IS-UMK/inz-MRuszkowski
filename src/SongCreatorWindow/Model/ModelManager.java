@@ -6,10 +6,14 @@ import SongCreatorWindow.Model.Events.IMusicEvent;
 import SongCreatorWindow.Model.Events.ISoundEvent;
 import SongCreatorWindow.Model.Events.IPathEvent;
 import SongCreatorWindow.Model.Exceptions.CannotAddAnotherPathException;
+import org.jfugue.devices.MusicTransmitterToSequence;
+import org.jfugue.devtools.MidiDevicePrompt;
 import org.jfugue.midi.MidiFileManager;
 import org.jfugue.pattern.Pattern;
 
 import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.MidiDevice;
+import javax.sound.midi.MidiUnavailableException;
 import java.io.*;
 import java.util.*;
 
@@ -320,7 +324,7 @@ public class ModelManager implements Serializable
         }
         catch(RuntimeException e)
         {
-            path = musicPaths.get(pathIndex - 1);
+            return;
         }
 
         IPlayable sound = null;
@@ -350,7 +354,26 @@ public class ModelManager implements Serializable
     //endregion
 
     //region Paths Methods
+    public void recordPath() throws CannotAddAnotherPathException
+    {
+        if(musicPaths.size() > 16)
+            throw new CannotAddAnotherPathException("Program does not support of handling more than 16 paths at once.");
 
+        /*try {
+            MidiDevice device = MidiDevicePrompt.askForMidiDevice();
+            MusicTransmitterToSequence transmitter = new MusicTransmitterToSequence(device);
+            DemoPrint.step("Press [ENTER] when you're ready to start playing...");
+            Scanner scanner = new Scanner(System.in);
+            scanner.nextLine();
+            transmitter.startListening();
+            DemoPrint.step("Press [ENTER] when you're ready to stop playing...");
+            scanner.nextLine();
+            scanner.close();
+            transmitter.stopListening();
+        }
+        catch (MidiUnavailableException e) { e.printStackTrace(); }
+        catch (InvalidMidiDataException e) { e.printStackTrace(); }*/
+    }
     /**
      * Get path that is selected. Return null if none is chosen
      * @return Path or null

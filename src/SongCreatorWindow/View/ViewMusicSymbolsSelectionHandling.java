@@ -675,4 +675,9 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
     {
         onMusicSoundClearSelection();
     }
+
+    @Override
+    public void onMusicSoundOccurrenceTimeChangedPreprocess(Path path, IPlayable musicSound) {
+
+    }
 }

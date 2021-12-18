@@ -329,7 +329,15 @@ public class MainController
 
     public void RecordPath(ActionEvent actionEvent)
     {
-
+        try
+        {
+            modelManager.recordPath();
+        }
+        catch (CannotAddAnotherPathException e)
+        {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, e.getMessage());
+            alert.showAndWait();
+        }
     }
     //endregion
 
@@ -414,7 +422,6 @@ public class MainController
         }
     }
     //endregion
-
 
     //region MouseEvents
     public void InsertNoteOnMouseClicked(MouseEvent mouseEvent)
