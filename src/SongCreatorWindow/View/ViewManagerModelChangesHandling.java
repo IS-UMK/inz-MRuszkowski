@@ -487,18 +487,14 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         //move up canvases below selected to delete
         int index = canvasList.indexOf(canvas);
 
+        List<ImageView> views;
+
         for(int i = index + 1; i < canvasList.size(); i++)
         {
             System.out.println(String.format("Moving components of path %d up", i));
 
             var canvas_to_move_up = canvasList.get(i);
             canvas_to_move_up.setLayoutY(canvas_to_move_up.getLayoutY() - Height);
-
-            Path currentPath = modelManager.getPathByIndex(i);
-            for(IPlayable sound : currentPath.getSounds())
-            {
-
-            }
 
             var volumeSlider_to_move_up = volumeSliderMap.get(canvas_to_move_up);
             volumeSlider_to_move_up.setLayoutY(volumeSlider_to_move_up.getLayoutY() - Height);
@@ -510,7 +506,6 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
             tempoMap_to_move_up.setLayoutY(tempoMap_to_move_up.getLayoutY() - Height);
         }
 
-        List<ImageView> views;
         ImageView modifier;
         for(IPlayable sound : path.getSounds())
         {
@@ -558,6 +553,17 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         selectSoundMenuItem.getItems().remove(soundsOfPath);
         selectionMenuForSounds.remove(soundsOfPath);
 
+        Path currentPath;
+        for(int i = index; i < canvasList.size(); i++)
+        {
+            currentPath = modelManager.getPathByIndex(i);
+            for (IPlayable sound : currentPath.getSounds()) {
+                onMusicSoundHeightChange(currentPath, sound);
+                onMusicSoundTieCheck(currentPath, sound);
+                onMusicSoundModified(currentPath, sound);
+            }
+        }
+
         onPathClearSelection();
         onMusicSoundClearSelection();
     }
@@ -586,7 +592,10 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         drawPathClef(path, gc);
 
         for(IPlayable sound : path.getSounds())
+        {
             onMusicSoundHeightChange(path, sound);
+            onMusicSoundTieCheck(path, sound);
+        }
 
         onMusicSoundClearSelection();
     }
