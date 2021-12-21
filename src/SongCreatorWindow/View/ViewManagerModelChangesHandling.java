@@ -22,6 +22,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.CubicCurveTo;
+import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
 
@@ -304,10 +305,10 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
         Slider volumeSlider = displayVolumeSliderOfNewPath(path);
 
-        drawFiveLinesOfNewPath(canvas, gc);
+        drawFiveLinesOfNewPath(canvas, gc, numberOfPropertySquaresInPath * Height + GlobalSettings.getLinesMargins(), 0);
 
         //add (default Violin) music key
-        drawPathClef(path, gc);
+        drawPathClef(path, gc, 0,0);
 
         //Save created components
         canvasList.add(canvas);
@@ -378,15 +379,15 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         selectSoundMenuItem.getItems().add(pathMenuToSelectSound);
     }
 
-    private void drawFiveLinesOfNewPath(Canvas canvas, GraphicsContext gc) {
+    private void drawFiveLinesOfNewPath(Canvas canvas, GraphicsContext gc, double startX, int multipliedHeight) {
         //five lines for inserting notes
         gc.setLineWidth(GlobalSettings.strokeLineBorderWidth);
         for(int i = 1; i <= 5; i++)
             gc.strokeLine(
-                    numberOfPropertySquaresInPath * Height + GlobalSettings.getLinesMargins(),
-                    GlobalSettings.getLinesStartHeight() + i * GlobalSettings.getLinesPadding(),
+                    startX,
+                    GlobalSettings.getLinesStartHeight() + i * GlobalSettings.getLinesPadding() + multipliedHeight * GlobalSettings.Height,
                     canvas.getWidth() - GlobalSettings.getLinesMargins(),
-                    GlobalSettings.getLinesStartHeight() + i * GlobalSettings.getLinesPadding()
+                    GlobalSettings.getLinesStartHeight() + i * GlobalSettings.getLinesPadding() + multipliedHeight * GlobalSettings.Height
             );
     }
 
@@ -634,7 +635,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
                     GlobalSettings.getLinesStartHeight() + i * GlobalSettings.getLinesPadding()
             );
 
-        drawPathClef(path, gc);
+        drawPathClef(path, gc, 0, 0);
 
         for(IPlayable sound : path.getSounds())
         {
@@ -645,21 +646,21 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         onMusicSoundClearSelection();
     }
 
-    private void drawPathClef(Path path, GraphicsContext gc) {
+    private void drawPathClef(Path path, GraphicsContext gc, double moveX, int multiplyHeight) {
         Image newClef;
 
         switch (path.getMusicClefSelection()) {
             case ViolinClef -> {
                 newClef = ImageManager.getInstance().setDimensions(GlobalSettings.musicClefWidth, GlobalSettings.getMusicClefHeight(path.getMusicClefSelection())).getMusicClef(MusicClefSelection.ViolinClef);
-                gc.drawImage(newClef, Height * 3, Height / 13);
+                gc.drawImage(newClef, Height * 3 + moveX, Height / 13 + multiplyHeight * GlobalSettings.Height);
             }
             case BassClef -> {
                 newClef = ImageManager.getInstance().setDimensions(GlobalSettings.musicClefWidth * .6, GlobalSettings.getMusicClefHeight(path.getMusicClefSelection()) * .6).getMusicClef(MusicClefSelection.BassClef);
-                gc.drawImage(newClef, Height * 3 + getLinesPadding() * 1.2, Height / 3.3);
+                gc.drawImage(newClef, Height * 3 + getLinesPadding() * 1.2 + moveX, Height / 3.3+ multiplyHeight * GlobalSettings.Height);
             }
             case AltoClef -> {
                 newClef = ImageManager.getInstance().setDimensions(GlobalSettings.musicClefWidth * .81, GlobalSettings.getMusicClefHeight(path.getMusicClefSelection()) * .81).getMusicClef(MusicClefSelection.AltoClef);
-                gc.drawImage(newClef, Height * 3 + getLinesPadding() * .5, Height / 3.5);
+                gc.drawImage(newClef, Height * 3 + getLinesPadding() * .5 + moveX, Height / 3.5+ multiplyHeight * GlobalSettings.Height);
             }
         }
     }
@@ -732,7 +733,8 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         }
     }
 
-    private void redrawSoundBinding(Path path, IPlayable musicSound) {
+    private void redrawSoundBinding(Path path, IPlayable musicSound)
+    {
         javafx.scene.shape.Path tiePath = bindingSymbols.get(musicSound);
 
         if (tiePath != null)
@@ -746,7 +748,8 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         anchorPaneWithPaths.getChildren().add(tiePath);
     }
 
-    private javafx.scene.shape.Path createBindingSymbolImageView(Path path, IPlayable musicSound) {
+    private javafx.scene.shape.Path createBindingSymbolImageView(Path path, IPlayable musicSound)
+    {
         IPlayable previousSound = musicSound.getPreviousTiedSound();
 
         var tiePath = new javafx.scene.shape.Path();
@@ -1004,17 +1007,73 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
     public void printSongToPDFFile(String destinationPath) throws FileNotFoundException
     {
-        Canvas canvas;
-        for(Path path : canvasMap.keySet()) {
-            canvas = canvasMap.get(path);
+        Canvas canvasToPrint = new Canvas(canvasCurrentWidth, GlobalSettings.Height * canvasMap.size());
+        Canvas currentCanvas;
 
-            WritableImage image = canvas.snapshot(null, null);
-            BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
-            try {
-                ImageIO.write(bImage, "png", new File(destinationPath.substring(0, destinationPath.length() - 4) + ".png"));
-            } catch (IOException e) {
-                e.printStackTrace();
+        var gc = canvasToPrint.getGraphicsContext2D();
+        int i = 0;
+        double moveX = GlobalSettings.Height * canvasMap.size() * -1;
+
+        List<ImageView> soundViews;
+        ImageView modifiersView;
+        javafx.scene.shape.Path bindingViewPath;
+
+        for(Path path : canvasMap.keySet()) {
+            currentCanvas = canvasMap.get(path);
+
+            drawFiveLinesOfNewPath(currentCanvas, gc, 0, i);
+            drawPathClef(path, gc, moveX, i);
+
+            for(IPlayable sound : path.getSounds())
+            {
+                soundViews = musicSymbols.get(sound);
+
+                for(ImageView view : soundViews)
+                    gc.drawImage(view.getImage(), view.getLayoutX() + moveX, view.getLayoutY());
+
+                modifiersView = modificationSymbols.get(sound);
+                if(modifiersView != null)
+                    gc.drawImage(modifiersView.getImage(), modifiersView.getLayoutX() + moveX, modifiersView.getLayoutY());
+
+                bindingViewPath = bindingSymbols.get(sound);
+                if(bindingViewPath != null)
+                {
+                    var elementsOfPath = bindingViewPath.getElements();
+                    System.out.println(elementsOfPath);
+                    MoveTo moveToPoint = (MoveTo)elementsOfPath.get(0);
+                    CubicCurveTo curve = (CubicCurveTo) elementsOfPath.get(1);
+
+                    gc.setLineWidth(5 * GlobalSettings.strokeLineBorderWidth);
+                    gc.setLineCap(StrokeLineCap.ROUND);
+                    gc.beginPath();
+                    gc.moveTo(moveToPoint.getX() + moveX, moveToPoint.getY());
+                    gc.bezierCurveTo(
+                            curve.getControlX1() + moveX,
+                            curve.getControlY1(),
+                            curve.getControlX2() + moveX,
+                            curve.getControlY2(),
+                            curve.getX() + moveX,
+                            curve.getY()
+                    );
+
+                    gc.closePath();
+                    gc.setFill(Color.TRANSPARENT);
+                    gc.stroke();
+                    gc.setLineWidth(GlobalSettings.strokeLineBorderWidth);
+                }
             }
+
+            i++;
         }
+
+        WritableImage image = canvasToPrint.snapshot(null, null);
+        BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
+        try {
+            ImageIO.write(bImage, "png", new File(destinationPath));//destinationPath.substring(0, destinationPath.length() - 4) + ".png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println(String.format("Song printed to %s", destinationPath));
     }
 }

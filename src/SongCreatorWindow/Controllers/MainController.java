@@ -394,12 +394,12 @@ public class MainController
         }).start();
     }
 
-    public void PrintSongToPDFFile(ActionEvent actionEvent)
+    public void PrintSongToPNGFile(ActionEvent actionEvent)
     {
         FileChooser fileChooser = new FileChooser();
 
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF File", "*.pdf"));
-        fileChooser.setTitle("Save song to pdf file");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG File", "*.png"));
+        fileChooser.setTitle("Save song to png file");
 
         File file = fileChooser.showSaveDialog(MainWindow.StageToDeleteLater);
 
