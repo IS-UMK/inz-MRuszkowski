@@ -1,6 +1,7 @@
 package SongCreatorWindow.Model;
 
 import SongCreatorWindow.Model.Core.MusicClefSelection;
+import SongCreatorWindow.Model.Core.Path;
 import SongCreatorWindow.Model.Core.SoundTypeSelection;
 import SongCreatorWindow.Model.Core.TieSelection;
 import javafx.scene.paint.Color;
@@ -106,4 +107,9 @@ public class GlobalSettings
     public static SoundTypeSelection selectedTypeOfSoundToInsertInPath = SoundTypeSelection.Note;
     public static TieSelection TieBetweenNotes = TieSelection.None;
     public static String accordSelectionName = "maj";
+
+    /**
+     * Bar settings
+     */
+    public static double constBarFactor_WidthPerTick = (512 / (Path.getSoundTimeX(1)-Path.getSoundTimeX(0)));
 }

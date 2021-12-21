@@ -17,12 +17,16 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import org.jfugue.player.ManagedPlayer;
+import org.jfugue.player.ManagedPlayerListener;
 import org.jfugue.player.Player;
 
 import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.Sequence;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 import static SongCreatorWindow.Model.GlobalSettings.*;
 
@@ -99,6 +103,50 @@ public class MainController
                         e.printStackTrace();
                     }
                 }
+
+                managedPlayer.addManagedPlayerListener(new ManagedPlayerListener() {
+                    @Override
+                    public void onStarted(Sequence sequence) {
+                        viewManager.changeTextOfPlayMenuItem("Pause");
+                        new Thread(() ->
+                        {
+                            viewManager.initializeVisualBar();
+                            while(!managedPlayer.isFinished())
+                            {
+                                if(managedPlayer.isPlaying())
+                                {
+                                    viewManager.setVisualBarPosition(GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() + managedPlayer.getTickPosition() / GlobalSettings.constBarFactor_WidthPerTick);
+                                }
+                            }
+                            viewManager.removeVisualBar();
+                        }).start();
+                    }
+
+                    @Override
+                    public void onFinished() {
+                        viewManager.changeTextOfPlayMenuItem("Play");
+                    }
+
+                    @Override
+                    public void onPaused() {
+                        viewManager.changeTextOfPlayMenuItem("Resume");
+                    }
+
+                    @Override
+                    public void onResumed() {
+                        viewManager.changeTextOfPlayMenuItem("Pause");
+                    }
+
+                    @Override
+                    public void onSeek(long l) {
+                        System.out.println("Time: " + l);
+                    }
+
+                    @Override
+                    public void onReset() {
+
+                    }
+                });
             }
         });
     }
@@ -336,11 +384,15 @@ public class MainController
             Alert alert = new Alert(Alert.AlertType.INFORMATION, e.getMessage());
             alert.showAndWait();
         }
+        catch(NoSuchElementException e)
+        {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "There is no MIDI device plugged in");
+            alert.showAndWait();
+        }
     }
     //endregion
 
     //region Music Symbols
-
     public void ChangePathClefToViolin(ActionEvent actionEvent)
     {
         if(!checkPathSelection())
@@ -384,12 +436,28 @@ public class MainController
     //endregion
 
     //region Song
+    Player player = new Player();
+    ManagedPlayer managedPlayer = player.getManagedPlayer();
+
     public void PlayAllPathsWithoutMutedOnes(ActionEvent actionEvent)
     {
         new Thread(() -> {
-            Player player = new Player();
-            player.play(modelManager.extractEntireMusic());
+            if(!managedPlayer.isPlaying()){
+                if(!managedPlayer.isPaused())
+                    player.play(modelManager.extractEntireMusic());
+                else
+                    managedPlayer.resume();
+            }
+            else{
+                managedPlayer.pause();
+            }
         }).start();
+    }
+
+    public void StopMusic(ActionEvent actionEvent)
+    {
+        if(managedPlayer.isPlaying())
+            managedPlayer.finish();
     }
 
     public void PrintSongToPNGFile(ActionEvent actionEvent)

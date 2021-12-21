@@ -246,7 +246,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
      */
     private void redrawMusicSymbols()
     {
-        double currentWidth = musicSymbolsCanvas.getWidth();
+        double currentWidth = GlobalSettings.Height;//musicSymbolsCanvas.getWidth();
         nextImageInterval = currentWidth / notesInRow;
 
         var gc = musicSymbolsCanvas.getGraphicsContext2D();

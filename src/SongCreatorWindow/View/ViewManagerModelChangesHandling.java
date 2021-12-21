@@ -66,6 +66,8 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
     Canvas soundEditionCanvas;
 
+    Canvas visualBarCanvas;
+
     public ViewManagerModelChangesHandling(ModelManager modelManager, AnchorPane anchorPaneWithPaths, Menu selectPathMenuItem, Menu selectSoundMenuItem, MenuItem playMenuItem)
     {
         this.modelManager = modelManager;
@@ -89,6 +91,10 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         this.selectPathMenuItem = selectPathMenuItem;
         this.selectSoundMenuItem = selectSoundMenuItem;
         this.playMenuItem = playMenuItem;
+
+        visualBarCanvas = new Canvas(strokeLineBorderWidth * 5, 0);
+        anchorPaneWithPaths.getChildren().add(visualBarCanvas);
+        visualBarCanvas.getGraphicsContext2D().setFill(Color.RED);
     }
 
     @Override
@@ -1004,6 +1010,32 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
             anchorPaneWithPaths.getChildren().remove(tiePath);
         }
     }
+
+    public void changeTextOfPlayMenuItem(String newText)
+    {
+        playMenuItem.setText(newText);
+    }
+
+    //region visual bar
+    public void setVisualBarPosition(double newX)
+    {
+        visualBarCanvas.setLayoutX(newX);
+    }
+
+    public void initializeVisualBar()
+    {
+        visualBarCanvas.setHeight(anchorPaneWithPaths.getHeight());
+        visualBarCanvas.setLayoutX(GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal());
+        visualBarCanvas.setLayoutY(0);
+        visualBarCanvas.getGraphicsContext2D().fillRect(0, 0, visualBarCanvas.getWidth(), visualBarCanvas.getHeight());
+        visualBarCanvas.setHeight(anchorPaneWithPaths.getHeight());
+    }
+    public void removeVisualBar()
+    {
+        visualBarCanvas.setHeight(0);
+        visualBarCanvas.setLayoutX(GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal());
+    }
+    //endregion
 
     public void printSongToPNGFile(String destinationPath) throws FileNotFoundException
     {

@@ -55,12 +55,22 @@ public class Controller
         managedPlayer.addManagedPlayerListener(new ManagedPlayerListener() {
             @Override
             public void onStarted(Sequence sequence) {
-                playSongDirectlyFromFileButton.setText("Stop Playing");
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        playSongDirectlyFromFileButton.setText("Stop Playing");
+                    }
+                });
             }
 
             @Override
             public void onFinished() {
-                playSongDirectlyFromFileButton.setText("Play Song from MIDI File");
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        playSongDirectlyFromFileButton.setText("Play Song from MIDI File");
+                    }
+                });
             }
 
             @Override
@@ -80,7 +90,12 @@ public class Controller
 
             @Override
             public void onReset() {
-                playSongDirectlyFromFileButton.setText("Play Song from MIDI File");
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        playSongDirectlyFromFileButton.setText("Play Song from MIDI File");
+                    }
+                });
             }
         });
     }
@@ -117,6 +132,12 @@ public class Controller
                 Thread music = new Thread(playing);
                 music.start();
 
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        playSongDirectlyFromFileButton.setText("Stop Playing");
+                    }
+                });
                 /*new Thread(() -> {
                     //TODO: Jak wysłać wiadomość z innego wątku? Czy można uruchamiać funkcje z innego wątku?
                     //appendTextToLogLabel(String.format("Playing song %s has started", file.getName()));

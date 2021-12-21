@@ -49,6 +49,7 @@
             <Menu mnemonicParsing="false" text="Song">
                <items>
                   <MenuItem fx:id="playMenuItem" mnemonicParsing="false" onAction="#PlayAllPathsWithoutMutedOnes" text="Play" />
+                  <MenuItem mnemonicParsing="false" onAction="#StopMusic" text="Stop" />
                   <MenuItem mnemonicParsing="false" onAction="#PrintSongToPNGFile" text="Print Song" />
                </items>
             </Menu>
