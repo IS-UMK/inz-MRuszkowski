@@ -273,6 +273,8 @@ public class ModelManager implements Serializable
 
         var userPrefTie = GlobalSettings.TieBetweenNotes;
 
+        Path loadedPath;
+        SoundModification modifier;
         for(Path path : modelManager.getPaths())
         {
             try {
@@ -282,12 +284,23 @@ public class ModelManager implements Serializable
                 return;
             }
 
+            loadedPath = this.getPathByIndex(musicPaths.size() - 1);
+
             for(IPlayable sound : path.getSounds()) {
                 if(sound.getSoundConcatenation() != TieSelection.None)
                     GlobalSettings.TieBetweenNotes = TieSelection.Include;
                 else GlobalSettings.TieBetweenNotes = TieSelection.None;
 
-                addMusicSymbol(path.getVoice(), sound.getTimeX(), sound.getSoundHeight(), sound.getDuration());
+                modifier = SoundModification.None;
+                if(sound.isSharp())
+                    modifier = SoundModification.Sharp;
+                else if(sound.isFlat())
+                    modifier = SoundModification.Flat;
+
+                loadedPath.setSoundModification(
+                        addMusicSymbol(path.getVoice(), sound.getTimeX(), sound.getSoundHeight(), sound.getDuration()),
+                        modifier
+                );
             }
         }
 
@@ -296,12 +309,12 @@ public class ModelManager implements Serializable
     //endregion
 
     //region Music Symbols
-    public void addMusicSymbol(int pathIndex, int insertX, int insertY)
+    public IPlayable addMusicSymbol(int pathIndex, int insertX, int insertY)
     {
-        addMusicSymbol(pathIndex, insertX, insertY, GlobalSettings.chosenNote);
+        return addMusicSymbol(pathIndex, insertX, insertY, GlobalSettings.chosenNote);
     }
 
-    public void addMusicSymbol(int pathIndex, int insertX, int insertY, char duration)
+    public IPlayable addMusicSymbol(int pathIndex, int insertX, int insertY, char duration)
     {
         Path path;
         try {
@@ -309,7 +322,7 @@ public class ModelManager implements Serializable
         }
         catch(RuntimeException e)
         {
-            return;
+            return null;
         }
 
         IPlayable sound = null;
@@ -330,6 +343,8 @@ public class ModelManager implements Serializable
         path.addSound(sound);
 
         fireOnNoteAdded(path, sound);
+
+        return sound;
     }
     //endregion
 

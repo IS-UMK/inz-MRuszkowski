@@ -8,6 +8,7 @@ import SongCreatorWindow.Model.ModelManager;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
@@ -15,6 +16,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -23,7 +25,11 @@ import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
 
 import static SongCreatorWindow.Model.GlobalSettings.*;
@@ -509,6 +515,9 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         MenuItem pathSelectionMenuItem = selectionMenuItemToCanvas.get(canvas);
         pathSelectionMenuItem.setText(path.getName());
 
+        MenuItem pathWhereSoundsAreSelected = selectionMenuForSounds.get(path);
+        pathWhereSoundsAreSelected.setText(path.getName());
+
         onPathClearSelection();
     }
 
@@ -993,8 +1002,19 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         }
     }
 
-    public void printSongToPDFFile(String path) throws FileNotFoundException
+    public void printSongToPDFFile(String destinationPath) throws FileNotFoundException
     {
+        Canvas canvas;
+        for(Path path : canvasMap.keySet()) {
+            canvas = canvasMap.get(path);
 
+            WritableImage image = canvas.snapshot(null, null);
+            BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
+            try {
+                ImageIO.write(bImage, "png", new File(destinationPath.substring(0, destinationPath.length() - 4) + ".png"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
