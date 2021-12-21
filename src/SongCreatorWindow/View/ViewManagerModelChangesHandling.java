@@ -1005,7 +1005,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         }
     }
 
-    public void printSongToPDFFile(String destinationPath) throws FileNotFoundException
+    public void printSongToPNGFile(String destinationPath) throws FileNotFoundException
     {
         Canvas canvasToPrint = new Canvas(canvasCurrentWidth, GlobalSettings.Height * canvasMap.size());
         Canvas currentCanvas;
@@ -1039,7 +1039,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
                 if(bindingViewPath != null)
                 {
                     var elementsOfPath = bindingViewPath.getElements();
-                    System.out.println(elementsOfPath);
+
                     MoveTo moveToPoint = (MoveTo)elementsOfPath.get(0);
                     CubicCurveTo curve = (CubicCurveTo) elementsOfPath.get(1);
 

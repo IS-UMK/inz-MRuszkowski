@@ -14,7 +14,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ZoomEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -23,7 +22,6 @@ import org.jfugue.player.Player;
 import javax.sound.midi.InvalidMidiDataException;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 import static SongCreatorWindow.Model.GlobalSettings.*;
@@ -410,7 +408,7 @@ public class MainController
 
         try
         {
-            viewManager.printSongToPDFFile(path);
+            viewManager.printSongToPNGFile(path);
         }
         catch (FileNotFoundException e) {
             e.printStackTrace();

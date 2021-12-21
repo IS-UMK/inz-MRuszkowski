@@ -546,7 +546,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
     {
         var instruments = Instrument.getAllInstruments();
         instrumentChoiceBoxForCurrentlySelectedSoundToEdition = new ChoiceBox(FXCollections.observableArrayList(instruments));
-        instrumentChoiceBoxForCurrentlySelectedSoundToEdition.setValue(instruments[musicSound.getInstrument()]);
+        instrumentChoiceBoxForCurrentlySelectedSoundToEdition.setValue(instruments[musicSound.getInstrument() + 1]);
         instrumentChoiceBoxForCurrentlySelectedSoundToEdition.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
             @Override
             public void changed(ObservableValue observableValue, Object o, Object t1) {
@@ -662,12 +662,13 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
     public void onMusicSoundHeightChange(Path path, IPlayable musicSound)
     {
         HBox toReplace = optionsContent.get(optionsContent.size() - 2);
+        System.out.println(toReplace.getChildren().get(1));
         vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().remove(toReplace);
         optionsContent.remove(toReplace);
 
         HBox newOne = createModificationSection(path, musicSound);
-        vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().add(newOne);
-        optionsContent.add(newOne);
+        vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().add(optionsContent.size() - 1, newOne);
+        optionsContent.add(optionsContent.size() - 1, newOne);
     }
 
     @Override
