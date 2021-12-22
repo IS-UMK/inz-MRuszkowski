@@ -376,8 +376,16 @@ public class Path implements Serializable
      */
     public void setSelectedMusicSound(IPlayable musicSound)
     {
-        selectedMusicSound = musicSound;
-        fireOnMusicSoundSelected(this, musicSound);
+        if(selectedMusicSound != musicSound)
+        {
+            selectedMusicSound = musicSound;
+            fireOnMusicSoundSelected(this, musicSound);
+        }
+        else
+        {
+            selectedMusicSound = null;
+            fireOnMusicSoundClearSelection();
+        }
     }
 
     /**
