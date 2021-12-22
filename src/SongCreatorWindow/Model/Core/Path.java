@@ -150,7 +150,6 @@ public class Path implements Serializable
     {
         sound.setSoundConcatenation(true);
 
-
         int index = _sounds.indexOf(sound);
 
         TieSelection previousTie = TieSelection.None;
@@ -180,23 +179,9 @@ public class Path implements Serializable
 
         if(musicSound instanceof Accord)
         {
-            int indexOfSound = _sounds.indexOf(musicSound);
-            _sounds.remove(musicSound);
-
             var newNote = Note.CreateNote(musicSound.getValue(), musicSound.getDuration(), musicSound.getInstrument());
-            newNote.setFlatness(musicSound.isFlat());
-            newNote.setSharpness(musicSound.isSharp());
-            newNote.setVolume(musicSound.getVolume());
 
-            newNote.setSoundConcatenation(musicSound.getSoundConcatenation());
-            newNote.setPreviousTiedSound(musicSound.getPreviousTiedSound());
-            newNote.setNextTiedSound(musicSound.getNextTiedSound());
-
-            newNote.setTimeX(musicSound.getTimeX());
-            newNote.setSoundHeight(musicSound.getSoundHeight());
-
-            _sounds.add(indexOfSound, newNote);
-            //addSound(newNote);
+            setUpConversion(musicSound, newNote);
 
             fireOnMusicSoundConvertedToNote(this, musicSound, newNote);
         }
@@ -209,26 +194,69 @@ public class Path implements Serializable
 
         if(musicSound instanceof Note)
         {
-            int indexOfSound = _sounds.indexOf(musicSound);
-            _sounds.remove(musicSound);
+            var rootNote = Note.CreateNote(musicSound.getValue(), musicSound.getDuration(), musicSound.getInstrument());
 
-            var newAccord = new Accord((Note)musicSound, GlobalSettings.accordSelectionName);
-            newAccord.setFlatness(musicSound.isFlat());
-            newAccord.setSharpness(musicSound.isSharp());
-            newAccord.setVolume(musicSound.getVolume());
+            var newAccord = new Accord(rootNote, GlobalSettings.accordSelectionName);
 
-            newAccord.setSoundConcatenation(musicSound.getSoundConcatenation());
-            newAccord.setPreviousTiedSound(musicSound.getPreviousTiedSound());
-            newAccord.setNextTiedSound(musicSound.getNextTiedSound());
-
-            newAccord.setTimeX(musicSound.getTimeX());
-            newAccord.setSoundHeight(musicSound.getSoundHeight());
-
-            _sounds.add(indexOfSound, newAccord);
-            //addSound(newAccord);
+            setUpConversion(musicSound, newAccord);
 
             fireOnMusicSoundConvertedToAccord(this, musicSound, newAccord);
         }
+    }
+
+    private void setUpConversion(IPlayable soundToReplace, IPlayable newSound)
+    {
+        newSound.setFlatness(soundToReplace.isFlat());
+        newSound.setSharpness(soundToReplace.isSharp());
+        newSound.setVolume(soundToReplace.getVolume());
+
+        //newAccord.setSoundConcatenation(musicSound.getSoundConcatenation());
+        TieSelection concatenationPrevious = TieSelection.None;
+        TieSelection concatenationNext = TieSelection.None;
+
+        if(soundToReplace.getSoundConcatenation() != TieSelection.None)
+        {
+            newSound.setSoundConcatenation(true);
+
+            if(soundToReplace.isTiedWithAnotherSound())
+            {
+                concatenationNext = soundToReplace.getNextTiedSound().getSoundConcatenation();
+                newSound.setNextTiedSound(soundToReplace.getNextTiedSound());
+            }
+
+            if(soundToReplace.isTiedWithPreviousSound())
+            {
+                concatenationPrevious = soundToReplace.getPreviousTiedSound().getSoundConcatenation();
+                newSound.setPreviousTiedSound(soundToReplace.getPreviousTiedSound());
+            }
+        }
+
+        newSound.setTimeX(soundToReplace.getTimeX());
+        newSound.setSoundHeight(soundToReplace.getSoundHeight());
+
+        deleteSound(soundToReplace);
+
+        TieSelection save = TieSelection.None;
+        if(soundToReplace.getSoundConcatenation() != TieSelection.None) {
+            save = GlobalSettings.TieBetweenNotes;
+            GlobalSettings.TieBetweenNotes = TieSelection.Include;
+        }
+
+        if(newSound.isTiedWithAnotherSound())
+        {
+            newSound.getNextTiedSound().setSoundConcatenation(concatenationNext);
+            newSound.getNextTiedSound().setPreviousTiedSound(newSound);
+        }
+
+        if(newSound.isTiedWithPreviousSound()){
+            newSound.getPreviousTiedSound().setSoundConcatenation(concatenationPrevious);
+            newSound.getPreviousTiedSound().setNextTiedSound(newSound);
+        }
+        //_sounds.add(indexOfSound, newAccord);
+
+        appendToMusicListInOrder(newSound);
+
+        GlobalSettings.TieBetweenNotes = save;
     }
 
     public void ChangeAccordName(IPlayable musicSound, String accordName)

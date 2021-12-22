@@ -280,6 +280,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
         //border of path
         gc.setStroke(Color.BLACK);
+        gc.setFill(Color.BLACK);
         gc.setLineWidth(1);
         gc.strokeRect(0,0, canvasCurrentWidth, Height);
 
@@ -501,7 +502,9 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         gc.strokeRect(0,0, Height, Height);
         gc.setFont(font);
         //Text should be placed basing on the middle of square, minus half of the final text size on canvas (font size)
-        gc.fillText(path.getName(), Height /2 - path.getName().length()/2.0*24*3/4, Height /2, Height);
+        //gc.fillText(path.getName(), Height /2 - path.getName().length()/2.0*24*3/4, Height /2, Height);
+        //gc.fillText(path.getName(), Height /2 - path.getName().length()/2.0*24*3/4, Height /2, Height);
+        gc.fillText(path.getName(), Height / 2 - path.getName().length() * 8, Height / 2);
     }
     //endregion
 
@@ -878,7 +881,8 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
     }
 
     @Override
-    public void onMusicSoundDurationChange(Path path, IPlayable musicSound) {
+    public void onMusicSoundDurationChange(Path path, IPlayable musicSound)
+    {
         var views = musicSymbols.get(musicSound);
 
         for(ImageView view : views)
@@ -886,7 +890,8 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
     }
 
     @Override
-    public void onMusicSoundModified(Path path, IPlayable musicSound) {
+    public void onMusicSoundModified(Path path, IPlayable musicSound)
+    {
         int symbolDim = GlobalSettings.noteHeight / 3;
 
         Image modificationSymbol = switch (musicSound.getModification())
@@ -951,29 +956,62 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
     @Override
     public void onMusicSoundConvertedToAccord(Path path, IPlayable musicSound, Accord newAccord)
     {
-        var views = musicSymbols.get(musicSound);
+        onMusicSymbolAdded(path, newAccord);
+
+        onMusicSoundTieCheck(path, newAccord);
+        /*var views = musicSymbols.get(musicSound);
         musicSymbols.remove(musicSound);
 
         musicSymbols.put(newAccord, views);
 
         addAdditionalSymbols(views, path, newAccord);
 
+        refreshSoundBindings(path, musicSound, newAccord);
+
         DeleteSoundMenuItem(path, musicSound);
-        AddSoundMenuItem(path, newAccord);
+        AddSoundMenuItem(path, newAccord);*/
     }
 
     @Override
     public void onMusicSoundConvertedToNote(Path path, IPlayable musicSound, IPlayable newNote)
     {
-        var views = musicSymbols.get(musicSound);
+        onMusicSymbolAdded(path, newNote);
+
+        onMusicSoundTieCheck(path, newNote);
+        /*var views = musicSymbols.get(musicSound);
         musicSymbols.remove(musicSound);
 
         musicSymbols.put(newNote, views);
 
         removeAdditionalSymbols(views);
 
+        refreshSoundBindings(path, musicSound, newNote);
+
         DeleteSoundMenuItem(path, musicSound);
-        AddSoundMenuItem(path, newNote);
+        AddSoundMenuItem(path, newNote);*/
+    }
+
+    private void refreshSoundBindings(Path path, IPlayable musicSound, IPlayable newSound)
+    {
+        if(musicSound.isTiedWithPreviousSound())
+        {
+            var tiePath = bindingSymbols.get(musicSound);
+            anchorPaneWithPaths.getChildren().remove(tiePath);
+            bindingSymbols.remove(musicSound);
+
+            redrawSoundBinding(path, newSound);
+        }
+
+        if(musicSound.isTiedWithAnotherSound())
+        {
+            IPlayable nextSound = musicSound.getNextTiedSound();
+
+            var tiePath = bindingSymbols.get(nextSound);
+            anchorPaneWithPaths.getChildren().remove(tiePath);
+            bindingSymbols.remove(nextSound);
+
+            redrawSoundBinding(path, nextSound);
+        }
     }
 
     @Override
