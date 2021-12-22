@@ -392,6 +392,9 @@ public class Note implements IPlayable{
     @Override
     public String ExtractJFugueSoundString(boolean withInstrument)
     {
+        if(this.volume == 0)
+            return "";
+
         StringBuilder musicString = new StringBuilder();
 
         if(withInstrument)

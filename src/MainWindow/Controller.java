@@ -1,7 +1,6 @@
 package MainWindow;
 
 import SongCreatorWindow.Controllers.MainController;
-import SongCreatorWindow.Model.Core.GlobalLoaderDTO;
 import SongCreatorWindow.Model.GlobalSettings;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -22,13 +21,9 @@ import javax.sound.midi.Sequence;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static SongCreatorWindow.Model.GlobalSettings.midiExtension;
 
 public class Controller
 {
@@ -40,6 +35,7 @@ public class Controller
     //When music is played from MainWindow
     @FXML
     Button playSongDirectlyFromFileButton;
+    String nameOfFile;
     Player player = new Player();
     ManagedPlayer managedPlayer = player.getManagedPlayer();
 
@@ -59,6 +55,7 @@ public class Controller
                     @Override
                     public void run() {
                         playSongDirectlyFromFileButton.setText("Stop Playing");
+                        Logger.appendTextToLogLabel(logLabel, String.format("Playing song from file %s", nameOfFile));
                     }
                 });
             }
@@ -69,6 +66,7 @@ public class Controller
                     @Override
                     public void run() {
                         playSongDirectlyFromFileButton.setText("Play Song from MIDI File");
+                        Logger.appendTextToLogLabel(logLabel, String.format("Playing song from file %s has been finished", nameOfFile));
                     }
                 });
             }
@@ -121,6 +119,7 @@ public class Controller
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle("Choose Midi File");
                 File file = fileChooser.showOpenDialog(MainWindow.StageToDeleteLater);
+                nameOfFile = file.getName();
 
                 Pattern patternFromFile = MidiFileManager.loadPatternFromMidi(file);
 
@@ -129,39 +128,10 @@ public class Controller
                         managedPlayer,
                         patternFromFile
                 );
+
                 Thread music = new Thread(playing);
                 music.start();
 
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        playSongDirectlyFromFileButton.setText("Stop Playing");
-                    }
-                });
-                /*new Thread(() -> {
-                    //TODO: Jak wysłać wiadomość z innego wątku? Czy można uruchamiać funkcje z innego wątku?
-                    //appendTextToLogLabel(String.format("Playing song %s has started", file.getName()));
-
-                    if (!managedPlayer.isPlaying()) {
-                        player.play(patternFromFile);
-
-                        while(!this.managedPlayer.isFinished()) {
-                            try {
-                                Thread.sleep(20L);
-                            } catch (InterruptedException var3) {
-                            }
-                        }
-
-                        //playSongDirectlyFromFileButton.setText("Play Song from MIDI File");
-                    } else {
-                        //appendTextToLogLabel(String.format("Cannot play song because there is already different one playing", file.getName()));
-                        return;
-                    }
-
-                    //appendTextToLogLabel(String.format("Playing song %s has been finished", file.getName()));
-                }).start();*/
-
-                //playSongDirectlyFromFileButton.setText("Stop Playing");
             } catch (RuntimeException e) {
                 Logger.appendTextToLogLabel(logLabel,"Loading song aborted");
                 return;

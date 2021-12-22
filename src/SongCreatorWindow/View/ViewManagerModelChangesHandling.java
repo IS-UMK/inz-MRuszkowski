@@ -959,17 +959,8 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         onMusicSymbolAdded(path, newAccord);
 
         onMusicSoundTieCheck(path, newAccord);
-        /*var views = musicSymbols.get(musicSound);
-        musicSymbols.remove(musicSound);
-
-        musicSymbols.put(newAccord, views);
-
-        addAdditionalSymbols(views, path, newAccord);
-
-        refreshSoundBindings(path, musicSound, newAccord);
-
-        DeleteSoundMenuItem(path, musicSound);
-        AddSoundMenuItem(path, newAccord);*/
+        onMusicSoundModified(path, newAccord);
+        onMusicSoundSelectedToEdition(path, newAccord);
     }
 
     @Override
@@ -978,17 +969,8 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         onMusicSymbolAdded(path, newNote);
 
         onMusicSoundTieCheck(path, newNote);
-        /*var views = musicSymbols.get(musicSound);
-        musicSymbols.remove(musicSound);
-
-        musicSymbols.put(newNote, views);
-
-        removeAdditionalSymbols(views);
-
-        refreshSoundBindings(path, musicSound, newNote);
-
-        DeleteSoundMenuItem(path, musicSound);
-        AddSoundMenuItem(path, newNote);*/
+        onMusicSoundModified(path, newNote);
+        onMusicSoundSelectedToEdition(path, newNote);
     }
 
     private void refreshSoundBindings(Path path, IPlayable musicSound, IPlayable newSound)

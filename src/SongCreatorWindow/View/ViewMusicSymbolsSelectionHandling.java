@@ -661,6 +661,10 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
     @Override
     public void onMusicSoundHeightChange(Path path, IPlayable musicSound)
     {
+        refreshModificationSection(path, musicSound);
+    }
+
+    private void refreshModificationSection(Path path, IPlayable musicSound) {
         HBox toReplace = optionsContent.get(optionsContent.size() - 2);
         System.out.println(toReplace.getChildren().get(1));
         vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().remove(toReplace);

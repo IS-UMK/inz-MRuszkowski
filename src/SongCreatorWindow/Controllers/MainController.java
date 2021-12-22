@@ -139,7 +139,7 @@ public class MainController
 
                     @Override
                     public void onSeek(long l) {
-                        System.out.println("Time: " + l);
+                        
                     }
 
                     @Override
