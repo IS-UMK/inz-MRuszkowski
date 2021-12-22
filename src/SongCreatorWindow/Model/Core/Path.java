@@ -558,7 +558,7 @@ public class Path implements Serializable
 
     public String getExtractedMusic()
     {
-        if(_sounds.size() == 0)
+        if(_sounds.size() == 0 || _volumeLevel == 0)
             return "";
 
         var musicString = new StringBuilder();

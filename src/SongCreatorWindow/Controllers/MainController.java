@@ -104,49 +104,7 @@ public class MainController
                     }
                 }
 
-                managedPlayer.addManagedPlayerListener(new ManagedPlayerListener() {
-                    @Override
-                    public void onStarted(Sequence sequence) {
-                        viewManager.changeTextOfPlayMenuItem("Pause");
-                        new Thread(() ->
-                        {
-                            viewManager.initializeVisualBar();
-                            while(!managedPlayer.isFinished())
-                            {
-                                if(managedPlayer.isPlaying())
-                                {
-                                    viewManager.setVisualBarPosition(GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() + managedPlayer.getTickPosition() / GlobalSettings.constBarFactor_WidthPerTick);
-                                }
-                            }
-                        }).start();
-                    }
-
-                    @Override
-                    public void onFinished() {
-                        viewManager.changeTextOfPlayMenuItem("Play");
-                        viewManager.removeVisualBar();
-                    }
-
-                    @Override
-                    public void onPaused() {
-                        viewManager.changeTextOfPlayMenuItem("Resume");
-                    }
-
-                    @Override
-                    public void onResumed() {
-                        viewManager.changeTextOfPlayMenuItem("Pause");
-                    }
-
-                    @Override
-                    public void onSeek(long l) {
-
-                    }
-
-                    @Override
-                    public void onReset() {
-
-                    }
-                });
+                //managedPlayer.addManagedPlayerListener();
             }
         });
     }
@@ -438,13 +396,86 @@ public class MainController
     //region Song
     Player player = new Player();
     ManagedPlayer managedPlayer = player.getManagedPlayer();
+    ManagedPlayerListener playerListener = new ManagedPlayerListener() {
+        @Override
+        public void onStarted(Sequence sequence) {
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    viewManager.changeTextOfPlayMenuItem("Pause");
+                    new Thread(() ->
+                    {
+                        viewManager.initializeVisualBar();
+                        while(!managedPlayer.isFinished())
+                        {
+                            if(managedPlayer.isPlaying())
+                            {
+                                viewManager.setVisualBarPosition(GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() + managedPlayer.getTickPosition() / GlobalSettings.constBarFactor_WidthPerTick);
+                                try {
+                                    Thread.sleep(20);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    }).start();
+                }
+            });
+        }
+
+        @Override
+        public void onFinished() {
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    viewManager.changeTextOfPlayMenuItem("Play");
+                    viewManager.removeVisualBar();
+                }
+            });
+        }
+
+        @Override
+        public void onPaused() {
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    viewManager.changeTextOfPlayMenuItem("Resume");
+                }
+            });
+        }
+
+        @Override
+        public void onResumed() {
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    viewManager.changeTextOfPlayMenuItem("Pause");
+                }
+            });
+        }
+
+        @Override
+        public void onSeek(long l) {
+
+        }
+
+        @Override
+        public void onReset() {
+
+        }
+    };
 
     public void PlayAllPathsWithoutMutedOnes(ActionEvent actionEvent)
     {
         new Thread(() -> {
             if(!managedPlayer.isPlaying()){
                 if(!managedPlayer.isPaused())
+                {
+                    player = new Player();
+                    managedPlayer = player.getManagedPlayer();
+                    managedPlayer.addManagedPlayerListener(playerListener);
                     player.play(modelManager.extractEntireMusic());
+                }
                 else
                     managedPlayer.resume();
             }
