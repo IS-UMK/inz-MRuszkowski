@@ -118,13 +118,13 @@ public class MainController
                                     viewManager.setVisualBarPosition(GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() + managedPlayer.getTickPosition() / GlobalSettings.constBarFactor_WidthPerTick);
                                 }
                             }
-                            viewManager.removeVisualBar();
                         }).start();
                     }
 
                     @Override
                     public void onFinished() {
                         viewManager.changeTextOfPlayMenuItem("Play");
+                        viewManager.removeVisualBar();
                     }
 
                     @Override
@@ -139,7 +139,7 @@ public class MainController
 
                     @Override
                     public void onSeek(long l) {
-                        
+
                     }
 
                     @Override
@@ -458,6 +458,12 @@ public class MainController
     {
         if(managedPlayer.isPlaying())
             managedPlayer.finish();
+
+        if(managedPlayer.isPaused())
+        {
+            managedPlayer.seek(managedPlayer.getTickLength());
+            managedPlayer.resume();
+        }
     }
 
     public void PrintSongToPNGFile(ActionEvent actionEvent)
