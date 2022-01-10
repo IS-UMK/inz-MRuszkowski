@@ -16,6 +16,7 @@ import java.util.List;
 public class Path implements Serializable
 {
     String _pathName;
+    final int nameLength = 12;
     public String getName()
     {
         return _pathName;
@@ -108,6 +109,9 @@ public class Path implements Serializable
     private Path(String pathName, byte voice, MusicClefSelection musicKey, String selectedInstrument, int tempo, byte volumeLevel)
     {
         _pathName = pathName;
+        if(_pathName.length() > nameLength)
+            _pathName = _pathName.substring(0, nameLength);
+
         _selectedKey = musicKey;
 
         _selectedInstrument = selectedInstrument;

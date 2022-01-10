@@ -270,15 +270,6 @@ public class Note implements IPlayable{
 
     public static int mapNoteSymbolToNumericalValue(String noteSymbol, int octave)
     {
-        /*if (sound != 'E' && sound != 'B') {
-                    modified.append("#");
-                }
-            }
-
-            case Flat -> {
-                if (sound != 'C' && sound != 'F') {
-                    modified.append("b");
-                }*/
         int baseNoteMIDIValue = switch (noteSymbol) {
             case "C" -> 0;
             case "C#", "Db" -> 1;

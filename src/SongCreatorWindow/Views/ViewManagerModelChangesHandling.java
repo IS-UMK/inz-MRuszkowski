@@ -542,8 +542,6 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         //move up canvases below selected to delete
         int index = canvasList.indexOf(canvas);
 
-        List<ImageView> views;
-
         for(int i = index + 1; i < canvasList.size(); i++)
         {
             System.out.println(String.format("Moving components of path %d up", i));
@@ -561,7 +559,10 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
             tempoMap_to_move_up.setLayoutY(tempoMap_to_move_up.getLayoutY() - Height);
         }
 
+
+        List<ImageView> views;
         ImageView modifier;
+        javafx.scene.shape.Path bindings;
         for(IPlayable sound : path.getSounds())
         {
             views = musicSymbols.get(sound);
@@ -570,7 +571,17 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
             modifier = modificationSymbols.get(sound);
             if(modifier != null)
+            {
                 anchorPaneWithPaths.getChildren().remove(modifier);
+                modificationSymbols.remove(modifier);
+            }
+
+            bindings = bindingSymbols.get(sound);
+            if(bindings != null)
+            {
+                anchorPaneWithPaths.getChildren().remove(bindings);
+                bindingSymbols.remove(bindings);
+            }
         }
 
         //remove this canvas from data structures

@@ -22,9 +22,6 @@ import static SongCreatorWindow.Model.GlobalSettings.*;
 
 public class ModelManager implements Serializable
 {
-    @Serial
-    private static final long serialVersionUID = 8538391531267863794L;
-
     String projectName = null;
     public void setProjectName(String name) { projectName = name; }
     public String getProjectName() { return projectName; }
@@ -149,15 +146,20 @@ public class ModelManager implements Serializable
         String musicString = patternFromMidiFile.toString();
         var modelManager = new ModelManager();
 
-        String[] patterns = musicString.split("T[0-9]{1,3}");
-
-        for(int i = 1; i < patterns.length; i++)
-            patterns[i] = patterns[i].substring(3).trim();
+        List<String> patterns = new LinkedList<>();
+        String tmpPattern;
+        for(String pattern : musicString.split("V[0-9]{1,2}")) {
+            tmpPattern = pattern.replaceAll("T[0-9]{1,3}", "").strip();
+            if (!tmpPattern.equals(""))
+                patterns.add(tmpPattern);
+        }
 
         byte i = 0;
 
         int startX, octave, noteValue, index, baseIndex, insertY;
         double parsedValue;
+        IPlayable lastSound;
+        SoundModification modification = SoundModification.None;
 
         char saveChoice = GlobalSettings.chosenNote;
         List<Integer> nonFlatSounds = Note.getNonFlatSoundNumericalValues();
@@ -165,9 +167,6 @@ public class ModelManager implements Serializable
         for(String pattern : patterns)
         {
             parsedValue = 0;
-
-            if(pattern.equals(""))
-                continue;
 
             startX = (int) (numberOfPropertySquaresInPath * Height + musicClefWidth);
 
@@ -245,14 +244,31 @@ public class ModelManager implements Serializable
                         noteValue = Note.mapNoteSymbolToNumericalValue(musicSoundLetter, octave);
 
                         index = nonFlatSounds.indexOf(noteValue);
+                        modification = SoundModification.None;
+                        if(index < 0)
+                        {
+                            if(musicSoundLetter.charAt(1) == 'b')
+                            {
+                                index = nonFlatSounds.indexOf(noteValue - 1);
+                                modification = SoundModification.Sharp;
+                            }
+                            else
+                            {
+                                index = nonFlatSounds.indexOf(noteValue + 1);
+                                modification = SoundModification.Flat;
+                            }
+                        }
+
                         baseIndex = nonFlatSounds.indexOf(modelManager.getBasePointSound(modelManager.getPathByIndex(i).getMusicClefSelection()));
                         insertY = (int)(GlobalSettings.getLinesStartHeight()) - (index - baseIndex) * 10;
 
-                        modelManager.addMusicSymbol(
+                        lastSound = modelManager.addMusicSymbol(
                                 i,
                                 startX,
                                 insertY
                         );
+
+                        modelManager.getPathByIndex(i).setSoundModification(lastSound, modification);
                     }
 
                 }
