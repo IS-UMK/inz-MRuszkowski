@@ -6,10 +6,15 @@ import SongCreatorWindow.Model.Events.IMusicEvent;
 import SongCreatorWindow.Model.Events.IPathEvent;
 import SongCreatorWindow.Model.Events.ISoundEvent;
 import SongCreatorWindow.Model.Exceptions.CannotAddAnotherPathException;
+import org.jfugue.devices.MusicTransmitterToSequence;
+import org.jfugue.devtools.MidiDevicePrompt;
 import org.jfugue.midi.MidiFileManager;
 import org.jfugue.pattern.Pattern;
 
 import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.MidiDevice;
+import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.Sequence;
 import java.io.*;
 import java.util.*;
 
@@ -368,6 +373,18 @@ public class ModelManager implements Serializable
         }
         catch (MidiUnavailableException e) { e.printStackTrace(); }
         catch (InvalidMidiDataException e) { e.printStackTrace(); }*/
+
+        try {
+            MidiDevice device = MidiDevicePrompt.askForMidiDevice();
+            MusicTransmitterToSequence transmitter = new MusicTransmitterToSequence(device);
+            transmitter.listenForMillis(10000);
+            Sequence music = transmitter.getSequence();
+
+            System.out.println(music);
+        }
+        catch (MidiUnavailableException e) { e.printStackTrace(); }
+        catch (InvalidMidiDataException e) { e.printStackTrace(); }
+        catch (InterruptedException ex) { }
     }
     /**
      * Get path that is selected. Return null if none is chosen

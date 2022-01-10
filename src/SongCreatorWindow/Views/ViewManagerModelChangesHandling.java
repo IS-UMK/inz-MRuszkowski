@@ -1,4 +1,4 @@
-package SongCreatorWindow.View;
+package SongCreatorWindow.Views;
 
 import Images.ImageManager;
 import SongCreatorWindow.Model.Core.*;
@@ -1109,7 +1109,6 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
                     );
 
                     gc.closePath();
-                    gc.setFill(Color.TRANSPARENT);
                     gc.stroke();
                     gc.setLineWidth(GlobalSettings.strokeLineBorderWidth);
                 }

@@ -1,4 +1,4 @@
-package SongCreatorWindow.View;
+package SongCreatorWindow.Views;
 
 import Images.ImageManager;
 import SongCreatorWindow.Model.Core.*;

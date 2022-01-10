@@ -6,8 +6,8 @@ import SongCreatorWindow.Model.Core.MusicClefSelection;
 import SongCreatorWindow.Model.Exceptions.CannotAddAnotherPathException;
 import SongCreatorWindow.Model.GlobalSettings;
 import SongCreatorWindow.Model.ModelManager;
-import SongCreatorWindow.View.ViewManagerModelChangesHandling;
-import SongCreatorWindow.View.ViewMusicSymbolsSelectionHandling;
+import SongCreatorWindow.Views.ViewManagerModelChangesHandling;
+import SongCreatorWindow.Views.ViewMusicSymbolsSelectionHandling;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -103,8 +103,6 @@ public class MainController
                         e.printStackTrace();
                     }
                 }
-
-                //managedPlayer.addManagedPlayerListener();
             }
         });
     }

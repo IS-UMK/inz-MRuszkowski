@@ -122,15 +122,18 @@ public class Controller
                 nameOfFile = file.getName();
 
                 Pattern patternFromFile = MidiFileManager.loadPatternFromMidi(file);
+                new Thread(() -> {
+                    if (!managedPlayer.isPlaying()) {
+                        player.play(patternFromFile);
 
-                var playing = new PlaySongThread(
-                        player,
-                        managedPlayer,
-                        patternFromFile
-                );
-
-                Thread music = new Thread(playing);
-                music.start();
+                        while (!this.managedPlayer.isFinished()) {
+                            try {
+                                Thread.sleep(20L);
+                            } catch (InterruptedException var3) {
+                            }
+                        }
+                    }
+                }).start();
 
             } catch (RuntimeException e) {
                 Logger.appendTextToLogLabel(logLabel,"Loading song aborted");
@@ -154,7 +157,7 @@ public class Controller
     {
         Parent root = FXMLLoader.load(getClass().getResource("../SongCreatorWindow/SongCreator.fxml"));
 
-        Scene scene = new Scene(root, 800, 600);
+        Scene scene = new Scene(root, 1280, 800);
 
         Stage stage = new Stage();
         stage.setTitle("Song Creator Window");

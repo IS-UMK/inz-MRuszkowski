@@ -4,8 +4,8 @@ import SongCreatorWindow.Model.Core.IPlayable;
 import SongCreatorWindow.Model.Core.Path;
 import SongCreatorWindow.Model.Events.IClickedEvent;
 import SongCreatorWindow.Model.Events.IPathEvent;
-import SongCreatorWindow.View.ViewManagerModelChangesHandling;
-import SongCreatorWindow.View.ViewMusicSymbolsSelectionHandling;
+import SongCreatorWindow.Views.ViewManagerModelChangesHandling;
+import SongCreatorWindow.Views.ViewMusicSymbolsSelectionHandling;
 
 public class MusicSymbolsController implements IClickedEvent, IPathEvent
 {
