@@ -36,9 +36,9 @@ public class ModelManager implements Serializable
     private int getBasePointSound(MusicClefSelection musicClefSelection)
     {
         return switch (musicClefSelection) {
-            case ViolinClef -> 67;//NoteToNumericValue.Get_Octave_5_sound_G(); // 67 - G5
-            case BassClef -> 53;//NoteToNumericValue.Get_Octave_4_sound_F(); // 53 - F4
-            case AltoClef -> 60; //NoteToNumericValue.Get_Octave_5_sound_C(); // 60 - C5
+            case ViolinClef -> 67;// G5
+            case BassClef -> 53;// F4
+            case AltoClef -> 60; // C5
         };
     }
     private String getCalculatedSoundValue(int insertY, MusicClefSelection musicClefSelection)
@@ -162,6 +162,7 @@ public class ModelManager implements Serializable
         SoundModification modification = SoundModification.None;
 
         char saveChoice = GlobalSettings.chosenNote;
+
         List<Integer> nonFlatSounds = Note.getNonFlatSoundNumericalValues();
 
         for(String pattern : patterns)
@@ -170,6 +171,11 @@ public class ModelManager implements Serializable
 
             startX = (int) (numberOfPropertySquaresInPath * Height + musicClefWidth);
 
+            String[] sounds = pattern.split("I[0-9]{1,3}");
+            sounds[0] = pattern.replace(sounds[1], "");
+
+            GlobalSettings.InstrumentChoice = Integer.parseInt(sounds[0].substring(1));
+
             try {
                 modelManager.createPath(String.format("Path %d", i+1));
             } catch (CannotAddAnotherPathException e) {
@@ -177,15 +183,11 @@ public class ModelManager implements Serializable
                 return modelManager;
             }
 
-            String[] sounds = pattern.split("I[0-9]{1,3}");
-
-            for(String sound : sounds)
-                sound = sound.trim();
-
             for(String sound : sounds)
             {
-                if(sound.equals(""))
+                if(sound.charAt(0) == 'I')
                     continue;
+
                 String[] notes = sound.split(" ");
 
                 for(String note: notes)
@@ -226,9 +228,9 @@ public class ModelManager implements Serializable
                         }
 
                         if(symbols.charAt(0) == '@')
-                            startX = (int)Path.getSoundTimeX(parsedValue);//;(int)((parsedValue * 2 * GlobalSettings.Height) + GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal() + GlobalSettings.fixedXPositionOfNotes);
+                            startX = (int)Path.getSoundTimeX(parsedValue);
                         else {
-                            startX += Path.getSoundTimeX(parsedValue) - GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal();//;(int)(parsedValue * 2 * GlobalSettings.Height);
+                            startX += Path.getSoundTimeX(parsedValue) - GlobalSettings.getStartXofAreaWhereInsertingNotesIsLegal();
                         }
                     }
                     else
@@ -240,6 +242,17 @@ public class ModelManager implements Serializable
                         octave = Character.getNumericValue(symbols.charAt(0));
 
                         GlobalSettings.chosenNote = symbols.charAt(1);
+                        if( GlobalSettings.chosenNote == '/'){
+                            float tmp = Float.parseFloat(symbols.substring(2, symbols.length() - 3));
+
+                            if(tmp > 0.75) GlobalSettings.chosenNote = 'w';
+                            else if(tmp > 0.375) GlobalSettings.chosenNote = 'h';
+                            else if(tmp > 0.1875) GlobalSettings.chosenNote = 'q';
+                            else if(tmp > 0.09375) GlobalSettings.chosenNote = 'i';
+                            else if(tmp > 0.046875) GlobalSettings.chosenNote = 's';
+                            else if(tmp > 0.0234375) GlobalSettings.chosenNote = 't';
+                            else GlobalSettings.chosenNote = 'x';
+                        }
 
                         noteValue = Note.mapNoteSymbolToNumericalValue(musicSoundLetter, octave);
 
@@ -249,13 +262,13 @@ public class ModelManager implements Serializable
                         {
                             if(musicSoundLetter.charAt(1) == 'b')
                             {
-                                index = nonFlatSounds.indexOf(noteValue - 1);
-                                modification = SoundModification.Sharp;
+                                index = nonFlatSounds.indexOf(noteValue + 1);
+                                modification = SoundModification.Flat;
                             }
                             else
                             {
-                                index = nonFlatSounds.indexOf(noteValue + 1);
-                                modification = SoundModification.Flat;
+                                index = nonFlatSounds.indexOf(noteValue - 1);
+                                modification = SoundModification.Sharp;
                             }
                         }
 
@@ -278,6 +291,7 @@ public class ModelManager implements Serializable
         }
 
         GlobalSettings.chosenNote = saveChoice;
+        GlobalSettings.InstrumentChoice = 1;
 
         return modelManager;
     }
@@ -307,6 +321,8 @@ public class ModelManager implements Serializable
 
             loadedPath = this.getPathByIndex(musicPaths.size() - 1);
 
+            SoundTypeSelection save = GlobalSettings.selectedTypeOfSoundToInsertInPath;
+
             for(IPlayable sound : path.getSounds()) {
                 if(sound.getSoundConcatenation() != TieSelection.None)
                     GlobalSettings.TieBetweenNotes = TieSelection.Include;
@@ -318,11 +334,17 @@ public class ModelManager implements Serializable
                 else if(sound.isFlat())
                     modifier = SoundModification.Flat;
 
+                if(sound.getSoundType().equals("Accord"))
+                    GlobalSettings.selectedTypeOfSoundToInsertInPath = SoundTypeSelection.Accord;
+                else GlobalSettings.selectedTypeOfSoundToInsertInPath = SoundTypeSelection.Note;
+
                 loadedPath.setSoundModification(
                         addMusicSymbol(path.getVoice(), sound.getTimeX(), sound.getSoundHeight(), sound.getDuration()),
                         modifier
                 );
             }
+
+            GlobalSettings.selectedTypeOfSoundToInsertInPath = save;
         }
 
         GlobalSettings.TieBetweenNotes = userPrefTie;
@@ -450,6 +472,11 @@ public class ModelManager implements Serializable
         {
             return null;
         }
+    }
+
+    public Path getLastPath()
+    {
+        return musicPaths.get(musicPaths.size() - 1);
     }
 
     /**
@@ -710,11 +737,8 @@ public class ModelManager implements Serializable
         Iterator iterator = pathListeners.iterator();
 
         while(iterator.hasNext()) {
-            try{
-                IPathEvent pathEvent = (IPathEvent) iterator.next();
-                pathEvent.onPathDeleted(path);
-            }
-            catch (Exception e){}
+            IPathEvent pathEvent = (IPathEvent) iterator.next();
+            pathEvent.onPathDeleted(path);
         }
     }
     //endregion
