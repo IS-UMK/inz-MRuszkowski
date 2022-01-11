@@ -104,8 +104,8 @@ public class GlobalSettings
     /**
      * User chooses what type of sound will be inserted
      */
-    public static SoundTypeSelection selectedTypeOfSoundToInsertInPath = SoundTypeSelection.Note;
-    public static TieSelection TieBetweenNotes = TieSelection.None;
+    public static SoundTypeSelection selectedTypeOfSoundToInsertIntoPath = SoundTypeSelection.Note;
+    public static TieSelection tieBetweenNotes = TieSelection.None;
     public static String accordSelectionName = "maj";
 
     /**

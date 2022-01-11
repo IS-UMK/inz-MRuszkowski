@@ -134,7 +134,7 @@ public class Path implements Serializable
     {
         appendToMusicListInOrder(sound);
 
-        if(GlobalSettings.TieBetweenNotes == TieSelection.Include)
+        if(GlobalSettings.tieBetweenNotes == TieSelection.Include)
             bindSounds(sound);
     }
 
@@ -242,8 +242,8 @@ public class Path implements Serializable
 
         TieSelection save = TieSelection.None;
         if(soundToReplace.getSoundConcatenation() != TieSelection.None) {
-            save = GlobalSettings.TieBetweenNotes;
-            GlobalSettings.TieBetweenNotes = TieSelection.Include;
+            save = GlobalSettings.tieBetweenNotes;
+            GlobalSettings.tieBetweenNotes = TieSelection.Include;
         }
 
         if(newSound.isTiedWithAnotherSound())
@@ -260,7 +260,7 @@ public class Path implements Serializable
 
         appendToMusicListInOrder(newSound);
 
-        GlobalSettings.TieBetweenNotes = save;
+        GlobalSettings.tieBetweenNotes = save;
     }
 
     public void ChangeAccordName(IPlayable musicSound, String accordName)

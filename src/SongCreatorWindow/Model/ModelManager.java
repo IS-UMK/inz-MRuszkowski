@@ -306,7 +306,7 @@ public class ModelManager implements Serializable
         this.setProjectName(modelManager.getProjectName());
         this.setProjectDestination(modelManager.getProjectDestination());
 
-        var userPrefTie = GlobalSettings.TieBetweenNotes;
+        var userPrefTie = GlobalSettings.tieBetweenNotes;
 
         Path loadedPath;
         SoundModification modifier;
@@ -321,12 +321,12 @@ public class ModelManager implements Serializable
 
             loadedPath = this.getPathByIndex(musicPaths.size() - 1);
 
-            SoundTypeSelection save = GlobalSettings.selectedTypeOfSoundToInsertInPath;
+            SoundTypeSelection save = GlobalSettings.selectedTypeOfSoundToInsertIntoPath;
 
             for(IPlayable sound : path.getSounds()) {
                 if(sound.getSoundConcatenation() != TieSelection.None)
-                    GlobalSettings.TieBetweenNotes = TieSelection.Include;
-                else GlobalSettings.TieBetweenNotes = TieSelection.None;
+                    GlobalSettings.tieBetweenNotes = TieSelection.Include;
+                else GlobalSettings.tieBetweenNotes = TieSelection.None;
 
                 modifier = SoundModification.None;
                 if(sound.isSharp())
@@ -335,8 +335,8 @@ public class ModelManager implements Serializable
                     modifier = SoundModification.Flat;
 
                 if(sound.getSoundType().equals("Accord"))
-                    GlobalSettings.selectedTypeOfSoundToInsertInPath = SoundTypeSelection.Accord;
-                else GlobalSettings.selectedTypeOfSoundToInsertInPath = SoundTypeSelection.Note;
+                    GlobalSettings.selectedTypeOfSoundToInsertIntoPath = SoundTypeSelection.Accord;
+                else GlobalSettings.selectedTypeOfSoundToInsertIntoPath = SoundTypeSelection.Note;
 
                 loadedPath.setSoundModification(
                         addMusicSymbol(path.getVoice(), sound.getTimeX(), sound.getSoundHeight(), sound.getDuration()),
@@ -344,10 +344,10 @@ public class ModelManager implements Serializable
                 );
             }
 
-            GlobalSettings.selectedTypeOfSoundToInsertInPath = save;
+            GlobalSettings.selectedTypeOfSoundToInsertIntoPath = save;
         }
 
-        GlobalSettings.TieBetweenNotes = userPrefTie;
+        GlobalSettings.tieBetweenNotes = userPrefTie;
     }
     //endregion
 
@@ -379,7 +379,7 @@ public class ModelManager implements Serializable
         note.setTimeX(insertX);
         note.setSoundHeight(insertY);
 
-        switch (GlobalSettings.selectedTypeOfSoundToInsertInPath) {
+        switch (GlobalSettings.selectedTypeOfSoundToInsertIntoPath) {
             case Note -> sound = note;
             case Accord -> sound = new Accord(note, GlobalSettings.accordSelectionName);
         }
@@ -528,11 +528,11 @@ public class ModelManager implements Serializable
         IPlayable duplicatedSound;
         for(IPlayable sound : selectedPath.getSounds())
         {
-            GlobalSettings.selectedTypeOfSoundToInsertInPath = sound.getSoundType().equals("Note") ? SoundTypeSelection.Note : SoundTypeSelection.Accord;
+            GlobalSettings.selectedTypeOfSoundToInsertIntoPath = sound.getSoundType().equals("Note") ? SoundTypeSelection.Note : SoundTypeSelection.Accord;
 
             if(sound.isTiedWithPreviousSound() || sound.isTiedWithAnotherSound())
-                GlobalSettings.TieBetweenNotes = TieSelection.Include;
-            else GlobalSettings.TieBetweenNotes = TieSelection.None;
+                GlobalSettings.tieBetweenNotes = TieSelection.Include;
+            else GlobalSettings.tieBetweenNotes = TieSelection.None;
 
             addMusicSymbol(pathIndex, sound.getTimeX(), sound.getSoundHeight(), sound.getDuration());
 

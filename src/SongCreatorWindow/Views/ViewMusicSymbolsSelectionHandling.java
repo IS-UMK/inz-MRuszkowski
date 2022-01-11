@@ -163,11 +163,11 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
                 switch (choice)
                 {
                     case Note -> {
-                        GlobalSettings.selectedTypeOfSoundToInsertInPath = SoundTypeSelection.Note;
+                        GlobalSettings.selectedTypeOfSoundToInsertIntoPath = SoundTypeSelection.Note;
                         accordChoiceBox.setDisable(true);
                     }
                     case Accord -> {
-                        GlobalSettings.selectedTypeOfSoundToInsertInPath = SoundTypeSelection.Accord;
+                        GlobalSettings.selectedTypeOfSoundToInsertIntoPath = SoundTypeSelection.Accord;
                         accordChoiceBox.setDisable(false);
                         System.out.println(String.format("Accord %s selected", GlobalSettings.accordSelectionName));
                     }
@@ -222,10 +222,10 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
                 switch (choice)
                 {
                     case None -> {
-                        GlobalSettings.TieBetweenNotes = TieSelection.None;
+                        GlobalSettings.tieBetweenNotes = TieSelection.None;
                     }
                     case Include -> {
-                        GlobalSettings.TieBetweenNotes = TieSelection.Include;
+                        GlobalSettings.tieBetweenNotes = TieSelection.Include;
                     }
                 }
                 System.out.println(String.format("Tie selection set to %s", choice.toString()));
