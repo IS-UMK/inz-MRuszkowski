@@ -735,6 +735,12 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
     @Override
     public void onMusicSoundClearSelection() {
+        if(soundEditionCanvas == null)
+        {
+            soundEditionCanvas = new Canvas(0, 0);
+            anchorPaneWithPaths.getChildren().add(soundEditionCanvas);
+        }
+
         soundEditionCanvas.getGraphicsContext2D().clearRect(0, 0, soundEditionCanvas.getWidth(), soundEditionCanvas.getHeight());
         soundEditionCanvas.setHeight(0);
     }
