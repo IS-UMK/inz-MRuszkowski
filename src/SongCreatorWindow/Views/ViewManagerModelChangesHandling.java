@@ -852,13 +852,17 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
     public void onMusicSoundHeightChange(Path path, IPlayable musicSound) {
         var views = musicSymbols.get(musicSound);
 
-        int movedLocation = 0;
-        if(views.size() > 1)
-            movedLocation = (int)(views.get(1).getLayoutY() - views.get(0).getLayoutY());
+        int savedLocation = (int) views.get(0).getLayoutY();
+        views.get(0).setLayoutY(musicSound.getSoundHeight() + GlobalSettings.Height * modelManager.getIndexOfPath(path));
 
-        for(int i = 0; i < views.size(); i++)
+        if(views.size() > 1)
         {
-            views.get(i).setLayoutY(musicSound.getSoundHeight() + i * movedLocation + GlobalSettings.Height * modelManager.getIndexOfPath(path));
+            int movedLocation = (int) (views.get(0).getLayoutY() - savedLocation);//(int) (views.get(1).getLayoutY() - views.get(0).getLayoutY());
+
+            for (int i = 1; i < views.size(); i++)
+            {
+                views.get(i).setLayoutY(views.get(i).getLayoutY() + movedLocation);//views.get(i - 1).getLayoutY() + i * movedLocation + GlobalSettings.Height * modelManager.getIndexOfPath(path));
+            }
         }
 
         onMusicSoundModified(path, musicSound);
@@ -1137,7 +1141,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         WritableImage image = canvasToPrint.snapshot(null, null);
         BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
         try {
-            ImageIO.write(bImage, "png", new File(destinationPath));//destinationPath.substring(0, destinationPath.length() - 4) + ".png"));
+            ImageIO.write(bImage, "png", new File(destinationPath));
         } catch (IOException e) {
             e.printStackTrace();
         }

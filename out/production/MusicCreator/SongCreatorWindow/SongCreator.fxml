@@ -42,7 +42,6 @@
                         <MenuItem mnemonicParsing="false" onAction="#ChangePathClefToAlto" text="Alto" />
                      </items>
                   </Menu>
-                  <MenuItem mnemonicParsing="false" onAction="#RecordPath" text="Record Path" />
                </items>
             </Menu>
             <Menu fx:id="selectSoundMenuItem" mnemonicParsing="false" text="Select Sound" />
