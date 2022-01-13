@@ -196,6 +196,9 @@ public class Controller
     {
         try {
             String selectedItem = listViewWithSongProjects.getSelectionModel().getSelectedItem();
+            if(selectedItem == null)
+                return;
+
             String destinationPath = listModelWithSongProjects.get(selectedItem);
 
             OpenSongCreatorWindow(destinationPath);

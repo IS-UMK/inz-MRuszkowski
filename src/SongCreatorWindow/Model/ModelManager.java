@@ -141,6 +141,11 @@ public class ModelManager implements Serializable
      */
     public static ModelManager importProjectFromMIDI(String pathToProject) throws IOException, InvalidMidiDataException
     {
+        String fileExtension = getExtensionByString(pathToProject).get();
+
+        if (!fileExtension.equals(GlobalSettings.midiExtension))
+            throw new IllegalArgumentException("File extension does not match.");
+
         Pattern patternFromMidiFile = MidiFileManager.loadPatternFromMidi(new File(pathToProject));
 
         String musicString = patternFromMidiFile.toString();

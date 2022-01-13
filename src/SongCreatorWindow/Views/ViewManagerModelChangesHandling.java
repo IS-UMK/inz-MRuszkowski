@@ -349,6 +349,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
                 int index = modelManager.getIndexOfSelectedPath();
                 interactionCanvas.setHeight(Height);
+                interactionCanvas.setWidth(canvasCurrentWidth);
                 interactionCanvas.setLayoutY(Height * index);
 
                 gc.setStroke(GlobalSettings.selectionColor);
@@ -504,7 +505,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         //Text should be placed basing on the middle of square, minus half of the final text size on canvas (font size)
         //gc.fillText(path.getName(), Height /2 - path.getName().length()/2.0*24*3/4, Height /2, Height);
         //gc.fillText(path.getName(), Height /2 - path.getName().length()/2.0*24*3/4, Height /2, Height);
-        gc.fillText(path.getName(), Height / 2 - path.getName().length() * 8, Height / 2);
+        gc.fillText(path.getName(), Height / 2 - path.getName().length() * 7, Height / 2);
     }
     //endregion
 

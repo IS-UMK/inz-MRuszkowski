@@ -185,8 +185,10 @@ public class MainController
             loadedProject = ModelManager.loadProject(file.getPath());
         } catch (IOException e) {
             e.printStackTrace();
+            return;
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+            return;
         }
 
         if(loadedProject == null)
@@ -234,8 +236,10 @@ public class MainController
             loadedProject = ModelManager.importProjectFromMIDI(file.getPath());
         } catch (IOException e) {
             e.printStackTrace();
+            return;
         } catch (InvalidMidiDataException e) {
             e.printStackTrace();
+            return;
         }
 
         if(loadedProject == null)
