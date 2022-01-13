@@ -156,8 +156,6 @@ public class Path implements Serializable
 
         int index = _sounds.indexOf(sound);
 
-        TieSelection previousTie = TieSelection.None;
-
         IPlayable previousSound = null;
         for(int i = index - 1; i >= 0; i--)
         {
@@ -167,7 +165,6 @@ public class Path implements Serializable
                 if(previousSound.getSoundConcatenation() == TieSelection.Begin && previousSound.getNextTiedSound() != null)
                     continue;
 
-                previousTie = previousSound.getSoundConcatenation();
                 sound.setPreviousTiedSound(previousSound);
                 previousSound.setNextTiedSound(sound);
             }
@@ -547,14 +544,18 @@ public class Path implements Serializable
         {
             switch (musicSound.getSoundConcatenation()) {
                 case Begin -> {
-                    musicSound.getNextTiedSound().setPreviousTiedSound(null);
+                    if(musicSound.isTiedWithAnotherSound())
+                        musicSound.getNextTiedSound().setPreviousTiedSound(null);
                 }
                 case Continue -> {
-                    musicSound.getPreviousTiedSound().setNextTiedSound(null);
-                    musicSound.getNextTiedSound().setPreviousTiedSound(null);
+                    if(musicSound.isTiedWithPreviousSound())
+                        musicSound.getPreviousTiedSound().setNextTiedSound(null);
+                    if(musicSound.isTiedWithAnotherSound())
+                        musicSound.getNextTiedSound().setPreviousTiedSound(null);
                 }
                 case End -> {
-                    musicSound.getPreviousTiedSound().setNextTiedSound(null);
+                    if(musicSound.isTiedWithPreviousSound())
+                        musicSound.getPreviousTiedSound().setNextTiedSound(null);
                 }
             }
         }

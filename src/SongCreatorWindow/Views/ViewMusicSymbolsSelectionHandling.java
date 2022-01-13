@@ -413,16 +413,17 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
                         accordChoiceBox.setDisable(true);
                     }
                     case Accord -> {
+                        String saved = GlobalSettings.accordSelectionName;
+                        GlobalSettings.accordSelectionName = accordNames[0];
                         path.convertToAccord(musicSound);
                         accordChoiceBox.setDisable(false);
                         System.out.println(String.format("Accord %s selected", GlobalSettings.accordSelectionName));
+                        GlobalSettings.accordSelectionName = saved;
                     }
                 }
                 System.out.println(String.format("Sound type changed to %s", choice.toString()));
             }
         });
-
-
 
         accordChoiceBoxOption = new ChoiceBox(FXCollections.observableArrayList(accordNames));
         accordChoiceBoxOption.setDisable(isNote);
