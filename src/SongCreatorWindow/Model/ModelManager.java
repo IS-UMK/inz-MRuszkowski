@@ -322,10 +322,16 @@ public class ModelManager implements Serializable
             loadedPath = this.getPathByIndex(musicPaths.size() - 1);
 
             SoundTypeSelection save = GlobalSettings.selectedTypeOfSoundToInsertIntoPath;
+            IPlayable previousSave;
+            IPlayable nextSave;
 
             for(IPlayable sound : path.getSounds()) {
                 if(sound.getSoundConcatenation() != TieSelection.None)
+                {
                     GlobalSettings.tieBetweenNotes = TieSelection.Include;
+                    if(!sound.isTiedWithPreviousSound())
+                        GlobalSettings.skipBindingAfterLoad = true;
+                }
                 else GlobalSettings.tieBetweenNotes = TieSelection.None;
 
                 modifier = SoundModification.None;
@@ -338,10 +344,14 @@ public class ModelManager implements Serializable
                     GlobalSettings.selectedTypeOfSoundToInsertIntoPath = SoundTypeSelection.Accord;
                 else GlobalSettings.selectedTypeOfSoundToInsertIntoPath = SoundTypeSelection.Note;
 
+                IPlayable copiedSound = addMusicSymbol(path.getVoice(), sound.getTimeX(), sound.getSoundHeight(), sound.getDuration());
+
                 loadedPath.setSoundModification(
-                        addMusicSymbol(path.getVoice(), sound.getTimeX(), sound.getSoundHeight(), sound.getDuration()),
+                        copiedSound,
                         modifier
                 );
+
+                GlobalSettings.skipBindingAfterLoad = false;
             }
 
             GlobalSettings.selectedTypeOfSoundToInsertIntoPath = save;

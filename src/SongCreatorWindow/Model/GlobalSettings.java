@@ -106,6 +106,7 @@ public class GlobalSettings
      */
     public static SoundTypeSelection selectedTypeOfSoundToInsertIntoPath = SoundTypeSelection.Note;
     public static TieSelection tieBetweenNotes = TieSelection.None;
+    public static boolean skipBindingAfterLoad = false;
     public static String accordSelectionName = "maj";
 
     /**

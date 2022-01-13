@@ -157,18 +157,21 @@ public class Path implements Serializable
         int index = _sounds.indexOf(sound);
 
         IPlayable previousSound = null;
-        for(int i = index - 1; i >= 0; i--)
-        {
-            previousSound = _sounds.get(i);
-            if(previousSound.getSoundConcatenation() != TieSelection.None && previousSound.getSoundConcatenation() != TieSelection.Continue)
-            {
-                if(previousSound.getSoundConcatenation() == TieSelection.Begin && previousSound.getNextTiedSound() != null)
-                    continue;
 
-                sound.setPreviousTiedSound(previousSound);
-                previousSound.setNextTiedSound(sound);
+        if(!GlobalSettings.skipBindingAfterLoad)
+            for(int i = index - 1; i >= 0; i--)
+            {
+                previousSound = _sounds.get(i);
+                if(previousSound.getSoundConcatenation() != TieSelection.None && previousSound.getSoundConcatenation() != TieSelection.Continue)
+                {
+                    if(previousSound.getSoundConcatenation() == TieSelection.Begin && previousSound.getNextTiedSound() != null)
+                        continue;
+
+                    sound.setPreviousTiedSound(previousSound);
+                    previousSound.setNextTiedSound(sound);
+                    break;
+                }
             }
-        }
 
         fireOnMusicSoundTieCheck(this, sound);
     }
