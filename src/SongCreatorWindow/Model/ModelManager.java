@@ -537,7 +537,8 @@ public class ModelManager implements Serializable
     {
         createPath(selectedPath.getName(), selectedPath.getInstrument(), selectedPath.getTempo(), selectedPath.getVolume(), selectedPath.getMusicClefSelection());
 
-        Path newPath = musicPaths.get(musicPaths.size() - 1);
+        Path newPath = getLastPath();// musicPaths.get(musicPaths.size() - 1);
+        newPath.setVolume((byte) 0);
         int pathIndex = musicPaths.indexOf(newPath);
 
         IPlayable duplicatedSound;
@@ -559,6 +560,7 @@ public class ModelManager implements Serializable
                 newPath.setSoundModification(duplicatedSound, SoundModification.Flat);
         }
 
+        newPath.setVolume(selectedPath.getVolume());
         System.out.println(String.format("Path %s duplicated successfully", selectedPath.getName()));
     }
 

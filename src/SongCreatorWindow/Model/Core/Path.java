@@ -132,6 +132,7 @@ public class Path implements Serializable
     //region MusicSounds
     public void addSound(IPlayable sound)
     {
+        sound.setVolume(getVolume());
         appendToMusicListInOrder(sound);
 
         if(GlobalSettings.tieBetweenNotes == TieSelection.Include)

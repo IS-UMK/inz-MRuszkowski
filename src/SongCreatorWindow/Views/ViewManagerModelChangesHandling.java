@@ -25,6 +25,7 @@ import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.text.Font;
+import org.jfugue.player.Player;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -68,6 +69,8 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
 
     Canvas visualBarCanvas;
 
+    Player player;
+
     public ViewManagerModelChangesHandling(ModelManager modelManager, AnchorPane anchorPaneWithPaths, Menu selectPathMenuItem, Menu selectSoundMenuItem, MenuItem playMenuItem)
     {
         this.modelManager = modelManager;
@@ -95,6 +98,8 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         visualBarCanvas = new Canvas(strokeLineBorderWidth * 5, 0);
         anchorPaneWithPaths.getChildren().add(visualBarCanvas);
         visualBarCanvas.getGraphicsContext2D().setFill(Color.RED);
+
+        player = new Player();
     }
 
     @Override
@@ -106,6 +111,10 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
     @Override
     public void onMusicSymbolAdded(Path path, IPlayable musicSound)
     {
+        new Thread(() -> {
+            player.play(musicSound.ExtractJFugueSoundString(true));
+        }).start();
+
         Image musicSymbolImage = ImageManager.getInstance().setDimensions(GlobalSettings.noteWidth, GlobalSettings.noteHeight).getNote(musicSound.getDuration());
 
         List<ImageView> views = new LinkedList<>();
