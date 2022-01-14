@@ -520,7 +520,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         Font font = new Font(Font.getFamilies().toArray()[1].toString(), 24);
         gc.setFont(font);
         //Text should be placed basing on the middle of square, minus half of the final text size on canvas (font size)
-        gc.fillText(path.getName(), Height /2 - path.getName().length()/2.0*24*3/4, Height /2, Height);
+        gc.fillText(path.getName(), Height / 2 - path.getName().length() * 7, Height / 2);
 
         //change name in menu item
         MenuItem pathSelectionMenuItem = selectionMenuItemToCanvas.get(canvas);
