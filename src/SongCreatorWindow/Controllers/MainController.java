@@ -91,14 +91,13 @@ public class MainController
 
 
                 if(loader.isHereProjectToLoad()) {
+                    GlobalSettings.loadingProject = true;
                     try {
-                        GlobalSettings.loadingProject = true;
                         modelManager.replaceExistingModel(
                                 ModelManager.loadProject(
                                         loader.getProjectDestinationOnce()
                                 )
                         );
-                        GlobalSettings.loadingProject = false;
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (ClassNotFoundException e) {
@@ -107,6 +106,7 @@ public class MainController
                 }
             }
         });
+        GlobalSettings.loadingProject = false;
     }
 
     //region Project
@@ -182,7 +182,6 @@ public class MainController
             return;
 
         ModelManager loadedProject = null;
-
         try {
             loadedProject = ModelManager.loadProject(file.getPath());
         } catch (IOException e) {
@@ -201,7 +200,9 @@ public class MainController
         if(alert.showAndWait().get() != ButtonType.OK)
             return;
 
+        GlobalSettings.loadingProject = true;
         modelManager.replaceExistingModel(loadedProject);
+        GlobalSettings.loadingProject = false;
     }
 
     public void ExportProjectToMIDIFile(ActionEvent actionEvent)
@@ -252,7 +253,9 @@ public class MainController
         if(alert.showAndWait().get() != ButtonType.OK)
             return;
 
+        GlobalSettings.loadingProject = true;
         modelManager.replaceExistingModel(loadedProject);
+        GlobalSettings.loadingProject = false;
     }
     //endregion
 

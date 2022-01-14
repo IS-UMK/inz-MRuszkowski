@@ -13,7 +13,7 @@ public class GlobalSettings
      * File extension where projects data is stored
      */
     public final static String projectsExtensions = "mrinz";
-    public static boolean loadingProject = false;
+    public static boolean loadingProject = true;
     /**
      * File extension where model of HashMap "Project name --->  Project Destination Path" is stored
      */
