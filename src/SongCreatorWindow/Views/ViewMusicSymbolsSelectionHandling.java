@@ -16,6 +16,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.jfugue.player.Player;
 
 import java.util.*;
 
@@ -81,6 +82,8 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
     List<HBox> optionsContent;
     //endregion
 
+    Player player;
+
     public ViewMusicSymbolsSelectionHandling(AnchorPane anchorPaneWithNotesAndAccordsSelection, VBox vBoxWithNotesAndAccordsProperties, VBox anchorPaneWithCurrentlySelectedNoteOrAccordProperties)
     {
         this.anchorPaneWithNotesAndAccordsSelection = anchorPaneWithNotesAndAccordsSelection;
@@ -129,6 +132,8 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
 
         redrawMusicSymbols();
         drawSelectionOfNote(0, 0);
+
+        player = new Player();
     }
 
     //region Properties of sound that will be inserted
@@ -340,20 +345,22 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         HBox hbox13 = createSoundSelectionSection(path, musicSound, soundChoiceBoxListener);
         HBox hbox14 = createSoundOctaveSection(path, musicSound, soundChoiceBoxListener);
 
+        HBox hbox15 = createSoundPlaySection(musicSound);
+
         //Occurrence Time
-        HBox hbox15 = createSoundOccurrenceSection(path, musicSound);
+        HBox hbox16 = createSoundOccurrenceSection(path, musicSound);
 
         //Instrument
-        HBox hbox16 = createInstrumentChoiceSection(path, musicSound);
+        HBox hbox17 = createInstrumentChoiceSection(path, musicSound);
 
         soundTieLabel = new Label(musicSound.getSoundConcatenation().toString());
-        HBox hbox17 = new HBox(optionLabels[6], soundTieLabel);
-        hbox17.setPadding(padding);
+        HBox hbox18 = new HBox(optionLabels[6], soundTieLabel);
+        hbox18.setPadding(padding);
 
-        HBox hbox18 = createModificationSection(path, musicSound);
-        HBox hbox19 = createSoundDeleteSection(path, musicSound);
+        HBox hbox19 = createModificationSection(path, musicSound);
+        HBox hbox20 = createSoundDeleteSection(path, musicSound);
 
-        vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().addAll(hbox11, hbox12, hbox13, hbox14, hbox15, hbox16, hbox17, hbox18, hbox19);
+        vBoxPaneWithCurrentlySelectedNoteOrAccordProperties.getChildren().addAll(hbox11, hbox12, hbox13, hbox14, hbox15, hbox16, hbox17, hbox18, hbox19, hbox20);
 
         optionsContent.add(hbox11);
         optionsContent.add(hbox12);
@@ -364,6 +371,7 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         optionsContent.add(hbox17);
         optionsContent.add(hbox18);
         optionsContent.add(hbox19);
+        optionsContent.add(hbox20);
     }
 
     //region Sections - Modifications of Music Sounds
@@ -566,6 +574,23 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
         tiesTypes.remove(tiesTypes.size() - 1); // remove artifact - $VALUES
 
         HBox hbox = new HBox(optionLabels[5], instrumentChoiceBoxForCurrentlySelectedSoundToEdition);
+        hbox.setPadding(padding);
+        return hbox;
+    }
+
+    private HBox createSoundPlaySection(IPlayable musicSound)
+    {
+        Button playButton = new Button("Play Sound");
+        playButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                new Thread(() -> {
+                    player.play(musicSound.ExtractJFugueSoundString(true));
+                }).start();
+            }
+        });
+
+        HBox hbox = new HBox(playButton);
         hbox.setPadding(padding);
         return hbox;
     }
