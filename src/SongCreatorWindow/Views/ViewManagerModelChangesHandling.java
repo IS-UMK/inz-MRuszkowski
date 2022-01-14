@@ -112,7 +112,8 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
     public void onMusicSymbolAdded(Path path, IPlayable musicSound)
     {
         new Thread(() -> {
-            player.play(musicSound.ExtractJFugueSoundString(true));
+            if(GlobalSettings.loadingProject)
+                player.play(musicSound.ExtractJFugueSoundString(true));
         }).start();
 
         Image musicSymbolImage = ImageManager.getInstance().setDimensions(GlobalSettings.noteWidth, GlobalSettings.noteHeight).getNote(musicSound.getDuration());

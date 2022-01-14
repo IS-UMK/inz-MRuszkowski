@@ -92,11 +92,13 @@ public class MainController
 
                 if(loader.isHereProjectToLoad()) {
                     try {
+                        GlobalSettings.loadingProject = true;
                         modelManager.replaceExistingModel(
                                 ModelManager.loadProject(
                                         loader.getProjectDestinationOnce()
                                 )
                         );
+                        GlobalSettings.loadingProject = false;
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (ClassNotFoundException e) {
