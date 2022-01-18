@@ -170,6 +170,9 @@ public class ModelManager implements Serializable
 
         List<Integer> nonFlatSounds = Note.getNonFlatSoundNumericalValues();
 
+        TieSelection savedUserChoice = GlobalSettings.tieBetweenNotes;
+        GlobalSettings.tieBetweenNotes = TieSelection.None;
+
         for(String pattern : patterns)
         {
             parsedValue = 0;
@@ -179,7 +182,7 @@ public class ModelManager implements Serializable
             String[] sounds = pattern.split("I[0-9]{1,3}");
             sounds[0] = pattern.replace(sounds[1], "");
 
-            GlobalSettings.InstrumentChoice = Integer.parseInt(sounds[0].substring(1));
+            GlobalSettings.InstrumentChoice = Integer.parseInt(sounds[0].substring(1)) + 1;
 
             try {
                 modelManager.createPath(String.format("Path %d", i+1));
@@ -297,6 +300,7 @@ public class ModelManager implements Serializable
 
         GlobalSettings.chosenNote = saveChoice;
         GlobalSettings.InstrumentChoice = 1;
+        GlobalSettings.tieBetweenNotes = savedUserChoice;
 
         return modelManager;
     }

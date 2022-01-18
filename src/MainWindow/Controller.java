@@ -169,7 +169,7 @@ public class Controller
     {
         FXMLLoader root = new FXMLLoader(getClass().getResource("../SongCreatorWindow/SongCreator.fxml"));
 
-        Scene scene = new Scene(root.load(), 800, 600);
+        Scene scene = new Scene(root.load(), 1280, 800);
 
         MainController controller = root.getController();
         controller.initLoader(pathToProject);
