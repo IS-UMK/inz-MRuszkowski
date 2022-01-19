@@ -151,7 +151,7 @@ public class MainController
         );
         fileChooser.getExtensionFilters().add(extFilter);
 
-        File file = fileChooser.showSaveDialog(MainWindow.StageToDeleteLater);
+        File file = fileChooser.showSaveDialog(MainWindow.MainStage);
         if(file == null)
             return false;
 
@@ -176,7 +176,7 @@ public class MainController
         );
         fileChooser.getExtensionFilters().add(extFilter);
 
-        File file = fileChooser.showOpenDialog(MainWindow.StageToDeleteLater);
+        File file = fileChooser.showOpenDialog(MainWindow.MainStage);
 
         if(file == null)
             return;
@@ -228,7 +228,7 @@ public class MainController
         );
         fileChooser.getExtensionFilters().add(extFilter);
 
-        File file = fileChooser.showOpenDialog(MainWindow.StageToDeleteLater);
+        File file = fileChooser.showOpenDialog(MainWindow.MainStage);
 
         if(file == null)
             return;
@@ -511,7 +511,7 @@ public class MainController
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG File", "*.png"));
         fileChooser.setTitle("Save song to png file");
 
-        File file = fileChooser.showSaveDialog(MainWindow.StageToDeleteLater);
+        File file = fileChooser.showSaveDialog(MainWindow.MainStage);
 
         if(file == null)
             return;

@@ -2,6 +2,18 @@
 
 title __MUSICCREATOR's Class Diagram__\n
 
+  namespace Images {
+    class Images.ImageManager {
+    }
+  }
+  
+
+  namespace MainWindow {
+    class MainWindow.Controller {
+    }
+  }
+  
+
   namespace MainWindow {
     class MainWindow.MainWindow {
     }
@@ -21,25 +33,7 @@ title __MUSICCREATOR's Class Diagram__\n
   
 
   namespace Model {
-    class Model.Acord {
-    }
-  }
-  
-
-  namespace Model {
     class Model.Duration {
-    }
-  }
-  
-
-  namespace Model {
-    class Model.Duration {
-    }
-  }
-  
-
-  namespace Model {
-    interface Model.IPlayable {
     }
   }
   
@@ -57,25 +51,7 @@ title __MUSICCREATOR's Class Diagram__\n
   
 
   namespace Model {
-    class Model.Instrument {
-    }
-  }
-  
-
-  namespace Model {
     class Model.Note {
-    }
-  }
-  
-
-  namespace Model {
-    class Model.Note {
-    }
-  }
-  
-
-  namespace Model {
-    class Model.NoteToNumericValue {
     }
   }
   
@@ -92,16 +68,272 @@ title __MUSICCREATOR's Class Diagram__\n
   }
   
 
-  namespace Model {
-    class Model.Path {
+  namespace SongCreatorWindow {
+    namespace Controllers {
+      class SongCreatorWindow.Controllers.MainController {
+      }
     }
   }
   
 
+  namespace SongCreatorWindow {
+    namespace Controllers {
+      class SongCreatorWindow.Controllers.MusicSymbolsController {
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        class SongCreatorWindow.Model.Core.Accord {
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        class SongCreatorWindow.Model.Core.Duration {
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        class SongCreatorWindow.Model.Core.GlobalLoaderDTO {
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        interface SongCreatorWindow.Model.Core.IPlayable {
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        class SongCreatorWindow.Model.Core.Instrument {
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        enum MusicClefSelection {
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        class SongCreatorWindow.Model.Core.Note {
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        class SongCreatorWindow.Model.Core.Path {
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        enum SoundModification {
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        enum SoundTypeSelection {
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        enum TieSelection {
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Events {
+        interface SongCreatorWindow.Model.Events.IClickedEvent {
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Events {
+        interface SongCreatorWindow.Model.Events.IModelEvent {
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Events {
+        interface SongCreatorWindow.Model.Events.IMusicEvent {
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Events {
+        interface SongCreatorWindow.Model.Events.IMusicSoundEditionEvent {
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Events {
+        interface SongCreatorWindow.Model.Events.IPathEvent {
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Events {
+        interface SongCreatorWindow.Model.Events.ISoundEvent {
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Exceptions {
+        class SongCreatorWindow.Model.Exceptions.CannotAddAnotherPathException {
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      class SongCreatorWindow.Model.GlobalSettings {
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      class SongCreatorWindow.Model.ModelManager {
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    class SongCreatorWindow.SongCreator {
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Views {
+      class SongCreatorWindow.Views.ViewManagerModelChangesHandling {
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Views {
+      class SongCreatorWindow.Views.ViewMusicSymbolsSelectionHandling {
+      }
+    }
+  }
+  
+
+  MainWindow.MainWindow -up-|> javafx.application.Application
   Model.Acord .up.|> Model.IPlayable
-  Model.Acord .up.|> IPlayable
-  Model.Note .up.|> IPlayable
   Model.Note .up.|> Model.IPlayable
+  SongCreatorWindow.Controllers.MainController o-- SongCreatorWindow.Model.Core.GlobalLoaderDTO : loader
+  SongCreatorWindow.Controllers.MainController o-- SongCreatorWindow.Model.ModelManager : modelManager
+  SongCreatorWindow.Controllers.MainController o-- SongCreatorWindow.Controllers.MusicSymbolsController : musicSymbolsController
+  SongCreatorWindow.Controllers.MainController o-- SongCreatorWindow.Views.ViewMusicSymbolsSelectionHandling : musicSymbolsViewManager
+  SongCreatorWindow.Controllers.MainController o-- SongCreatorWindow.Views.ViewManagerModelChangesHandling : viewManager
+  SongCreatorWindow.Controllers.MusicSymbolsController .up.|> SongCreatorWindow.Model.Events.IClickedEvent
+  SongCreatorWindow.Controllers.MusicSymbolsController .up.|> SongCreatorWindow.Model.Events.IPathEvent
+  SongCreatorWindow.Controllers.MusicSymbolsController o-- SongCreatorWindow.Views.ViewManagerModelChangesHandling : modelView
+  SongCreatorWindow.Controllers.MusicSymbolsController o-- SongCreatorWindow.Views.ViewMusicSymbolsSelectionHandling : symbolsView
+  SongCreatorWindow.Model.Core.Accord .up.|> SongCreatorWindow.Model.Core.IPlayable
+  SongCreatorWindow.Model.Core.Accord o-- SongCreatorWindow.Model.Core.Note : rootNote
+  SongCreatorWindow.Model.Core.Note .up.|> SongCreatorWindow.Model.Core.IPlayable
+  SongCreatorWindow.Model.Core.Note o-- SongCreatorWindow.Model.Core.SoundModification : modification
+  SongCreatorWindow.Model.Core.Note o-- SongCreatorWindow.Model.Core.IPlayable : nextTiedSound
+  SongCreatorWindow.Model.Core.Note o-- SongCreatorWindow.Model.Core.TieSelection : noteConcatenation
+  SongCreatorWindow.Model.Core.Note o-- SongCreatorWindow.Model.Core.IPlayable : previousTiedSound
+  SongCreatorWindow.Model.Core.Path .up.|> java.io.Serializable
+  SongCreatorWindow.Model.Core.Path o-- SongCreatorWindow.Model.Core.MusicClefSelection : _selectedKey
+  SongCreatorWindow.Model.Core.Path o-- SongCreatorWindow.Model.Core.IPlayable : selectedMusicSound
+  SongCreatorWindow.Model.ModelManager .up.|> java.io.Serializable
+  SongCreatorWindow.Model.ModelManager o-- SongCreatorWindow.Model.Core.MusicClefSelection : selectedDefaultKey
+  SongCreatorWindow.Model.ModelManager o-- SongCreatorWindow.Model.Core.Path : selectedPath
+  SongCreatorWindow.SongCreator -up-|> javafx.application.Application
+  SongCreatorWindow.Views.ViewManagerModelChangesHandling .up.|> SongCreatorWindow.Model.Events.IModelEvent
+  SongCreatorWindow.Views.ViewManagerModelChangesHandling .up.|> SongCreatorWindow.Model.Events.IMusicSoundEditionEvent
+  SongCreatorWindow.Views.ViewManagerModelChangesHandling .up.|> SongCreatorWindow.Model.Events.IPathEvent
+  SongCreatorWindow.Views.ViewManagerModelChangesHandling .up.|> SongCreatorWindow.Model.Events.ISoundEvent
+  SongCreatorWindow.Views.ViewManagerModelChangesHandling o-- SongCreatorWindow.Model.ModelManager : modelManager
+  SongCreatorWindow.Views.ViewMusicSymbolsSelectionHandling .up.|> SongCreatorWindow.Model.Events.IMusicSoundEditionEvent
 
 
 right footer

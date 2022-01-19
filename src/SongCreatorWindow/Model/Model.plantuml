@@ -2,74 +2,106 @@
 
 title __MODEL's Class Diagram__\n
 
-  namespace Model {
-    class Model.Acord {
-        ~ notes : LinkedList<Note>
-        + Acord()
-        + AddNote()
-        + ExtractJFugueSoundString()
-        + RemoveNoteAtIndex()
+  namespace SongCreatorWindow {
+    namespace Model {
+      class SongCreatorWindow.Model.GlobalSettings {
+          {static} + Height : double
+          {static} + InstrumentChoice : int
+          {static} + InstrumentForParticularNoteChoice : int
+          {static} + Width : double
+          {static} + accordSelectionName : String
+          {static} + canvasExtension : int
+          {static} + chosenNote : char
+          {static} + constBarFactor_WidthPerTick : double
+          {static} + defaultMusicClef : MusicClefSelection
+          {static} + fileNameWithProjectList : String
+          {static} + fileNameWithProjectListView : String
+          {static} + fixedXPositionOfNotes : int
+          {static} + loadingProject : boolean
+          {static} + midiExtension : String
+          {static} + musicClefWidth : double
+          {static} + noteHeight : int
+          {static} + noteWidth : int
+          {static} + numberOfPropertySquaresInPath : int
+          {static} + projectsExtensions : String
+          {static} + selectedTypeOfSoundToInsertIntoPath : SoundTypeSelection
+          {static} + selectionColor : Color
+          {static} + skipBindingAfterLoad : boolean
+          {static} + strokeLineBorderWidth : int
+          {static} + strokeLineWidthForSelection : int
+          {static} + tieBetweenNotes : TieSelection
+          {static} + widthOfAreaWhereCanvasExtends : int
+          {static} + getLinesMargins()
+          {static} + getLinesPadding()
+          {static} + getLinesStartHeight()
+          {static} + getMusicClefHeight()
+          {static} + getMusicClefHeight()
+          {static} + getStartXofAreaWhereInsertingNotesIsLegal()
+      }
     }
   }
   
 
-  namespace Model {
-    class Model.Duration {
-        {static} + Eighth : char
-        {static} + Half : char
-        {static} + One_twenty_eighth : char
-        {static} + Quater : char
-        {static} + Sixteenth : char
-        {static} + Sixty_fourth : char
-        {static} + Thirty_second : char
-        {static} + Whole : char
-        - Duration()
+  namespace SongCreatorWindow {
+    namespace Model {
+      class SongCreatorWindow.Model.ModelManager {
+          + modelListeners : List<IModelEvent>
+          + noteListeners : List<ISoundEvent>
+          + pathListeners : List<IPathEvent>
+          ~ musicPaths : List<Path>
+          ~ projectDestination : String
+          ~ projectName : String
+          + ModelManager()
+          + addListener()
+          + addMusicSymbol()
+          + addMusicSymbol()
+          + changeMusicClefOfSelectedPath()
+          + clearModel()
+          + clearSelectionOfPath()
+          + createPath()
+          + createPath()
+          + duplicateSelectedPath()
+          {static} + exportProjectToMIDI()
+          + extractEntireMusic()
+          + fireOnModelLoaded()
+          + getDefaultMusicKeySelection()
+          + getIndexOfPath()
+          + getIndexOfSelectedPath()
+          + getLastPath()
+          + getPathByIndex()
+          + getPaths()
+          + getProjectDestination()
+          + getProjectName()
+          + getSelectedPath()
+          + getTheLatestTimeX()
+          {static} + importProjectFromMIDI()
+          {static} + loadProject()
+          + recordPath()
+          + removeSelectedPath()
+          + renameSelectedPathName()
+          + replaceExistingModel()
+          {static} + saveProject()
+          + setDefaultMusicKeySelection()
+          + setProjectDestination()
+          + setProjectName()
+          + setSelectedPath()
+          - fireOnCreatedPathEvent()
+          - fireOnNoteAdded()
+          - fireOnPathClearSelection()
+          - fireOnPathClefChanged()
+          - fireOnPathDeleted()
+          - fireOnPathNameRenamed()
+          - getBasePointSound()
+          - getCalculatedSoundValue()
+          {static} - getExtensionByString()
+      }
     }
   }
   
 
-  namespace Model {
-    interface Model.IPlayable {
-        {abstract} + ExtractJFugueSoundString()
-    }
-  }
-  
-
-  namespace Model {
-    class Model.Instrument {
-    }
-  }
-  
-
-  namespace Model {
-    class Model.Note {
-        + Instrument : int
-        + NoteDuration : char
-        + Time : int
-        ~ NoteValue : int
-        + ExtractJFugueSoundString()
-    }
-  }
-  
-
-  namespace Model {
-    class Model.NoteToNumericValue {
-    }
-  }
-  
-
-  namespace Model {
-    class Model.Path {
-        ~ Lenght : int
-        ~ PathId : int
-        ~ PathName : String
-        ~ Sound : LinkedList<IPlayable>
-    }
-  }
-  
-
-  Model.Acord .up.|> IPlayable
-  Model.Note .up.|> IPlayable
+  SongCreatorWindow.Model.ModelManager .up.|> java.io.Serializable
+  SongCreatorWindow.Model.ModelManager o-- SongCreatorWindow.Model.Core.MusicClefSelection : selectedDefaultKey
+  SongCreatorWindow.Model.ModelManager o-- SongCreatorWindow.Model.Core.Path : selectedPath
 
 
 right footer

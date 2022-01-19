@@ -118,7 +118,7 @@ public class Controller
             try {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle("Choose Midi File");
-                File file = fileChooser.showOpenDialog(MainWindow.StageToDeleteLater);
+                File file = fileChooser.showOpenDialog(MainWindow.MainStage);
                 nameOfFile = file.getName();
 
                 Pattern patternFromFile = MidiFileManager.loadPatternFromMidi(file);
@@ -224,7 +224,7 @@ public class Controller
             );
             fileChooser.getExtensionFilters().add(extFilter);
 
-            File file = fileChooser.showOpenDialog(MainWindow.StageToDeleteLater);
+            File file = fileChooser.showOpenDialog(MainWindow.MainStage);
 
             String fileName = file.getName();
             String filePath = file.getPath();

@@ -5,12 +5,10 @@
  */
 package MainWindow;
 
-import SongCreatorWindow.SongCreator;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
 /**
@@ -19,11 +17,8 @@ import javafx.stage.Stage;
  */
 public class MainWindow extends Application{
 
-    //TODO: To musi zniknąć
-    public static Stage StageToDeleteLater;
-    /**
-     * @param args the command line arguments
-     */
+    public static Stage MainStage;
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -33,7 +28,7 @@ public class MainWindow extends Application{
         Parent root = FXMLLoader.load(getClass().getResource("MainWindow.fxml"));
 
         Scene scene = new Scene(root, 800, 600);
-        StageToDeleteLater = stage;
+        MainStage = stage;
         stage.setTitle("Menu Window");
         stage.setScene(scene);
         stage.show();
