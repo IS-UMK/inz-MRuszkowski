@@ -24,49 +24,7 @@ title __MUSICCREATOR's Class Diagram__\n
     class MainWindow.MainWindow {
     }
   }
-  
 
-  namespace Model {
-    class Model.Acord {
-    }
-  }
-  
-
-  namespace Model {
-    class Model.Duration {
-    }
-  }
-  
-
-  namespace Model {
-    interface Model.IPlayable {
-    }
-  }
-  
-
-  namespace Model {
-    class Model.Instrument {
-    }
-  }
-  
-
-  namespace Model {
-    class Model.Note {
-    }
-  }
-  
-
-  namespace Model {
-    class Model.NoteToNumericValue {
-    }
-  }
-  
-
-  namespace Model {
-    class Model.Path {
-    }
-  }
-  
 
   namespace SongCreatorWindow {
     namespace Controllers {

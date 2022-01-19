@@ -3,12 +3,53 @@
 title __MAINWINDOW's Class Diagram__\n
 
   namespace MainWindow {
-    class MainWindow.MainWindow {
-        {static} + main()
+    class MainWindow.Controller {
+        ~ logLabel : Label
+        ~ managedPlayer : ManagedPlayer
+        ~ nameOfFile : String
+        ~ playSongDirectlyFromFileButton : Button
+        ~ player : Player
+        - listModelWithSongProjects : HashMap<String, String>
+        - listViewWithSongProjects : ListView<String>
+        + Controller()
+        + CreateNewSongProject()
+        + DeleteSongProjectFromDisk()
+        + EditSongProjectFromList()
+        + ExitFromApp()
+        + LoadListWithProjects()
+        + MoveSongProjectDownOnList()
+        + MoveSongProjectUpOnList()
+        + OpenSongProjectFromFile()
+        + PlaySongDirectlyFromFile()
+        + RemoveSongProjectFromList()
+        + SaveListWithProjects()
+        - OpenSongCreatorWindow()
+        - OpenSongCreatorWindow()
+        - movementOnListView()
+        - removeItemFromListAndOptionallyFromDisk()
     }
   }
   
 
+  namespace MainWindow {
+    class MainWindow.Controller.Logger {
+        {static} ~ dtf : DateTimeFormatter
+        {static} + appendTextToLogLabel()
+    }
+  }
+  
+
+  namespace MainWindow {
+    class MainWindow.MainWindow {
+        {static} + MainStage : Stage
+        {static} + main()
+        + start()
+    }
+  }
+  
+
+  MainWindow.Controller +-down- MainWindow.Controller.Logger
+  MainWindow.MainWindow -up-|> javafx.application.Application
 
 
 right footer

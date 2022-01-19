@@ -458,7 +458,9 @@ public class ModelManager implements Serializable
      */
     public void setSelectedPath(Path path)
     {
-        selectedPath = path;
+        if(path == null && selectedPath != null)
+            clearSelectionOfPath();
+        else selectedPath = path;
     }
 
     /**

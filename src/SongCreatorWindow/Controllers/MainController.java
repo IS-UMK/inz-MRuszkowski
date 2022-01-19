@@ -290,6 +290,8 @@ public class MainController
         } catch (CannotAddAnotherPathException e) {
             e.printStackTrace();
         }
+
+        modelManager.setSelectedPath(null);
     }
 
     public void RenameSelected(ActionEvent actionEvent)
@@ -305,6 +307,8 @@ public class MainController
         //get user choice
         String newName = window.getResult();
         modelManager.renameSelectedPathName(newName);
+
+        modelManager.setSelectedPath(null);
     }
 
     public void UnselectPath(ActionEvent actionEvent)
@@ -313,6 +317,7 @@ public class MainController
             return;
 
         modelManager.clearSelectionOfPath();
+        modelManager.setSelectedPath(null);
     }
 
     public void DeleteSelected(ActionEvent actionEvent)
@@ -326,6 +331,7 @@ public class MainController
             return;
 
         modelManager.removeSelectedPath();
+        modelManager.setSelectedPath(null);
     }
 
     public void DeleteAllPaths(ActionEvent actionEvent)
@@ -364,6 +370,7 @@ public class MainController
             return;
 
         modelManager.changeMusicClefOfSelectedPath(MusicClefSelection.ViolinClef);
+        modelManager.setSelectedPath(null);
     }
 
     public void ChangePathClefToBass(ActionEvent actionEvent)
@@ -372,6 +379,7 @@ public class MainController
             return;
 
         modelManager.changeMusicClefOfSelectedPath(MusicClefSelection.BassClef);
+        modelManager.setSelectedPath(null);
     }
 
     public void ChangePathClefToAlto(ActionEvent actionEvent)
@@ -380,6 +388,7 @@ public class MainController
             return;
 
         modelManager.changeMusicClefOfSelectedPath(MusicClefSelection.AltoClef);
+        modelManager.setSelectedPath(null);
     }
 
     private boolean checkPathSelection()

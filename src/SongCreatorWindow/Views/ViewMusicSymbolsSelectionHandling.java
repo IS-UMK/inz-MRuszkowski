@@ -585,7 +585,10 @@ public class ViewMusicSymbolsSelectionHandling implements IMusicSoundEditionEven
             @Override
             public void handle(MouseEvent mouseEvent) {
                 new Thread(() -> {
-                    player.play(musicSound.ExtractJFugueSoundString(true));
+                    try{
+                        player.play(musicSound.ExtractJFugueSoundString(true));
+                    }
+                    catch (Exception ignored){}
                 }).start();
             }
         });
