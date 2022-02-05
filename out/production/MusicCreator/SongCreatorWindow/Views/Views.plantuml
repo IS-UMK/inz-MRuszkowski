@@ -1,0 +1,165 @@
+@startuml
+
+title __VIEWS's Class Diagram__\n
+
+  namespace SongCreatorWindow {
+    namespace Views {
+      class SongCreatorWindow.Views.ViewManagerModelChangesHandling {
+          ~ anchorPaneWithPaths : AnchorPane
+          ~ bindingSymbols : HashMap<IPlayable, Path>
+          ~ canvasCurrentWidth : double
+          ~ canvasList : List<Canvas>
+          ~ canvasMap : HashMap<Path, Canvas>
+          ~ choiceBoxMap : HashMap<Canvas, ChoiceBox>
+          ~ interactionCanvas : Canvas
+          ~ listeners : List<IClickedEvent>
+          ~ modificationSymbols : HashMap<IPlayable, ImageView>
+          ~ musicSymbols : HashMap<IPlayable, List<ImageView>>
+          ~ playMenuItem : MenuItem
+          ~ player : Player
+          ~ selectPathMenuItem : Menu
+          ~ selectSoundMenuItem : Menu
+          ~ selectionMenuForSounds : HashMap<Path, Menu>
+          ~ selectionMenuItemOfSound : HashMap<Menu, TreeMap<IPlayable, MenuItem>>
+          ~ selectionMenuItemToCanvas : HashMap<Canvas, MenuItem>
+          ~ soundEditionCanvas : Canvas
+          ~ tempoMap : HashMap<Canvas, TextField>
+          ~ visualBarCanvas : Canvas
+          ~ volumeSliderMap : HashMap<Canvas, Slider>
+          + ViewManagerModelChangesHandling()
+          + addListener()
+          + changeTextOfPlayMenuItem()
+          + initializeVisualBar()
+          + onAccordNameChanged()
+          + onModelLoaded()
+          + onMusicSoundClearSelection()
+          + onMusicSoundConvertedToAccord()
+          + onMusicSoundConvertedToNote()
+          + onMusicSoundDeleted()
+          + onMusicSoundDurationChange()
+          + onMusicSoundHeightChange()
+          + onMusicSoundModified()
+          + onMusicSoundOccurrenceTimeChanged()
+          + onMusicSoundOccurrenceTimeChangedPreprocess()
+          + onMusicSoundSelectedToEdition()
+          + onMusicSoundTieCheck()
+          + onMusicSymbolAdded()
+          + onPathClearSelection()
+          + onPathClefChanged()
+          + onPathCreated()
+          + onPathDeleted()
+          + onPathNameRenamed()
+          + printSongToPNGFile()
+          + removeVisualBar()
+          + setVisualBarPosition()
+          - AddSoundMenuItem()
+          - DeleteSoundMenuItem()
+          - addAdditionalSymbols()
+          - addSpaceToCanvas()
+          - createBindingSymbolImageView()
+          - createImageViewOfSound()
+          - displayInstrumentChoiceBoxOfNewPath()
+          - displayNameOfNewPath()
+          - displaySelectedInstrumentInfoOfNewPath()
+          - displayTempoOfNewPath()
+          - displayVolumeSliderOfNewPath()
+          - drawAnotherAccordParts()
+          - drawFiveLinesOfNewPath()
+          - drawPathClef()
+          - fireOnMusicSymbolClicked()
+          - initializeMenuItems()
+          - redrawSoundBinding()
+          - refreshSoundBindings()
+          - removeAdditionalSymbols()
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Views {
+      class SongCreatorWindow.Views.ViewMusicSymbolsSelectionHandling {
+          ~ accordChoiceBox : ChoiceBox
+          ~ accordChoiceBoxOption : ChoiceBox
+          ~ accordLabels : Label[]
+          ~ anchorPaneWithNotesAndAccordsSelection : AnchorPane
+          ~ availableSounds : List<String>
+          ~ choiceMap : Character[][]
+          ~ groupForSoundType : ToggleGroup
+          ~ groupForSoundTypeOption : ToggleGroup
+          ~ groupForTie : ToggleGroup
+          ~ includeOfTie : RadioButton
+          ~ instrumentChoiceBoxForCurrentlySelectedSoundToEdition : ChoiceBox
+          ~ instrumentChoiceBoxForNextSound : ChoiceBox
+          ~ interactionCanvas : Canvas
+          ~ musicSymbolDuration : ChoiceBox
+          ~ musicSymbolsCanvas : Canvas
+          ~ musicSymbolsNamesWithImages : HashMap<Character, Image>
+          ~ nextImageInterval : double
+          ~ noneTie : RadioButton
+          ~ notesInRow : int
+          ~ occurrenceTimeTextField : TextField
+          ~ octaveChoiceBox : ChoiceBox
+          ~ octaves : List<Integer>
+          ~ optionLabels : Label[]
+          ~ optionsContent : List<HBox>
+          ~ padding : Insets
+          ~ player : Player
+          ~ soundChoiceBox : ChoiceBox
+          ~ soundTieLabel : Label
+          ~ symbolAccord : RadioButton
+          ~ symbolAccordOption : RadioButton
+          ~ symbolNote : RadioButton
+          ~ symbolNoteOption : RadioButton
+          ~ vBoxPaneWithCurrentlySelectedNoteOrAccordProperties : VBox
+          ~ vBoxWithNotesAndAccordsProperties : VBox
+          + ViewMusicSymbolsSelectionHandling()
+          + drawSelectionOfNote()
+          + onAccordNameChanged()
+          + onMusicSoundClearSelection()
+          + onMusicSoundConvertedToAccord()
+          + onMusicSoundConvertedToNote()
+          + onMusicSoundDeleted()
+          + onMusicSoundDurationChange()
+          + onMusicSoundHeightChange()
+          + onMusicSoundModified()
+          + onMusicSoundOccurrenceTimeChanged()
+          + onMusicSoundOccurrenceTimeChangedPreprocess()
+          + onMusicSoundSelectedToEdition()
+          + onMusicSoundTieCheck()
+          - clearMusicSymbolSelection()
+          - createInstrumentChoiceSection()
+          - createModificationSection()
+          - createSoundDeleteSection()
+          - createSoundDurationSection()
+          - createSoundInstrumentPropertySection()
+          - createSoundOccurrenceSection()
+          - createSoundOctaveSection()
+          - createSoundPlaySection()
+          - createSoundSelectionSection()
+          - createSoundTiePropertySection()
+          - createSoundTypePropertySelection()
+          - createSoundTypeSection()
+          - redrawMusicSymbols()
+          - refreshModificationSection()
+      }
+    }
+  }
+  
+
+  SongCreatorWindow.Views.ViewManagerModelChangesHandling .up.|> SongCreatorWindow.Model.Events.IModelEvent
+  SongCreatorWindow.Views.ViewManagerModelChangesHandling .up.|> SongCreatorWindow.Model.Events.IMusicSoundEditionEvent
+  SongCreatorWindow.Views.ViewManagerModelChangesHandling .up.|> SongCreatorWindow.Model.Events.IPathEvent
+  SongCreatorWindow.Views.ViewManagerModelChangesHandling .up.|> SongCreatorWindow.Model.Events.ISoundEvent
+  SongCreatorWindow.Views.ViewManagerModelChangesHandling o-- SongCreatorWindow.Model.ModelManager : modelManager
+  SongCreatorWindow.Views.ViewMusicSymbolsSelectionHandling .up.|> SongCreatorWindow.Model.Events.IMusicSoundEditionEvent
+
+
+right footer
+
+
+PlantUML diagram generated by SketchIt! (https://bitbucket.org/pmesmeur/sketch.it)
+For more information about this tool, please contact philippe.mesmeur@gmail.com
+endfooter
+
+@enduml

@@ -1,0 +1,739 @@
+@startuml
+
+title __CORE's Class Diagram__\n
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        class SongCreatorWindow.Model.Core.Accord {
+            ~ JFugueAccordName : String
+            ~ NoteHeight : int
+            ~ TimeX : int
+            + Accord()
+            + ExtractJFugueSoundString()
+            + getAccordName()
+            + getDuration()
+            + getInstrument()
+            + getModification()
+            + getNextTiedSound()
+            + getNumericalNoteValue()
+            + getPreviousTiedSound()
+            + getSoundConcatenation()
+            + getSoundHeight()
+            + getSoundType()
+            + getTimeX()
+            + getValue()
+            + getVolume()
+            + isFlat()
+            + isSharp()
+            + isTiedWithAnotherSound()
+            + isTiedWithPreviousSound()
+            + setAccordName()
+            + setDuration()
+            + setFlatness()
+            + setInstrument()
+            + setNextTiedSound()
+            + setPreviousTiedSound()
+            + setSharpness()
+            + setSoundConcatenation()
+            + setSoundConcatenation()
+            + setSoundHeight()
+            + setTimeX()
+            + setValue()
+            + setVolume()
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        class SongCreatorWindow.Model.Core.Accord.AccordType {
+            {static} + Augmented : String
+            {static} + Augmented7th : String
+            {static} + Diminished : String
+            {static} + Diminished7th : String
+            {static} + Dominant11th : String
+            {static} + Dominant13th : String
+            {static} + Dominant13th_Sus : String
+            {static} + Dominant7th : String
+            {static} + Dominant7th_6by11 : String
+            {static} + Dominant7th_Sus : String
+            {static} + Dominant9th : String
+            {static} + Dominant_7by11 : String
+            {static} + Dominant_7by6 : String
+            {static} + Dominant_7by6_Sus : String
+            {static} + Major : String
+            {static} + Major13 : String
+            {static} + Major6th : String
+            {static} + Major7th : String
+            {static} + Major9th : String
+            {static} + MajorAdded9th : String
+            {static} + Major_6by9 : String
+            {static} + Major_7by6 : String
+            {static} + Minor : String
+            {static} + Minor11th : String
+            {static} + Minor6th : String
+            {static} + Minor7th : String
+            {static} + Minor9th : String
+            {static} + MinorAdded9th : String
+            {static} + MinorMajor7th : String
+            {static} + MinorMajor9th : String
+            {static} + Minor_6by9 : String
+            {static} + Minor_7by11 : String
+            {static} + Suspended2nd : String
+            {static} + Suspended4th : String
+            {static} + getAccordTypeNames()
+            {static} + getAccordValueByName()
+            {static} + getAugmented7thIntervals()
+            {static} + getAugmentedIntervals()
+            {static} + getDiminished7thIntervals()
+            {static} + getDiminishedIntervals()
+            {static} + getDominant11thIntervals()
+            {static} + getDominant13thIntervals()
+            {static} + getDominant13th_SusIntervals()
+            {static} + getDominant7thIntervals()
+            {static} + getDominant7th_6by11Intervals()
+            {static} + getDominant7th_SusIntervals()
+            {static} + getDominant9thIntervals()
+            {static} + getDominant_7by11Intervals()
+            {static} + getDominant_7by6Intervals()
+            {static} + getDominant_7by6_SusIntervals()
+            {static} + getIntervalsOfAccord()
+            {static} + getMajor13Intervals()
+            {static} + getMajor6thIntervals()
+            {static} + getMajor7thIntervals()
+            {static} + getMajor9thIntervals()
+            {static} + getMajorAdded9thIntervals()
+            {static} + getMajorIntervals()
+            {static} + getMajor_6by9Intervals()
+            {static} + getMajor_7by6Intervals()
+            {static} + getMinor11thIntervals()
+            {static} + getMinor6thIntervals()
+            {static} + getMinor7thIntervals()
+            {static} + getMinor9thIntervals()
+            {static} + getMinorAdded9thIntervals()
+            {static} + getMinorIntervals()
+            {static} + getMinorMajor7thIntervals()
+            {static} + getMinorMajor9thIntervals()
+            {static} + getMinor_6by9Intervals()
+            {static} + getMinor_7by11Intervals()
+            {static} + getSuspended2ndIntervals()
+            {static} + getSuspended4thIntervals()
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        class SongCreatorWindow.Model.Core.Duration {
+            {static} + Eighth : char
+            {static} + Half : char
+            {static} + One_twenty_eighth : char
+            {static} + Quarter : char
+            {static} + Sixteenth : char
+            {static} + Sixty_fourth : char
+            {static} + Thirty_second : char
+            {static} + Whole : char
+            {static} + getCharacterByDurationName()
+            {static} + getDurationNameByCharacter()
+            {static} + getDurations()
+            - Duration()
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        class SongCreatorWindow.Model.Core.GlobalLoaderDTO {
+            {static} ~ instance : GlobalLoaderDTO
+            ~ loadProject : boolean
+            ~ projectLocation : String
+            {static} + getInstance()
+            + getProjectDestinationOnce()
+            + isHereProjectToLoad()
+            + setLoadingData()
+            - GlobalLoaderDTO()
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        interface SongCreatorWindow.Model.Core.IPlayable {
+            {abstract} + ExtractJFugueSoundString()
+            {abstract} + getDuration()
+            {abstract} + getInstrument()
+            {abstract} + getModification()
+            {abstract} + getNextTiedSound()
+            {abstract} + getNumericalNoteValue()
+            {abstract} + getPreviousTiedSound()
+            {abstract} + getSoundConcatenation()
+            {abstract} + getSoundHeight()
+            {abstract} + getSoundType()
+            {abstract} + getTimeX()
+            {abstract} + getValue()
+            {abstract} + getVolume()
+            {abstract} + isFlat()
+            {abstract} + isSharp()
+            {abstract} + isTiedWithAnotherSound()
+            {abstract} + isTiedWithPreviousSound()
+            {abstract} + setDuration()
+            {abstract} + setFlatness()
+            {abstract} + setInstrument()
+            {abstract} + setNextTiedSound()
+            {abstract} + setPreviousTiedSound()
+            {abstract} + setSharpness()
+            {abstract} + setSoundConcatenation()
+            {abstract} + setSoundConcatenation()
+            {abstract} + setSoundHeight()
+            {abstract} + setTimeX()
+            {abstract} + setValue()
+            {abstract} + setVolume()
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        class SongCreatorWindow.Model.Core.Instrument {
+            {static} ~ instrumentsNames : String[]
+            {static} + getAllInstruments()
+            {static} + getInstrumentValueByChosenName()
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        abstract class SongCreatorWindow.Model.Core.Instrument.Bass {
+            {static} + ACOUSTIC_BASS : int
+            {static} + ELECTRIC_BASS_FINGER : int
+            {static} + ELECTRIC_BASS_PICK : int
+            {static} + FRETLESS_BASS : int
+            {static} + SLAP_BASS_1 : int
+            {static} + SLAP_BASS_2 : int
+            {static} + SYNTH_BASS_1 : int
+            {static} + SYNTH_BASS_2 : int
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        abstract class SongCreatorWindow.Model.Core.Instrument.Brass {
+            {static} + BRASS_SECTION : int
+            {static} + FRENCH_HORN : int
+            {static} + MUTED_TRUMPET : int
+            {static} + SYNTH_BRASS_1 : int
+            {static} + SYNTH_BRASS_2 : int
+            {static} + TROMBONE : int
+            {static} + TRUMPET : int
+            {static} + TUBA : int
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        abstract class SongCreatorWindow.Model.Core.Instrument.Chromatic_Percussion {
+            {static} + CELESTA : int
+            {static} + DULCIMER : int
+            {static} + GLOCKENSPIEL : int
+            {static} + MARIMBA : int
+            {static} + MUSIC_BOX : int
+            {static} + TUBULAR_BELLS : int
+            {static} + VIBRAPHONE : int
+            {static} + XYLOPHONE : int
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        abstract class SongCreatorWindow.Model.Core.Instrument.Ensemble {
+            {static} + CHOIR_AAHS : int
+            {static} + ORCHESTRA_HIT : int
+            {static} + STRING_ENSEMBLE_1 : int
+            {static} + STRING_ENSEMBLE_2 : int
+            {static} + SYNTH_STRINGS_1 : int
+            {static} + SYNTH_STRINGS_2 : int
+            {static} + SYNTH_VOICE : int
+            {static} + VOICE_OOHS : int
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        abstract class SongCreatorWindow.Model.Core.Instrument.Ethnic {
+            {static} + BAGPIPE : int
+            {static} + BANJO : int
+            {static} + FIDDLE : int
+            {static} + KALIMBA : int
+            {static} + KOTO : int
+            {static} + SHAMISEN : int
+            {static} + SHANAI : int
+            {static} + SITAR : int
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        abstract class SongCreatorWindow.Model.Core.Instrument.Guitar {
+            {static} + DISTORTION_GUITAR : int
+            {static} + ELECTRIC_CLEAN_GUITAR : int
+            {static} + ELECTRIC_JAZZ_GUITAR : int
+            {static} + ELECTRIC_MUTED_GUITAR : int
+            {static} + GUITAR_HARMONICS : int
+            {static} + GUITAR_or_NYLON_STRING_GUITAR : int
+            {static} + OVERDRIVEN_GUITAR : int
+            {static} + STEEL_STRING_GUITAR : int
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        abstract class SongCreatorWindow.Model.Core.Instrument.None {
+            {static} + None_Instrument : int
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        abstract class SongCreatorWindow.Model.Core.Instrument.Organ {
+            {static} + ACCORDION : int
+            {static} + CHURCH_ORGAN : int
+            {static} + DRAWBAR_ORGAN : int
+            {static} + HARMONICA : int
+            {static} + PERCUSSIVE_ORGAN : int
+            {static} + REED_ORGAN : int
+            {static} + ROCK_ORGAN : int
+            {static} + TANGO_ACCORDION : int
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        abstract class SongCreatorWindow.Model.Core.Instrument.Percussive {
+            {static} + AGOGO : int
+            {static} + MELODIC_TOM : int
+            {static} + REVERSE_CYMBAL : int
+            {static} + STEEL_DRUMS : int
+            {static} + SYNTH_DRUM : int
+            {static} + TAIKO_DRUM : int
+            {static} + TINKLE_BELL : int
+            {static} + WOODBLOCK : int
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        abstract class SongCreatorWindow.Model.Core.Instrument.Piano {
+            {static} + BRIGHT_ACOUSTIC : int
+            {static} + CLAVINET : int
+            {static} + ELECTRIC_GRAND : int
+            {static} + ELECTRIC_PIANO_1 : int
+            {static} + ELECTRIC_PIANO_2 : int
+            {static} + HARPISCHORD : int
+            {static} + HONKEY_TONK : int
+            {static} + PIANO_or_ACOUSTIC_GRAND : int
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        abstract class SongCreatorWindow.Model.Core.Instrument.Pipe {
+            {static} + BLOWN_BOTTLE : int
+            {static} + FLUTE : int
+            {static} + OCARINA : int
+            {static} + PAN_FLUTE : int
+            {static} + PICCOLO : int
+            {static} + RECORDER : int
+            {static} + SKAKUHACHI : int
+            {static} + WHISTLE : int
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        abstract class SongCreatorWindow.Model.Core.Instrument.Reed {
+            {static} + ALTO_SAX : int
+            {static} + BARITONE_SAX : int
+            {static} + BASSOON : int
+            {static} + CLARINET : int
+            {static} + ENGLISH_HORN : int
+            {static} + OBOE : int
+            {static} + SOPRANO_SAX : int
+            {static} + TENOR_SAX : int
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        abstract class SongCreatorWindow.Model.Core.Instrument.Sound_Effects {
+            {static} + APPLAUSE : int
+            {static} + BIRD_TWEET : int
+            {static} + BREATH_NOISE : int
+            {static} + GUITAR_FRET_NOISE : int
+            {static} + GUNSHOT : int
+            {static} + HELICOPTER : int
+            {static} + SEASHORE : int
+            {static} + TELEPHONE_RING : int
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        abstract class SongCreatorWindow.Model.Core.Instrument.Strings {
+            {static} + CELLO : int
+            {static} + CONTRABASS : int
+            {static} + ORCHESTRAL_STRINGS : int
+            {static} + PIZZICATO_STRINGS : int
+            {static} + TIMPANI : int
+            {static} + TREMOLO_STRING : int
+            {static} + VIOLA : int
+            {static} + VIOLIN : int
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        abstract class SongCreatorWindow.Model.Core.Instrument.Synth_Effects {
+            {static} + FX_ATMOSPHERE : int
+            {static} + FX_BRIGHTSNESS_or_BRIGHTNESS : int
+            {static} + FX_CRYSTAL_or_CRYSTAL : int
+            {static} + FX_ECHOES_or_ECHOES : int
+            {static} + FX_GOBLINS_or_GOBLINS : int
+            {static} + FX_RAIN_or_RAIN : int
+            {static} + FX_SCIFI_or_SCIFI : int
+            {static} + FX_SOUNDTRACK_or_SOUNDTRACK : int
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        abstract class SongCreatorWindow.Model.Core.Instrument.Synth_Lead {
+            {static} + LEAD_BASSLEAD_or_BASSLEAD : int
+            {static} + LEAD_CALLIOPE_or_CALLIOPE : int
+            {static} + LEAD_CHARANG_or_CHARANG : int
+            {static} + LEAD_CHIFF_or_CHIFF : int
+            {static} + LEAD_FIFTHS_or_FIFTHS : int
+            {static} + LEAD_SAWTOOTH_or_SAWTOOTH : int
+            {static} + LEAD_SQUARE_or_SQUARE : int
+            {static} + LEAD_VOICE_or_VOICE : int
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        abstract class SongCreatorWindow.Model.Core.Instrument.Synth_Pad {
+            {static} + PAD_BOWED_or_BOWED : int
+            {static} + PAD_CHOIR_or_CHOIR : int
+            {static} + PAD_HALO_or_HALO : int
+            {static} + PAD_METALLIC_or_METALLIC : int
+            {static} + PAD_NEW_AGE_or_NEW_AGE : int
+            {static} + PAD_POLYSYNTH_or_POLYSYNTH : int
+            {static} + PAD_SWEEP_or_SWEEP : int
+            {static} + PAD_WARM_or_WARM : int
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        enum MusicClefSelection {
+          AltoClef
+          BassClef
+          ViolinClef
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        class SongCreatorWindow.Model.Core.Note {
+            ~ flatness : boolean
+            ~ instrument : int
+            {static} ~ listWithFlatSoundNumericalValues : List<Integer>
+            ~ noteDuration : char
+            ~ noteHeight : int
+            ~ noteValue : String
+            ~ sharpness : boolean
+            ~ timeX : int
+            ~ volume : byte
+            {static} + CreateNote()
+            {static} + CreateNote()
+            {static} + CreateNote()
+            + ExtractJFugueSoundString()
+            + getDuration()
+            + getInstrument()
+            + getModification()
+            + getNextTiedSound()
+            {static} + getNonFlatSoundNumericalValues()
+            + getNumericalNoteValue()
+            + getPreviousTiedSound()
+            + getSoundConcatenation()
+            + getSoundHeight()
+            + getSoundType()
+            + getTimeX()
+            + getValue()
+            + getVolume()
+            + isFlat()
+            + isSharp()
+            + isTiedWithAnotherSound()
+            + isTiedWithPreviousSound()
+            {static} + mapNoteSymbolToNumericalValue()
+            {static} + mapNumericalValueOfNoteToSymbols()
+            {static} + modifySingleSound()
+            {static} + modifySingleSound()
+            + setDuration()
+            + setFlatness()
+            + setInstrument()
+            + setNextTiedSound()
+            + setPreviousTiedSound()
+            + setSharpness()
+            + setSoundConcatenation()
+            + setSoundConcatenation()
+            + setSoundHeight()
+            + setTimeX()
+            + setValue()
+            + setVolume()
+            - Note()
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        class SongCreatorWindow.Model.Core.Path {
+            ~ _pathName : String
+            ~ _selectedInstrument : String
+            ~ _sounds : List<IPlayable>
+            ~ _tempo : int
+            ~ _voice : byte
+            ~ _volumeLevel : byte
+            ~ listeners : List<IMusicSoundEditionEvent>
+            ~ nameLength : int
+            + ChangeAccordName()
+            {static} + CreatePath()
+            {static} + CreatePath()
+            {static} + CreatePath()
+            + addListener()
+            + addSound()
+            + changeSoundDuration()
+            + changeSoundHeight()
+            + changeSoundInstrument()
+            + changeSoundOccurrence()
+            + clearSelectionOfMusicSound()
+            + convertToAccord()
+            + convertToNote()
+            + deleteSound()
+            + getExtractedMusic()
+            + getIndexOfSelectedMusicSound()
+            + getInstrument()
+            + getLatestSound()
+            + getMusicClefSelection()
+            + getName()
+            + getSelectedMusicSound()
+            {static} + getSoundTimeOccurrence()
+            {static} + getSoundTimeX()
+            + getSounds()
+            + getTempo()
+            + getVoice()
+            + getVolume()
+            + setInstrument()
+            + setMusicClefSelection()
+            + setName()
+            + setSelectedMusicSound()
+            + setSoundModification()
+            + setTempo()
+            + setVoice()
+            + setVolume()
+            + toString()
+            - Path()
+            - appendToMusicListInOrder()
+            - bindSounds()
+            - fireOnAccordNameChanged()
+            - fireOnMusicSoundClearSelection()
+            - fireOnMusicSoundConvertedToAccord()
+            - fireOnMusicSoundConvertedToNote()
+            - fireOnMusicSoundDeleted()
+            - fireOnMusicSoundDurationChange()
+            - fireOnMusicSoundHeightChange()
+            - fireOnMusicSoundModified()
+            - fireOnMusicSoundOccurrenceTimeChanged()
+            - fireOnMusicSoundOccurrenceTimeChangedPreprocess()
+            - fireOnMusicSoundSelected()
+            - fireOnMusicSoundTieCheck()
+            - setUpConversion()
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        enum SoundModification {
+          Flat
+          None
+          Sharp
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        enum SoundTypeSelection {
+          Accord
+          Note
+        }
+      }
+    }
+  }
+  
+
+  namespace SongCreatorWindow {
+    namespace Model {
+      namespace Core {
+        enum TieSelection {
+          Begin
+          Continue
+          End
+          Include
+          None
+        }
+      }
+    }
+  }
+  
+
+  SongCreatorWindow.Model.Core.Accord .up.|> SongCreatorWindow.Model.Core.IPlayable
+  SongCreatorWindow.Model.Core.Accord o-- SongCreatorWindow.Model.Core.Note : rootNote
+  SongCreatorWindow.Model.Core.Accord +-down- SongCreatorWindow.Model.Core.Accord.AccordType
+  SongCreatorWindow.Model.Core.Instrument +-down- SongCreatorWindow.Model.Core.Instrument.Bass
+  SongCreatorWindow.Model.Core.Instrument +-down- SongCreatorWindow.Model.Core.Instrument.Brass
+  SongCreatorWindow.Model.Core.Instrument +-down- SongCreatorWindow.Model.Core.Instrument.Chromatic_Percussion
+  SongCreatorWindow.Model.Core.Instrument +-down- SongCreatorWindow.Model.Core.Instrument.Ensemble
+  SongCreatorWindow.Model.Core.Instrument +-down- SongCreatorWindow.Model.Core.Instrument.Ethnic
+  SongCreatorWindow.Model.Core.Instrument +-down- SongCreatorWindow.Model.Core.Instrument.Guitar
+  SongCreatorWindow.Model.Core.Instrument +-down- SongCreatorWindow.Model.Core.Instrument.None
+  SongCreatorWindow.Model.Core.Instrument +-down- SongCreatorWindow.Model.Core.Instrument.Organ
+  SongCreatorWindow.Model.Core.Instrument +-down- SongCreatorWindow.Model.Core.Instrument.Percussive
+  SongCreatorWindow.Model.Core.Instrument +-down- SongCreatorWindow.Model.Core.Instrument.Piano
+  SongCreatorWindow.Model.Core.Instrument +-down- SongCreatorWindow.Model.Core.Instrument.Pipe
+  SongCreatorWindow.Model.Core.Instrument +-down- SongCreatorWindow.Model.Core.Instrument.Reed
+  SongCreatorWindow.Model.Core.Instrument +-down- SongCreatorWindow.Model.Core.Instrument.Sound_Effects
+  SongCreatorWindow.Model.Core.Instrument +-down- SongCreatorWindow.Model.Core.Instrument.Strings
+  SongCreatorWindow.Model.Core.Instrument +-down- SongCreatorWindow.Model.Core.Instrument.Synth_Effects
+  SongCreatorWindow.Model.Core.Instrument +-down- SongCreatorWindow.Model.Core.Instrument.Synth_Lead
+  SongCreatorWindow.Model.Core.Instrument +-down- SongCreatorWindow.Model.Core.Instrument.Synth_Pad
+  SongCreatorWindow.Model.Core.Note .up.|> SongCreatorWindow.Model.Core.IPlayable
+  SongCreatorWindow.Model.Core.Note o-- SongCreatorWindow.Model.Core.SoundModification : modification
+  SongCreatorWindow.Model.Core.Note o-- SongCreatorWindow.Model.Core.IPlayable : nextTiedSound
+  SongCreatorWindow.Model.Core.Note o-- SongCreatorWindow.Model.Core.TieSelection : noteConcatenation
+  SongCreatorWindow.Model.Core.Note o-- SongCreatorWindow.Model.Core.IPlayable : previousTiedSound
+  SongCreatorWindow.Model.Core.Path .up.|> java.io.Serializable
+  SongCreatorWindow.Model.Core.Path o-- SongCreatorWindow.Model.Core.MusicClefSelection : _selectedKey
+  SongCreatorWindow.Model.Core.Path o-- SongCreatorWindow.Model.Core.IPlayable : selectedMusicSound
+
+
+right footer
+
+
+PlantUML diagram generated by SketchIt! (https://bitbucket.org/pmesmeur/sketch.it)
+For more information about this tool, please contact philippe.mesmeur@gmail.com
+endfooter
+
+@enduml
