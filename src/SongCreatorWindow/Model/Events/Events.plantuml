@@ -82,7 +82,10 @@ title __EVENTS's Class Diagram__\n
   }
   
 
-
+SongCreatorWindow.Model.Events.IMusicSoundEditionEvent -up-|> SongCreatorWindow.Model.Events.IMusicEvent
+SongCreatorWindow.Model.Events.IModelEvent -up-|> SongCreatorWindow.Model.Events.IMusicEvent
+SongCreatorWindow.Model.Events.IPathEvent -up-|> SongCreatorWindow.Model.Events.IMusicEvent
+SongCreatorWindow.Model.Events.ISoundEvent -up-|> SongCreatorWindow.Model.Events.IMusicEvent
 
 right footer
 

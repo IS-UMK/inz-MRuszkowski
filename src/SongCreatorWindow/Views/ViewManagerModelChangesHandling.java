@@ -1128,7 +1128,6 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
                     CubicCurveTo curve = (CubicCurveTo) elementsOfPath.get(1);
 
                     gc.setLineWidth(5 * GlobalSettings.strokeLineBorderWidth);
-                    gc.setLineCap(StrokeLineCap.ROUND);
                     gc.beginPath();
                     gc.moveTo(moveToPoint.getX() + moveX, moveToPoint.getY());
                     gc.bezierCurveTo(
@@ -1140,8 +1139,8 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
                             curve.getY()
                     );
 
-                    gc.closePath();
                     gc.stroke();
+                    gc.closePath();
                     gc.setLineWidth(GlobalSettings.strokeLineBorderWidth);
                 }
             }
