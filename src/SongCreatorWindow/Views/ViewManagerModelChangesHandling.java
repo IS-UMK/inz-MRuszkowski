@@ -1102,7 +1102,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
         ImageView modifiersView;
         javafx.scene.shape.Path bindingViewPath;
 
-        for(Path path : canvasMap.keySet()) {
+        for(Path path : modelManager.getPaths()) {
             currentCanvas = canvasMap.get(path);
 
             drawFiveLinesOfNewPath(currentCanvas, gc, 0, i);
