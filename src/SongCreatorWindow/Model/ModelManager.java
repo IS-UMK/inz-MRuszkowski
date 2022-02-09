@@ -307,6 +307,8 @@ public class ModelManager implements Serializable
 
     public void replaceExistingModel(ModelManager modelManager)
     {
+        GlobalSettings.loadingProject = true;
+
         clearModel();
         fireOnModelLoaded(modelManager.getTheLatestTimeX());
 
@@ -334,7 +336,8 @@ public class ModelManager implements Serializable
             IPlayable previousSave;
             IPlayable nextSave;
 
-            for(IPlayable sound : path.getSounds()) {
+            for(IPlayable sound : path.getSounds())
+            {
                 if(sound.getSoundConcatenation() != TieSelection.None)
                 {
                     GlobalSettings.tieBetweenNotes = TieSelection.Include;
@@ -367,6 +370,8 @@ public class ModelManager implements Serializable
         }
 
         GlobalSettings.tieBetweenNotes = userPrefTie;
+
+        GlobalSettings.loadingProject = false;
     }
     //endregion
 
@@ -541,6 +546,8 @@ public class ModelManager implements Serializable
      */
     public void duplicateSelectedPath() throws CannotAddAnotherPathException
     {
+        GlobalSettings.duplicatingPath = true;
+
         createPath(selectedPath.getName(), selectedPath.getInstrument(), selectedPath.getTempo(), selectedPath.getVolume(), selectedPath.getMusicClefSelection());
 
         Path newPath = getLastPath();// musicPaths.get(musicPaths.size() - 1);
@@ -552,8 +559,12 @@ public class ModelManager implements Serializable
         {
             GlobalSettings.selectedTypeOfSoundToInsertIntoPath = sound.getSoundType().equals("Note") ? SoundTypeSelection.Note : SoundTypeSelection.Accord;
 
-            if(sound.isTiedWithPreviousSound() || sound.isTiedWithAnotherSound())
+            if(sound.getSoundConcatenation() != TieSelection.None)
+            {
                 GlobalSettings.tieBetweenNotes = TieSelection.Include;
+                if(!sound.isTiedWithPreviousSound())
+                    GlobalSettings.skipBindingAfterLoad = true;
+            }
             else GlobalSettings.tieBetweenNotes = TieSelection.None;
 
             addMusicSymbol(pathIndex, sound.getTimeX(), sound.getSoundHeight(), sound.getDuration());
@@ -564,10 +575,13 @@ public class ModelManager implements Serializable
                 newPath.setSoundModification(duplicatedSound, SoundModification.Sharp);
             else if(sound.isFlat())
                 newPath.setSoundModification(duplicatedSound, SoundModification.Flat);
+
+            GlobalSettings.skipBindingAfterLoad = false;
         }
 
         newPath.setVolume(selectedPath.getVolume());
         System.out.println(String.format("Path %s duplicated successfully", selectedPath.getName()));
+        GlobalSettings.duplicatingPath = false;
     }
 
     public void changeMusicClefOfSelectedPath(MusicClefSelection musicClef)

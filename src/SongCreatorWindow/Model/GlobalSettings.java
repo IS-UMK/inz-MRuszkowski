@@ -13,7 +13,7 @@ public class GlobalSettings
      * File extension where projects data is stored
      */
     public final static String projectsExtensions = "mrinz";
-    public static boolean loadingProject = true;
+    public static boolean loadingProject = false;
     /**
      * File extension where model of HashMap "Project name --->  Project Destination Path" is stored
      */
@@ -47,6 +47,7 @@ public class GlobalSettings
      * Music Key Width setting
      */
     public static double musicClefWidth = 100.0;
+    public static boolean duplicatingPath = false;
 
     public static  double getMusicClefHeight(MusicClefSelection selection)
     {

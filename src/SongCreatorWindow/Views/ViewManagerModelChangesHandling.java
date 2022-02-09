@@ -111,7 +111,7 @@ public class ViewManagerModelChangesHandling implements IPathEvent, ISoundEvent,
     @Override
     public void onMusicSymbolAdded(Path path, IPlayable musicSound)
     {
-        if(!GlobalSettings.loadingProject)
+        if(!GlobalSettings.loadingProject && !GlobalSettings.duplicatingPath)
             new Thread(() -> {
                     player.play(musicSound.ExtractJFugueSoundString(true));
             }).start();

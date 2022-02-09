@@ -91,7 +91,6 @@ public class MainController
 
 
                 if(loader.isHereProjectToLoad()) {
-                    GlobalSettings.loadingProject = true;
                     try {
                         modelManager.replaceExistingModel(
                                 ModelManager.loadProject(
@@ -106,7 +105,6 @@ public class MainController
                 }
             }
         });
-        GlobalSettings.loadingProject = false;
     }
 
     //region Project
@@ -200,9 +198,7 @@ public class MainController
         if(alert.showAndWait().get() != ButtonType.OK)
             return;
 
-        GlobalSettings.loadingProject = true;
         modelManager.replaceExistingModel(loadedProject);
-        GlobalSettings.loadingProject = false;
     }
 
     public void ExportProjectToMIDIFile(ActionEvent actionEvent)
@@ -253,9 +249,7 @@ public class MainController
         if(alert.showAndWait().get() != ButtonType.OK)
             return;
 
-        GlobalSettings.loadingProject = true;
         modelManager.replaceExistingModel(loadedProject);
-        GlobalSettings.loadingProject = false;
     }
     //endregion
 
@@ -444,8 +438,8 @@ public class MainController
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
-                    viewManager.changeTextOfPlayMenuItem("Play");
                     viewManager.removeVisualBar();
+                    viewManager.changeTextOfPlayMenuItem("Play");
                 }
             });
         }
