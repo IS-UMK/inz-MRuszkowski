@@ -21,7 +21,7 @@ public class SongCreator extends Application
 
         Scene scene = new Scene(root, 1280, 800);
 
-        stage.setTitle("Song Creator Window");
+        stage.setTitle("Szkrabix Song Creator Window");
         stage.setScene(scene);
         stage.show();
     }

@@ -29,7 +29,7 @@ public class MainWindow extends Application{
 
         Scene scene = new Scene(root, 800, 600);
         MainStage = stage;
-        stage.setTitle("Menu Window");
+        stage.setTitle("Szkrabix Menu Window");
         stage.setScene(scene);
         stage.show();
     }

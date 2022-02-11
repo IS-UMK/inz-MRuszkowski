@@ -160,7 +160,7 @@ public class Controller
         Scene scene = new Scene(root, 1280, 800);
 
         Stage stage = new Stage();
-        stage.setTitle("Song Creator Window");
+        stage.setTitle("Szkrabix Song Creator Window");
         stage.setScene(scene);
         stage.show();
     }
@@ -175,7 +175,7 @@ public class Controller
         controller.initLoader(pathToProject);
 
         Stage stage = new Stage();
-        stage.setTitle("Song Creator Window");
+        stage.setTitle("Szkrabix Song Creator Window");
         stage.setScene(scene);
         stage.show();
     }
